@@ -1,9 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
+using SimpleECommerceBackend.Api.Extensions;
+using SimpleECommerceBackend.Application.Extensions;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddInfrastructure();
+builder.Services.AddApplication();
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>
@@ -11,40 +16,27 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-    builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-    
+
     // Use 1 in 4 ways to set version
     options.ApiVersionReader = ApiVersionReader.Combine(
         // 1. Query string
         // GET /api/products?api-version=1.0
         new QueryStringApiVersionReader("api-version"),
-        
+
         // 2. Header
         // GET /api/products
         // Header: X-Version: 1.0
         new HeaderApiVersionReader("X-Version"),
-        
+
         // 3. Media type (content negotiation)
         // GET /api/products
         // Header: Accept: application/json;ver=1.0
         new MediaTypeApiVersionReader("ver"),
-        
+
         // 4. URL segment (phổ biến nhất)
         // GET /api/v1/products
         new UrlSegmentApiVersionReader()
     );
-});
-
-builder.Services.AddVersionedApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
-});
-
 });
 
 builder.Services.AddVersionedApiExplorer(options =>
@@ -77,6 +69,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseGlobalExceptionHandler();
 app.MapControllers();
 app.Run();
-

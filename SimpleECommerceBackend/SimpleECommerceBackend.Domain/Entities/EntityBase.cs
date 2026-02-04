@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Domain.Interfaces;
+using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities;
 

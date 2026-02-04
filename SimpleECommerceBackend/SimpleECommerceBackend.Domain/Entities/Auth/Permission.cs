@@ -1,6 +1,5 @@
-namespace SimpleECommerceBackend.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Entities.Auth;
 
-public class Permission
+public class Permission : EntityBase
 {
-    
 }

@@ -1,10 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Interfaces;
+using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
-namespace SimpleECommerceBackend.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Category : EntityBase, IAuditable, ICreatedByUser, IUpdatedByUser
+public class Category : EntityBase, IAuditable, ICreationActorTrackable, IUpdateActorTrackable
 {
     private Category()
     {
@@ -23,27 +23,28 @@ public class Category : EntityBase, IAuditable, ICreatedByUser, IUpdatedByUser
     public DateTime? UpdatedAt { get; private set; }
 
     public Guid CreatedBy { get; private set; }
+
+    public void MarkCreatedBy(Guid actorId)
+    {
+        if (actorId == Guid.Empty)
+            throw new DomainException("Actor ID is required");
+
+        if (CreatedBy != Guid.Empty)
+            throw new DomainException("Creation actor of this category has already been set");
+
+        CreatedBy = actorId;
+    }
+
     public Guid? UpdatedBy { get; private set; }
 
-    internal void MarkCreated(DateTime now)
+    public void MarkUpdatedBy(Guid actorId)
     {
-        CreatedAt = now;
+        if (actorId == Guid.Empty)
+            throw new DomainException("Actor ID is required");
+
+        UpdatedBy = actorId;
     }
 
-    internal void MarkUpdated(DateTime now)
-    {
-        UpdatedAt = now;
-    }
-
-    internal void MarkCreatedBy(Guid userId)
-    {
-        CreatedBy = userId;
-    }
-
-    internal void MarkUpdatedBy(Guid userId)
-    {
-        UpdatedBy = userId;
-    }
 
     public static Category Create(string name, string? description)
     {
@@ -52,51 +53,34 @@ public class Category : EntityBase, IAuditable, ICreatedByUser, IUpdatedByUser
 
     public void SetName(string name)
     {
-        Name = NormalizeAndValidateName(name);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("Category name is required");
+
+        var trimmedName = name.Trim();
+
+        if (trimmedName.Length > CategoryConstants.NameMaxLength)
+            throw new DomainException($"Category name cannot exceed {CategoryConstants.NameMaxLength} characters");
+
+        Name = trimmedName;
     }
 
     public void SetDescription(string? description)
     {
-        Description = NormalizeAndValidateDescription(description);
-    }
-
-    public void SetCreatedBy(Guid createdBy)
-    {
-        CreatedBy = createdBy;
-    }
-
-    public void SetUpdatedBy(Guid updatedBy)
-    {
-        UpdatedBy = updatedBy;
-    }
-
-    private static string NormalizeAndValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Category name is required");
-
-        name = name.Trim();
-
-        if (name.Length > CategoryConstants.NameMaxLength)
-            throw new DomainException($"Category name cannot exceed {CategoryConstants.NameMaxLength} characters");
-
-        return name;
-    }
-
-    private static string? NormalizeAndValidateDescription(string? description)
-    {
         if (description is null)
-            return null;
+        {
+            Description = null;
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(description))
             throw new DomainException("Category description is not blank");
 
-        description = description.Trim();
+        var trimmedDescription = description.Trim();
 
-        if (description.Length > CategoryConstants.DescriptionMaxLength)
+        if (trimmedDescription.Length > CategoryConstants.DescriptionMaxLength)
             throw new DomainException(
                 $"Category description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
 
-        return description;
+        Description = trimmedDescription;
     }
 }

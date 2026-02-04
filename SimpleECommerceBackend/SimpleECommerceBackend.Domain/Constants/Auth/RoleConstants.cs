@@ -1,6 +1,6 @@
 namespace SimpleECommerceBackend.Domain.Constants.Auth;
 
-public class RoleConstants
+public static class RoleConstants
 {
-    
+    public const int NameMaxLength = 50;
 }

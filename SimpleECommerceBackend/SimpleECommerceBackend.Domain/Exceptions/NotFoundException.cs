@@ -4,7 +4,7 @@ namespace SimpleECommerceBackend.Domain.Exceptions;
 ///     Exception for not existed resource.
 ///     Maps to HTTP 404 Not Found.
 /// </summary>
-public class NotFoundException : DomainException
+public class NotFoundException : Exception
 {
     public NotFoundException(string entityName, object entityId)
         : base($"{entityName} with identifier '{entityId}' was not found")

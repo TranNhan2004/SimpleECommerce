@@ -1,11 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Interfaces;
+using SimpleECommerceBackend.Domain.Interfaces.Entities;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
-namespace SimpleECommerceBackend.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : EntityBase, IAuditable, ISoftDeletable, ICreatedByUser, IUpdatedByUser
+public class Product : EntityBase, IAuditable, ISoftDeletable, ICreationActorTrackable, IUpdateActorTrackable
 {
     private Product()
     {
@@ -25,29 +25,62 @@ public class Product : EntityBase, IAuditable, ISoftDeletable, ICreatedByUser, I
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
     public Guid CreatedBy { get; private set; }
+
+    public void MarkCreatedBy(Guid actorId)
+    {
+        if (actorId == Guid.Empty)
+            throw new DomainException("Actor ID is required");
+
+        if (CreatedBy != Guid.Empty)
+            throw new DomainException("Creation actor of this product has already been set");
+
+        CreatedBy = actorId;
+    }
+
     public bool IsDeleted { get; private set; }
     public DateTime? DeletedAt { get; private set; }
+
+    public void SoftDelete()
+    {
+        if (IsDeleted)
+            return;
+
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+    }
+
     public Guid? UpdatedBy { get; private set; }
 
-    private static string NormalizeAndValidateName(string name)
+    public void MarkUpdatedBy(Guid actorId)
+    {
+        if (actorId == Guid.Empty)
+            throw new DomainException("Actor ID is required");
+
+        UpdatedBy = actorId;
+    }
+
+    public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Product name is required");
 
-        if (name.Length > ProductConstants.NameMaxLength)
+        var trimmedName = name.Trim();
+        if (trimmedName.Length > ProductConstants.NameMaxLength)
             throw new DomainException($"Product name cannot exceed {ProductConstants.NameMaxLength} characters");
 
-        return name;
+        Name = trimmedName;
     }
 
-    private static string NormalizeAndValidateDescription(string description)
+    public void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
             throw new DomainException("Product description is required");
 
-        if (description.Length > ProductConstants.NameMaxLength)
-            throw new DomainException($"Product description cannot exceed {ProductConstants.NameMaxLength} characters");
+        var trimmedDescription = description.Trim();
+        if (trimmedDescription.Length > ProductConstants.DescriptionMaxLength)
+            throw new DomainException(
+                $"Product description cannot exceed {ProductConstants.DescriptionMaxLength} characters");
 
-        return description;
+        Description = trimmedDescription;
     }
 }

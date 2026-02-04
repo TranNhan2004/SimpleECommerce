@@ -1,6 +1,6 @@
 using SimpleECommerceBackend.Domain.ValueObjects;
 
-namespace SimpleECommerceBackend.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class ProductPrice
 {

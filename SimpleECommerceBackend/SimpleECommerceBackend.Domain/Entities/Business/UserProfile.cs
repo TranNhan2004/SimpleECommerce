@@ -1,20 +1,21 @@
 using System.Text.RegularExpressions;
 using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.Auth;
+using SimpleECommerceBackend.Domain.Entities.Auth;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Interfaces;
+using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
-namespace SimpleECommerceBackend.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class User : EntityBase, IAuditable, ISoftDeletable
+public class UserProfile : EntityBase, IAuditable, ISoftDeletable
 {
-    private User()
+    private UserProfile()
     {
     }
 
-    private User(
-        string credentialId,
+    private UserProfile(
+        Guid credentialId,
         string email,
-        string phoneNumber,
         string firstName,
         string lastName,
         DateOnly birthDate
@@ -22,18 +23,17 @@ public class User : EntityBase, IAuditable, ISoftDeletable
     {
         SetCredentialId(credentialId);
         SetEmail(email);
-        SetPhoneNumber(phoneNumber);
         SetFirstName(firstName);
         SetLastName(lastName);
         SetBirthDate(birthDate);
     }
 
 
-    public string CredentialId { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string PhoneNumber { get; private set; } = null!;
-    public string FirstName { get; private set; } = null!;
-    public string LastName { get; private set; } = null!;
+    public Guid CredentialId { get; private set; }
+    public Credential? Credential { get; private set; }
+    public string Email { get; private set; } = string.Empty;
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
     public DateOnly BirthDate { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
@@ -41,46 +41,67 @@ public class User : EntityBase, IAuditable, ISoftDeletable
     public bool IsDeleted { get; private set; }
     public DateTime? DeletedAt { get; private set; }
 
-    internal void MarkDeleted(DateTime now)
+    public void SoftDelete()
     {
+        if (IsDeleted)
+            return;
+
         IsDeleted = true;
-        DeletedAt = now;
-    }
-
-    internal void MarkCreated(DateTime now)
-    {
-        CreatedAt = now;
-    }
-
-    internal void MarkUpdated(DateTime now)
-    {
-        UpdatedAt = now;
+        DeletedAt = DateTime.UtcNow;
     }
 
 
-    public void SetCredentialId(string credentialId)
+    public void SetCredentialId(Guid credentialId)
     {
-        CredentialId = NormalizeAndValidateCredentialId(credentialId);
+        if (credentialId == Guid.Empty)
+            throw new DomainException("Credential ID is required");
+
+        CredentialId = credentialId;
     }
 
     public void SetEmail(string email)
     {
-        Email = NormalizeAndValidateEmail(email);
+        if (string.IsNullOrEmpty(email))
+            throw new DomainException("User email is required");
+
+        var trimmedEmail = email.Trim();
+
+        if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
+            throw new DomainException($"User email cannot exceed {CredentialConstants.EmailMaxLength} characters");
+
+        if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
+            throw new DomainException("User email is invalid");
+
+        Email = trimmedEmail;
     }
 
-    public void SetPhoneNumber(string phoneNumber)
-    {
-        PhoneNumber = NormalizeAndValidatePhoneNumber(phoneNumber);
-    }
 
     public void SetFirstName(string firstName)
     {
-        FirstName = NormalizeAndValidateFirstName(firstName);
+        if (string.IsNullOrEmpty(firstName))
+            throw new DomainException("User firstname is required");
+
+        var trimmedFirstName = firstName.Trim();
+
+        if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
+            throw new DomainException(
+                $"User firstname cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
+
+        FirstName = trimmedFirstName;
     }
 
     public void SetLastName(string lastName)
     {
-        LastName = NormalizeAndValidateLastName(lastName);
+        if (string.IsNullOrEmpty(lastName))
+            throw new DomainException("User lastname is required");
+
+        var trimmedLastName = lastName.Trim();
+
+        if (trimmedLastName.Length > UserProfileConstants.LastNameMaxLength)
+            throw new DomainException(
+                $"User lastname cannot exceed {UserProfileConstants.LastNameMaxLength} characters");
+
+        LastName = trimmedLastName;
     }
 
     public void SetBirthDate(DateOnly birthDate)
@@ -88,85 +109,14 @@ public class User : EntityBase, IAuditable, ISoftDeletable
         BirthDate = birthDate;
     }
 
-    public static User Create(
-        string credentialId,
+    public static UserProfile Create(
+        Guid credentialId,
         string email,
-        string phoneNumber,
         string firstName,
         string lastName,
         DateOnly birthDate
     )
     {
-        return new User(credentialId, email, phoneNumber, firstName, lastName, birthDate);
-    }
-
-
-    private static string NormalizeAndValidateCredentialId(string credentialId)
-    {
-        if (string.IsNullOrEmpty(credentialId))
-            throw new DomainException("User credential ID is required");
-
-        return credentialId.Trim();
-    }
-
-
-    private static string NormalizeAndValidateEmail(string email)
-    {
-        if (string.IsNullOrEmpty(email))
-            throw new DomainException("User email is required");
-
-        email = email.Trim();
-
-        if (email.Length > UserConstants.EmailMaxLength)
-            throw new DomainException($"User email cannot exceed {UserConstants.EmailMaxLength} characters");
-
-        if (!Regex.IsMatch(email, UserConstants.EmailPattern))
-            throw new DomainException("User email is invalid");
-
-
-        return email;
-    }
-
-    private static string NormalizeAndValidatePhoneNumber(string phoneNumber)
-    {
-        if (string.IsNullOrEmpty(phoneNumber))
-            throw new DomainException("User phoneNumber is required");
-
-        phoneNumber = phoneNumber.Trim();
-
-        if (phoneNumber.Length != UserConstants.PhoneNumberExactLength)
-            throw new ValidationException($"User phone number must have {UserConstants.PhoneNumberExactLength} digits");
-
-        if (!Regex.IsMatch(phoneNumber, UserConstants.PhoneNumberPattern))
-            throw new ValidationException("User phone number is invalid");
-
-
-        return phoneNumber;
-    }
-
-    private static string NormalizeAndValidateFirstName(string firstName)
-    {
-        if (string.IsNullOrEmpty(firstName))
-            throw new DomainException("User firstname is required");
-
-        firstName = firstName.Trim();
-
-        if (firstName.Length > UserConstants.FirstNameMaxLength)
-            throw new DomainException($"User firstname cannot exceed {UserConstants.FirstNameMaxLength} characters");
-
-        return firstName;
-    }
-
-    private static string NormalizeAndValidateLastName(string lastName)
-    {
-        if (string.IsNullOrEmpty(lastName))
-            throw new DomainException("User lastname is required");
-
-        lastName = lastName.Trim();
-
-        if (lastName.Length > UserConstants.LastNameMaxLength)
-            throw new DomainException($"User lastname cannot exceed {UserConstants.LastNameMaxLength} characters");
-
-        return lastName;
+        return new UserProfile(credentialId, email, firstName, lastName, birthDate);
     }
 }

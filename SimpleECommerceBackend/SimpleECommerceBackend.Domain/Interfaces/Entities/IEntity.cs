@@ -1,5 +1,6 @@
-namespace SimpleECommerceBackend.Domain.Interfaces;
+namespace SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 public interface IEntity
 {
+    Guid Id { get; }
 }

@@ -1,6 +1,7 @@
-namespace SimpleECommerceBackend.Domain.Interfaces;
+namespace SimpleECommerceBackend.Domain.Interfaces.Entities;
 
-public interface ICreatedByUser
+public interface ICreationActorTrackable
 {
     Guid CreatedBy { get; }
+    void MarkCreatedBy(Guid actorId);
 }

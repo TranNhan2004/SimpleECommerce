@@ -1,6 +1,7 @@
-namespace SimpleECommerceBackend.Domain.Interfaces;
+namespace SimpleECommerceBackend.Domain.Interfaces.Entities;
 
-public interface IUpdatedByUser
+public interface IUpdateActorTrackable
 {
     Guid? UpdatedBy { get; }
+    void MarkUpdatedBy(Guid actorId);
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities.Business;
 
-namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
+namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.DboSchema;
 
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {

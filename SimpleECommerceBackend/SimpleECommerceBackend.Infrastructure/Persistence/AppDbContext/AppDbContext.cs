@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace SimpleECommerceBackend.Infrastructure.Persistence.DbContext;
+namespace SimpleECommerceBackend.Infrastructure.Persistence.AppDbContext;
 
 public class AppDbContext : DbContext
 {

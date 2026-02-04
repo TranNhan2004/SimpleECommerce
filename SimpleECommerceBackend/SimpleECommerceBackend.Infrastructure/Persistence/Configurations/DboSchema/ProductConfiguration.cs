@@ -1,6 +1,5 @@
-namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
+namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.DboSchema;
 
 public class ProductConfiguration
 {
-    
 }

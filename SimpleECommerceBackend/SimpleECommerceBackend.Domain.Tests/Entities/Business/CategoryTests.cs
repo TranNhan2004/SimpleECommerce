@@ -1,9 +1,9 @@
 using FluentAssertions;
 using SimpleECommerceBackend.Domain.Constants;
-using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Domain.Tests.Entities;
+namespace SimpleECommerceBackend.Domain.Tests.Entities.Business;
 
 public class CategoryTests
 {
@@ -59,9 +59,8 @@ public class CategoryTests
         var act = () => Category.Create(name, "desc");
 
         // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Errors.Should().ContainKey("name");
-        exception.Errors["name"].Should().ContainSingle().Which.Should().Be("Category name is required");
+        var exception = act.Should().Throw<DomainException>().Which;
+        exception.Message.Should().Be("Category name is required");
     }
 
     [Fact]
@@ -74,10 +73,8 @@ public class CategoryTests
         var act = () => Category.Create(name, "desc");
 
         // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Errors.Should().ContainKey("name");
-        exception.Errors["name"].Should().ContainSingle().Which.Should()
-            .Be($"Category name cannot exceed {CategoryConstants.NameMaxLength} characters");
+        var exception = act.Should().Throw<DomainException>().Which;
+        exception.Message.Should().Be($"Category name cannot exceed {CategoryConstants.NameMaxLength} characters");
     }
 
     // ---------- Description validation ----------
@@ -90,9 +87,8 @@ public class CategoryTests
         var act = () => Category.Create("name", description);
 
         // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Errors.Should().ContainKey("description");
-        exception.Errors["description"].Should().ContainSingle().Which.Should().Be("Category description is not blank");
+        var exception = act.Should().Throw<DomainException>().Which;
+        exception.Message.Should().Be("Category description is not blank");
     }
 
 
@@ -107,9 +103,8 @@ public class CategoryTests
         var act = () => Category.Create("Books", description);
 
         // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Errors.Should().ContainKey("description");
-        exception.Errors["description"].Should().ContainSingle().Which.Should()
+        var exception = act.Should().Throw<DomainException>().Which;
+        exception.Message.Should()
             .Be($"Category description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
     }
 }

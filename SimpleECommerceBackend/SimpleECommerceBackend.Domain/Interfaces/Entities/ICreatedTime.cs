@@ -1,6 +1,6 @@
 namespace SimpleECommerceBackend.Domain.Interfaces.Entities;
 
-public class ICreatedTime
+public interface ICreatedTime
 {
-    
+    DateTimeOffset CreatedAt { get; }
 }

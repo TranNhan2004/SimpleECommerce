@@ -1,6 +1,5 @@
-namespace SimpleECommerceBackend.Domain.Constants;
+namespace SimpleECommerceBackend.Domain.Constants.Business;
 
 public class PriceConstants
 {
-    
 }

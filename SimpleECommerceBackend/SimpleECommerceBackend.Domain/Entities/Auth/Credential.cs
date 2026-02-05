@@ -5,16 +5,17 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Auth;
 
-public class Credential : EntityBase, IAuditable
+public class Credential : EntityBase, ICreatedTime, IUpdatedTime
 {
     private Credential()
     {
     }
 
-    private Credential(string email, string passwordHash)
+    private Credential(string email, string passwordHash, Guid roleId)
     {
         SetEmail(email);
         SetPasswordHash(passwordHash);
+        SetRoleId(roleId);
     }
 
     public string Email { get; private set; } = string.Empty;
@@ -22,27 +23,27 @@ public class Credential : EntityBase, IAuditable
     public Guid RoleId { get; private set; }
     public Role? Role { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
-    public DateTime? UpdatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public static Credential Create(string email, string passwordHash)
+    public static Credential Create(string email, string passwordHash, Guid roleId)
     {
-        return new Credential(email, passwordHash);
+        return new Credential(email, passwordHash, roleId);
     }
 
     public void SetEmail(string email)
     {
         if (string.IsNullOrEmpty(email))
-            throw new DomainException("Credential email is required");
+            throw new DomainException("Email is required");
 
         var trimmedEmail = email.Trim();
 
         if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
             throw new DomainException(
-                $"Credential email cannot exceed {CredentialConstants.EmailMaxLength} characters");
+                $"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
 
         if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
-            throw new DomainException("Credential email is invalid");
+            throw new DomainException("Email is invalid");
 
         Email = trimmedEmail;
     }
@@ -50,11 +51,19 @@ public class Credential : EntityBase, IAuditable
     public void SetPasswordHash(string passwordHash)
     {
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException("Credential password hash is required");
+            throw new DomainException("Password hash is required");
 
         if (passwordHash.Length < CredentialConstants.PasswordHashMinLength)
-            throw new DomainException("Credential password hash is invalid");
+            throw new DomainException("Password hash is invalid");
 
         PasswordHash = passwordHash;
+    }
+
+    public void SetRoleId(Guid roleId)
+    {
+        if (roleId == Guid.Empty)
+            throw new DomainException("Role ID is required");
+
+        RoleId = roleId;
     }
 }

@@ -1,6 +1,9 @@
 namespace SimpleECommerceBackend.Domain.Enums;
 
-public class ProductStatusEnum
+public enum ProductStatusEnum
 {
-    
+    Draft,
+    InStock,
+    OutOfStock,
+    Hidden
 }

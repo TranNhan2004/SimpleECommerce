@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Domain.Constants;
+namespace SimpleECommerceBackend.Domain.Constants.Business;
 
 public static class ProductConstants
 {

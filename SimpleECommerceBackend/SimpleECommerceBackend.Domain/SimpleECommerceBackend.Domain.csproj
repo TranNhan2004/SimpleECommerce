@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Interfaces\Repositories\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="NodaMoney" Version="2.6.0"/>
     </ItemGroup>
 

@@ -3,7 +3,7 @@ using SimpleECommerceBackend.Domain.Constants.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.UnitTests.Entities.Business;
+namespace SimpleECommerceBackend.UnitTests.Domain.Entities.Business;
 
 public class CategoryTests
 {

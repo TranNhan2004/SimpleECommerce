@@ -8,6 +8,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.Appl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.Infrastructure", "SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj", "{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6AD5D289-C7C6-4DAA-A03E-A413B090D683}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.UnitTests", "SimpleECommerceBackend.UnitTests\SimpleECommerceBackend.UnitTests.csproj", "{84DE3351-C45A-4420-BB16-F73B79D9CD72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{15D21EEC-6E42-4F88-BCE5-F313143F8CB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.IntegrationTest", "SimpleECommerceBackend.IntegrationTest\SimpleECommerceBackend.IntegrationTest.csproj", "{00DAA7A7-54F9-4A60-86F8-98630558367C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{889AEAED-ACE6-4947-A445-4908391502F5}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +43,21 @@ Global
 		{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84DE3351-C45A-4420-BB16-F73B79D9CD72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84DE3351-C45A-4420-BB16-F73B79D9CD72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84DE3351-C45A-4420-BB16-F73B79D9CD72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84DE3351-C45A-4420-BB16-F73B79D9CD72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00DAA7A7-54F9-4A60-86F8-98630558367C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00DAA7A7-54F9-4A60-86F8-98630558367C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00DAA7A7-54F9-4A60-86F8-98630558367C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00DAA7A7-54F9-4A60-86F8-98630558367C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84DE3351-C45A-4420-BB16-F73B79D9CD72} = {6AD5D289-C7C6-4DAA-A03E-A413B090D683}
+		{53AFAA90-BFAA-4748-A6F8-1615E34981DA} = {15D21EEC-6E42-4F88-BCE5-F313143F8CB1}
+		{D4060C45-FAAF-4AFE-A7BD-4D44AA3BAC57} = {15D21EEC-6E42-4F88-BCE5-F313143F8CB1}
+		{8C066C18-89D0-4E7E-AE77-01EE6837AA2B} = {15D21EEC-6E42-4F88-BCE5-F313143F8CB1}
+		{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF} = {15D21EEC-6E42-4F88-BCE5-F313143F8CB1}
+		{00DAA7A7-54F9-4A60-86F8-98630558367C} = {6AD5D289-C7C6-4DAA-A03E-A413B090D683}
 	EndGlobalSection
 EndGlobal

@@ -84,3 +84,8 @@ Desktop.ini
 
 # Linux
 *~
+
+
+# Env
+.env*
+!.env.example

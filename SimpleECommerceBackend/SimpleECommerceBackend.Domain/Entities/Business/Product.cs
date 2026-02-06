@@ -17,7 +17,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
         string name,
         string description,
         Money currentPrice,
-        ProductStatusEnum status,
+        ProductStatus status,
         Guid categoryId,
         Guid sellerId
     )
@@ -33,7 +33,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public Money CurrentPrice { get; private set; } = new(0, "VND");
-    public ProductStatusEnum Status { get; private set; }
+    public ProductStatus Status { get; private set; }
 
     public Guid CategoryId { get; private set; }
     public Category? Category { get; private set; }
@@ -88,7 +88,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
         CurrentPrice = currentPrice;
     }
 
-    public void SetStatus(ProductStatusEnum status)
+    public void SetStatus(ProductStatus status)
     {
         Status = status;
     }
@@ -113,7 +113,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
         string name,
         string description,
         Money currentPrice,
-        ProductStatusEnum status,
+        ProductStatus status,
         Guid categoryId,
         Guid sellerId
     )

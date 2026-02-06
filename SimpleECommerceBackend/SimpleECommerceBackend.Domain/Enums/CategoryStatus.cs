@@ -1,6 +1,8 @@
 namespace SimpleECommerceBackend.Domain.Enums;
 
-public class CategoryStatus
+public enum CategoryStatus
 {
-    
+    Active = 1,
+    Inactive = 2,
+    Archived = 99
 }

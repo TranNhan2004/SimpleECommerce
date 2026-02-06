@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using SimpleECommerceBackend.Domain.Constants.Auth;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
@@ -20,6 +21,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
 
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
+    public CredentialStatus Status { get; private set; }
     public Guid RoleId { get; private set; }
     public Role? Role { get; private set; }
 
@@ -52,9 +54,6 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     {
         if (string.IsNullOrWhiteSpace(passwordHash))
             throw new DomainException("Password hash is required");
-
-        if (passwordHash.Length < CredentialConstants.PasswordHashMinLength)
-            throw new DomainException("Password hash is invalid");
 
         PasswordHash = passwordHash;
     }

@@ -1,4 +1,5 @@
 using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
@@ -10,16 +11,17 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     {
     }
 
-    private Category(string name, string? description, Guid adminId)
+    private Category(string name, string? description, CategoryStatus status, Guid adminId)
     {
         SetName(name);
         SetDescription(description);
+        SetStatus(status);
         SetAdminId(adminId);
     }
 
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
-
+    public CategoryStatus Status { get; private set; }
     public Guid AdminId { get; private set; }
     public UserProfile? Admin { get; private set; }
 
@@ -60,6 +62,37 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
         Description = trimmedDescription;
     }
 
+    private void SetStatus(CategoryStatus status)
+    {
+        Status = status;
+    }
+
+    public void Activate()
+    {
+        if (Status == CategoryStatus.Archived)
+            throw new DomainException("Archived category cannot be activated");
+
+        if (Status != CategoryStatus.Active)
+            SetStatus(CategoryStatus.Active);
+    }
+
+    public void Deactivate()
+    {
+        if (Status == CategoryStatus.Archived)
+            throw new DomainException("Archived category cannot be deactivated");
+
+        if (Status != CategoryStatus.Inactive)
+            SetStatus(CategoryStatus.Inactive);
+    }
+
+    public void Archive()
+    {
+        if (Status == CategoryStatus.Archived)
+            throw new DomainException("Category already archived");
+
+        SetStatus(CategoryStatus.Archived);
+    }
+
     public void SetAdminId(Guid adminId)
     {
         if (adminId == Guid.Empty)
@@ -70,6 +103,6 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
 
     public static Category Create(string name, string? description, Guid adminId)
     {
-        return new Category(name, description, adminId);
+        return new Category(name, description, CategoryStatus.Active, adminId);
     }
 }

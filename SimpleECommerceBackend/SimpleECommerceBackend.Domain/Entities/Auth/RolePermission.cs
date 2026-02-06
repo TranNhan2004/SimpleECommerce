@@ -23,4 +23,17 @@ public class RolePermission : EntityBase
 
         RoleId = roleId;
     }
+
+    public void SetPermissionId(Guid permissionId)
+    {
+        if (permissionId == Guid.Empty)
+            throw new ArgumentException("Permission ID is required");
+
+        PermissionId = permissionId;
+    }
+
+    public static RolePermission Create(Guid roleId, Guid permissionId)
+    {
+        return new RolePermission(roleId, permissionId);
+    }
 }

@@ -10,7 +10,7 @@ using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
+public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
 {
     private UserProfile()
     {
@@ -22,7 +22,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletabl
         string firstName,
         string lastName,
         string? nickName,
-        SexEnum sex,
+        Sex sex,
         DateOnly birthDate,
         string? avatarUrl,
         IClock clock
@@ -45,22 +45,12 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletabl
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string? NickName { get; private set; }
-    public SexEnum Sex { get; private set; }
+    public Sex Sex { get; private set; }
+    public UserStatus Status { get; private set; }
     public DateOnly BirthDate { get; private set; }
     public string? AvatarUrl { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public DateTimeOffset? DeletedAt { get; private set; }
-
-    public void SoftDelete(IClock clock)
-    {
-        if (IsDeleted)
-            throw new DomainException("User profile is deleted");
-
-        IsDeleted = true;
-        DeletedAt = clock.UtcNow;
-    }
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
@@ -137,7 +127,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletabl
         NickName = trimmedNickName;
     }
 
-    public void SetSex(SexEnum sex)
+    public void SetSex(Sex sex)
     {
         Sex = sex;
     }
@@ -167,7 +157,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletabl
         string firstName,
         string lastName,
         string? nickName,
-        SexEnum sex,
+        Sex sex,
         DateOnly birthDate,
         string? avatarUrl,
         IClock clock

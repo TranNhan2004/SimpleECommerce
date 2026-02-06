@@ -1,8 +1,8 @@
 namespace SimpleECommerceBackend.Domain.Enums;
 
-public enum SexEnum
+public enum Sex
 {
-    Male,
-    Female,
-    Other
+    Male = 1,
+    Female = 2,
+    Other = 3
 }

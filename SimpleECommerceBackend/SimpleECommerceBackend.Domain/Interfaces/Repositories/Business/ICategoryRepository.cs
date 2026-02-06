@@ -1,6 +1,6 @@
 using SimpleECommerceBackend.Domain.Entities.Business;
 
-namespace SimpleECommerceBackend.Domain.Interfaces.Repositories;
+namespace SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 
 public interface ICategoryRepository
 {

@@ -1,6 +1,12 @@
 namespace SimpleECommerceBackend.Application.UseCases.Role.GetAll;
 
-public class GetAllRolesResult
+public sealed class GetAllRolesResult
 {
-    
+    public IEnumerable<RoleItem> Roles { get; init; } = [];
+
+    public sealed class RoleItem
+    {
+        public Guid Id { get; init; }
+        public string Name { get; init; } = string.Empty;
+    }
 }

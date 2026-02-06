@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Interfaces;
+namespace SimpleECommerceBackend.Application.Interfaces.Security;
 
 public interface IPasswordHasher
 {

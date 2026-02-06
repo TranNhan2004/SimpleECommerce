@@ -1,8 +1,8 @@
 using SimpleECommerceBackend.Application.Results;
 
-namespace SimpleECommerceBackend.Application.UseCases.Authentication.Errors;
+namespace SimpleECommerceBackend.Application.UseCases.Authentication;
 
-public class AuthenticationErrors
+public static class AuthenticationErrors
 {
     public static readonly Error InvalidCredentials =
         new("AUTH_INVALID_CREDENTIALS", "Invalid email or password");

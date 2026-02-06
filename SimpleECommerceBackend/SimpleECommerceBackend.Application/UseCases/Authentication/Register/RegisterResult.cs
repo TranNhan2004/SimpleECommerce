@@ -1,3 +1,6 @@
 namespace SimpleECommerceBackend.Application.UseCases.Authentication.Register;
 
-public record RegisterResult();
+public sealed class RegisterResult
+{
+    public Guid CredentialId { get; init; }
+}

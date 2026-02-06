@@ -1,6 +1,6 @@
+using MediatR;
+using SimpleECommerceBackend.Application.Results;
+
 namespace SimpleECommerceBackend.Application.UseCases.Role.GetAll;
 
-public class GetAllRolesQuery
-{
-    
-}
+public sealed record GetAllRolesQuery : IRequest<Result<GetAllRolesResult>>;

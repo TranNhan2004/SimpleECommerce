@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Common;
+namespace SimpleECommerceBackend.Application.Results;
 
 public class Result
 {

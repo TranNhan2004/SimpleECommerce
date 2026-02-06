@@ -1,9 +1,9 @@
 using FluentAssertions;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Domain.Tests.Entities.Business;
+namespace SimpleECommerceBackend.UnitTests.Entities.Business;
 
 public class CategoryTests
 {
@@ -13,24 +13,29 @@ public class CategoryTests
     public void Create_ShouldCreateCategory_WhenInputIsValid()
     {
         // Act
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
         var category = Category.Create(
             "Books",
-            "All kinds of books"
+            "All kinds of books",
+            adminId
         );
 
         // Assert
         category.Should().NotBeNull();
         category.Name.Should().Be("Books");
         category.Description.Should().Be("All kinds of books");
+        category.AdminId.Should().Be(adminId);
     }
 
     [Fact]
     public void Create_ShouldTrimNameAndDescription()
     {
         // Act
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
         var category = Category.Create(
             "  Books  ",
-            "  Description  "
+            "  Description  ",
+            adminId
         );
 
         // Assert
@@ -42,7 +47,8 @@ public class CategoryTests
     public void Create_ShouldAllowNullDescription()
     {
         // Act
-        var category = Category.Create("Books", null);
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
+        var category = Category.Create("Books", null, adminId);
 
         // Assert
         category.Description.Should().BeNull();
@@ -56,25 +62,27 @@ public class CategoryTests
     public void Create_ShouldThrow_WhenNameIsEmptyOrWhitespace(string name)
     {
         // Act
-        var act = () => Category.Create(name, "desc");
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
+        var act = () => Category.Create(name, "desc", adminId);
 
         // Assert
         var exception = act.Should().Throw<DomainException>().Which;
-        exception.Message.Should().Be("Category name is required");
+        exception.Message.Should().Be("Name is required");
     }
 
     [Fact]
     public void Create_ShouldThrow_WhenNameExceedsMaxLength()
     {
         // Arrange
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
         var name = new string('a', CategoryConstants.NameMaxLength + 1);
 
         // Act
-        var act = () => Category.Create(name, "desc");
+        var act = () => Category.Create(name, "desc", adminId);
 
         // Assert
         var exception = act.Should().Throw<DomainException>().Which;
-        exception.Message.Should().Be($"Category name cannot exceed {CategoryConstants.NameMaxLength} characters");
+        exception.Message.Should().Be($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
     }
 
     // ---------- Description validation ----------
@@ -84,11 +92,12 @@ public class CategoryTests
     public void Create_ShouldThrow_WhenDescriptionIsEmptyOrWhitespace(string description)
     {
         // Act
-        var act = () => Category.Create("name", description);
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
+        var act = () => Category.Create("name", description, adminId);
 
         // Assert
         var exception = act.Should().Throw<DomainException>().Which;
-        exception.Message.Should().Be("Category description is not blank");
+        exception.Message.Should().Be("Description is not blank");
     }
 
 
@@ -96,15 +105,31 @@ public class CategoryTests
     public void Create_ShouldThrow_WhenDescriptionExceedsMaxLength()
     {
         // Arrange
+        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
         var description =
             new string('a', CategoryConstants.DescriptionMaxLength + 1);
 
         // Act
-        var act = () => Category.Create("Books", description);
+        var act = () => Category.Create("Books", description, adminId);
 
         // Assert
         var exception = act.Should().Throw<DomainException>().Which;
         exception.Message.Should()
-            .Be($"Category description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
+            .Be($"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
+    }
+
+    // ---------- AdminId validation ----------
+    [Fact]
+    public void Create_ShouldThrow_WhenAdminIdIsEmpty()
+    {
+        // Act
+        var adminId = Guid.Empty;
+        var act = () => Category.Create("Books", null, adminId);
+
+        // Assert
+        // Assert
+        var exception = act.Should().Throw<DomainException>().Which;
+        exception.Message.Should()
+            .Be("Admin is required");
     }
 }

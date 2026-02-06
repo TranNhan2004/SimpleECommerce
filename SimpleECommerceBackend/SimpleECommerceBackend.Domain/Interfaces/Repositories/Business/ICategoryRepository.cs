@@ -6,7 +6,7 @@ public interface ICategoryRepository
 {
     Task<IEnumerable<Category>> FindAllAsync();
     Task<Category?> FindByIdAsync(Guid id);
-    Task<Category> AddAsync(Category category);
-    Task<Category> UpdateAsync(Category category);
-    Task<Category> DeleteAsync(Category category);
+    Category Add(Category category);
+    Category Update(Category category);
+    Category Delete(Category category);
 }

@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
@@ -6,8 +7,21 @@ using SimpleECommerceBackend.Application.Extensions;
 using SimpleECommerceBackend.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
-builder.Services.AddInfrastructure();
+if (env.IsDevelopment())
+{
+    var envFile = Path.Combine(
+        env.ContentRootPath,
+        ".env.development"
+    );
+
+    if (File.Exists(envFile))
+        Env.Load(envFile);
+}
+
+
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddControllers();
 

@@ -55,8 +55,7 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         switch (exception)
         {
-            case ValidationException:
-            case BusinessException:
+            case DomainException:
             case NotFoundException:
             case ConflictException:
                 // Expected exceptions - log as warning
@@ -89,35 +88,34 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         return exception switch
         {
-            ValidationException validationEx => (
+            DomainException domainException => (
                 StatusCodes.Status422UnprocessableEntity,
                 new ErrorResponse
                 {
                     Type = "https://tools.ietf.org/html/rfc4918#section-11.2",
                     Title = "One or more validation errors occurred",
                     Status = StatusCodes.Status422UnprocessableEntity,
-                    Detail = validationEx.Message,
+                    Detail = domainException.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
-                    Errors = validationEx.Errors
+                    TraceId = context.TraceIdentifier
                 }
             ),
 
-            BusinessException businessEx => (
-                StatusCodes.Status400BadRequest,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                    Title = "Business rule violation",
-                    Status = StatusCodes.Status400BadRequest,
-                    Detail = businessEx.Message,
-                    Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
-                    Extensions = businessEx.Code != null
-                        ? new Dictionary<string, object> { ["code"] = businessEx.Code }
-                        : null
-                }
-            ),
+            // BusinessException businessEx => (
+            //     StatusCodes.Status400BadRequest,
+            //     new ErrorResponse
+            //     {
+            //         Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            //         Title = "Business rule violation",
+            //         Status = StatusCodes.Status400BadRequest,
+            //         Detail = businessEx.Message,
+            //         Instance = context.Request.Path,
+            //         TraceId = context.TraceIdentifier,
+            //         Extensions = businessEx.Code != null
+            //             ? new Dictionary<string, object> { ["code"] = businessEx.Code }
+            //             : null
+            //     }
+            // ),
 
             NotFoundException notFoundEx => (
                 StatusCodes.Status404NotFound,

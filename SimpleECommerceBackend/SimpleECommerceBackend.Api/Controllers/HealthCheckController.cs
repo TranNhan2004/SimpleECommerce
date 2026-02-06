@@ -4,7 +4,7 @@ namespace SimpleECommerceBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/v{version:apiVersion}/health-check")]
-[ApiVersion("1.0", Deprecated = true)]
+[ApiVersion("1.0")]
 public class HealthCheckController : ControllerBase
 {
     [HttpGet]

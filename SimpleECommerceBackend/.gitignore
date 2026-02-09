@@ -10,6 +10,7 @@
 
 **/bin/
 **/obj/
+**/BuildHost-*/
 
 # Visual Studio
 .vs/

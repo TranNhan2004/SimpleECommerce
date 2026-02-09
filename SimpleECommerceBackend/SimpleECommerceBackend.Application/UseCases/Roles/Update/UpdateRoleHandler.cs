@@ -29,7 +29,8 @@ public sealed partial class UpdateRoleCommandHandler
 
         return new UpdateRoleResult
         {
-            RoleId = role.Id
+            Id = role.Id,
+            Name = role.Name
         };
     }
 }

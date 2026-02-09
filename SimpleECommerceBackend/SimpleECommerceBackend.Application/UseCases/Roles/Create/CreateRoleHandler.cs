@@ -23,7 +23,8 @@ public sealed partial class CreateRoleCommandHandler
 
         return new CreateRoleResult
         {
-            RoleId = role.Id
+            Id = role.Id,
+            Name = role.Name
         };
     }
 }

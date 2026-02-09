@@ -58,7 +58,8 @@ public class AppDbContext : DbContext, IUnitOfWork
 
                 modelBuilder.Entity(clrType)
                     .Property(nameof(IEntity.Id))
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("NEWSEQUENTIALID()")
+                    .ValueGeneratedOnAdd();
             }
 
             // ===== ICreatedTime =====

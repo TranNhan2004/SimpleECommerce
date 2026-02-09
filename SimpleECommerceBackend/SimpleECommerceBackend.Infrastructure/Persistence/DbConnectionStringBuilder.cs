@@ -1,14 +1,11 @@
 using DotNetEnv;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 
-public sealed class AppDbContextFactory
-    : IDesignTimeDbContextFactory<AppDbContext>
+public static class DbConnectionStringBuilder
 {
-    public AppDbContext CreateDbContext(string[] args)
+    public static string Build()
     {
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
@@ -30,10 +27,6 @@ public sealed class AppDbContextFactory
             $"Password={configuration["DB_PASSWORD"]};" +
             $"TrustServerCertificate=True;";
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlServer(connectionString)
-            .Options;
-
-        return new AppDbContext(options);
+        return connectionString;
     }
 }

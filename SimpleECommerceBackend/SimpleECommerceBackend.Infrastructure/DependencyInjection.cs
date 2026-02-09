@@ -17,7 +17,7 @@ namespace SimpleECommerceBackend.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         // Hasher
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
@@ -28,7 +28,7 @@ public static class DependencyInjection
         // Db
         services.AddScoped<AuditSaveChangesInterceptor>();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = DbConnectionStringBuilder.Build();
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString);

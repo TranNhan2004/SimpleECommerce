@@ -33,8 +33,8 @@ public partial class RoleController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetRoleByIdQuery(id));
-
-        return Ok(_mapper.Map<RoleResponse>(result));
+        var response = _mapper.Map<RoleResponse>(result);
+        return Ok(response);
     }
 
     [HttpPost]
@@ -43,10 +43,8 @@ public partial class RoleController : ControllerBase
         var command = _mapper.Map<CreateRoleCommand>(dto);
 
         var result = await _mediator.Send(command);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.RoleId });
+        var response = _mapper.Map<RoleResponse>(result);
+        return Created($"{response.Id}", response);
     }
 
     [HttpPut("{id:guid}")]
@@ -58,7 +56,7 @@ public partial class RoleController : ControllerBase
         var command = _mapper.Map<UpdateRoleCommand>((id, dto));
         var result = await _mediator.Send(command);
 
-        return Ok(new { roleId = result.RoleId });
+        return Ok(result);
     }
 
     [HttpDelete("{id:guid}")]
@@ -66,6 +64,6 @@ public partial class RoleController : ControllerBase
     {
         var result = await _mediator.Send(new DeleteRoleCommand(id));
 
-        return Ok(new { roleId = result.RoleId });
+        return Ok(result);
     }
 }

@@ -27,7 +27,7 @@ public sealed partial class DeleteRoleCommandHandler
 
         return new DeleteRoleResult
         {
-            RoleId = role.Id
+            Id = role.Id
         };
     }
 }

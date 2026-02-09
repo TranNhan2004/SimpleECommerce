@@ -8,6 +8,9 @@
 [Ll]og/
 [Ll]ogs/
 
+**/bin/
+**/obj/
+
 # Visual Studio
 .vs/
 *.suo

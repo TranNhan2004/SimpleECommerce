@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Domain.Entities.Auth;
 using SimpleECommerceBackend.Domain.Interfaces.Repositories.Auth;
-using SimpleECommerceBackend.Infrastructure.Persistence.AppDbContext;
+using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 

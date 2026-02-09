@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Api.DTOs.Responses;
+using SimpleECommerceBackend.Api.DTOs.Errors;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Api.Middleware;
@@ -111,7 +111,7 @@ public sealed class GlobalExceptionHandlerMiddleware
             //         Detail = businessEx.Message,
             //         Instance = context.Request.Path,
             //         TraceId = context.TraceIdentifier,
-            //         Extensions = businessEx.Code != null
+            //         Extensions = businessEx.Code is not null
             //             ? new Dictionary<string, object> { ["code"] = businessEx.Code }
             //             : null
             //     }
@@ -145,9 +145,10 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Detail = conflictEx.Message,
                     Instance = context.Request.Path,
                     TraceId = context.TraceIdentifier,
-                    Extensions = conflictEx.ConflictingField != null
+                    Extensions = conflictEx.EntityName is not null && conflictEx.ConflictingField is not null
                         ? new Dictionary<string, object>
                         {
+                            ["entityName"] = conflictEx.EntityName,
                             ["conflictingField"] = conflictEx.ConflictingField,
                             ["conflictingValue"] = conflictEx.ConflictingValue ?? string.Empty
                         }
@@ -178,7 +179,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Detail = forbiddenEx.Message,
                     Instance = context.Request.Path,
                     TraceId = context.TraceIdentifier,
-                    Extensions = forbiddenEx.Resource != null
+                    Extensions = forbiddenEx.Resource is not null
                         ? new Dictionary<string, object>
                         {
                             ["resource"] = forbiddenEx.Resource,

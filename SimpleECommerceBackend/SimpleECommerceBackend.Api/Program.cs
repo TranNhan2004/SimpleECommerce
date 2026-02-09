@@ -1,10 +1,13 @@
 using DotNetEnv;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
 using SimpleECommerceBackend.Api.Extensions;
-using SimpleECommerceBackend.Application.Extensions;
-using SimpleECommerceBackend.Infrastructure.Extensions;
+using SimpleECommerceBackend.Api.Mapping;
+using SimpleECommerceBackend.Application;
+using SimpleECommerceBackend.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -23,6 +26,12 @@ if (env.IsDevelopment())
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(typeof(RoleMappingConfig).Assembly);
+builder.Services.AddSingleton(mapsterConfig);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>

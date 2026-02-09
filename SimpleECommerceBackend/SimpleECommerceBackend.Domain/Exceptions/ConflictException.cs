@@ -10,13 +10,15 @@ public class ConflictException : Exception
     {
     }
 
-    public ConflictException(string message, string conflictingField, object conflictingValue)
+    public ConflictException(string entityName, string conflictingField, object conflictingValue, string message)
         : base(message)
     {
+        EntityName = entityName;
         ConflictingField = conflictingField;
         ConflictingValue = conflictingValue;
     }
 
+    public string? EntityName { get; }
     public string? ConflictingField { get; }
     public object? ConflictingValue { get; }
 }

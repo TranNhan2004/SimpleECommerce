@@ -21,9 +21,6 @@
 
     <ItemGroup>
         <Folder Include="UseCases\Category\"/>
-        <Folder Include="UseCases\Role\Create\"/>
-        <Folder Include="UseCases\Role\Delete\"/>
-        <Folder Include="UseCases\Role\Update\"/>
         <Folder Include="UseCases\UserProfile\"/>
     </ItemGroup>
 

@@ -81,9 +81,25 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
         CurrentPrice = currentPrice;
     }
 
-    public void SetStatus(ProductStatus status)
+    private void SetStatus(ProductStatus status)
     {
         Status = status;
+    }
+
+    public void Activate()
+    {
+        if (Status != ProductStatus.Draft && Status != ProductStatus.Hidden)
+            throw new DomainException("Only draft or hidden product can be activated");
+
+        Status = ProductStatus.Active;
+    }
+
+    public void Hide()
+    {
+        if (Status != ProductStatus.Draft && Status != ProductStatus.Active)
+            throw new DomainException("Only draft or active product can be hidden");
+
+        Status = ProductStatus.Hidden;
     }
 
     public void SetCategoryId(Guid categoryId)
@@ -131,17 +147,15 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     {
         _productPrices.Add(price);
     }
-
-
+    
     public static Product Create(
         string name,
         string description,
         Money currentPrice,
-        ProductStatus status,
         Guid categoryId,
         Guid sellerId
     )
     {
-        return new Product(name, description, currentPrice, status, categoryId, sellerId);
+        return new Product(name, description, currentPrice, ProductStatus.Draft, categoryId, sellerId);
     }
 }

@@ -7,6 +7,8 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
 {
+    private List<SellerWarehouse> _sellerWarehouses = [];
+    
     private SellerShop()
     {
     }
@@ -30,7 +32,9 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     public string Name { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
     public string? AvatarUrl { get; private set; }
-
+    
+    public IReadOnlyCollection<SellerWarehouse> SellerWarehouses => _sellerWarehouses;
+    
     public DateTimeOffset CreatedAt { get; private set; }
 
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -74,6 +78,29 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
             throw new DomainException("Seller is required");
 
         SellerId = sellerId;
+    }
+
+    public void AddSellerWarehouse(SellerWarehouse sellerWarehouse)
+    {
+        _sellerWarehouses.Add(sellerWarehouse);
+    }
+
+    public void ChangeSellerWarehouse(SellerWarehouse sellerWarehouse)
+    {
+        var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == sellerWarehouse.Id);
+        if (existing is null)
+            throw new DomainException("Warehouse not found");
+        
+        existing.SetFullAddress(sellerWarehouse.FullAddress);
+    }
+
+    public void RemoveSellerWarehouse(Guid id)
+    {
+        var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == id);
+        if (existing is null)
+            throw new DomainException("Warehouse not found");
+        
+        existing.SoftDelete();
     }
 
     public static SellerShop Create(

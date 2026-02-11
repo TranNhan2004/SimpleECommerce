@@ -11,12 +11,10 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
         builder.ToTable("Inventories", "dbo");
 
         builder.Property(i => i.QuantityInStock)
-            .IsRequired()
-            .HasDefaultValue(0);
+            .IsRequired();
 
         builder.Property(i => i.QuantityReserved)
-            .IsRequired()
-            .HasDefaultValue(0);
+            .IsRequired();
 
         builder.Property(i => i.Version)
             .IsRequired();

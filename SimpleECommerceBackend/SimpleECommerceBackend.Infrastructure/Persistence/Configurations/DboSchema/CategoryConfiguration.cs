@@ -14,6 +14,9 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasMaxLength(CategoryConstants.NameMaxLength);
 
+        builder.Property(c => c.Status)
+            .IsRequired();
+
         builder.Property(c => c.Description)
             .HasDefaultValue(null)
             .HasMaxLength(CategoryConstants.DescriptionMaxLength);
@@ -23,5 +26,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasForeignKey(c => c.AdminId)
             .OnDelete(DeleteBehavior.Restrict);
+        
     }
 }

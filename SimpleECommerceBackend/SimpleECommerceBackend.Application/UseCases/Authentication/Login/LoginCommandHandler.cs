@@ -37,7 +37,7 @@ public sealed partial class LoginCommandHandler
         {
             CredentialId = credential.Id,
             Email = credential.Email,
-            RoleId = credential.RoleId
+            Role = credential.Role
         };
     }
 }

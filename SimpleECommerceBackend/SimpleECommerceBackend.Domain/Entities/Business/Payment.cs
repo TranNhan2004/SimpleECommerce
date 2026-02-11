@@ -104,7 +104,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
         ExternalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
     }
 
-    public void MarkAsCompleted(string? externalTransactionId = null)
+    public void Complete(string? externalTransactionId = null)
     {
         if (Status != PaymentStatus.Pending)
             throw new DomainException("Only pending payments can be marked as completed");
@@ -115,7 +115,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
         SetStatus(PaymentStatus.Completed);
     }
 
-    public void MarkAsFailed()
+    public void Fail()
     {
         if (Status != PaymentStatus.Pending)
             throw new DomainException("Only pending payments can be marked as failed");

@@ -19,9 +19,4 @@
         <ProjectReference Include="..\SimpleECommerceBackend.Domain\SimpleECommerceBackend.Domain.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="UseCases\Category\"/>
-        <Folder Include="UseCases\User\Queries\"/>
-    </ItemGroup>
-
 </Project>

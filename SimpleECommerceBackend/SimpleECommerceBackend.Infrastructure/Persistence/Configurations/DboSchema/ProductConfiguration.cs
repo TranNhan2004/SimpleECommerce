@@ -34,25 +34,20 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Status)
             .IsRequired();
-
-        builder.Property(p => p.CategoryId)
-            .IsRequired();
-
-        builder.Property(p => p.SellerId)
-            .IsRequired();
-
+        
         builder.HasOne(p => p.Category)
             .WithMany()
+            .IsRequired()
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(p => p.Seller)
             .WithMany()
+            .IsRequired()
             .HasForeignKey(p => p.SellerId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(p => p.CategoryId);
         builder.HasIndex(p => p.SellerId);
-        builder.HasIndex(p => p.Status);
     }
 }

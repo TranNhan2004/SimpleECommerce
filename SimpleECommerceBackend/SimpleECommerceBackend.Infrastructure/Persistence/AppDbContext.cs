@@ -23,13 +23,14 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<Order> Orders => Set<Order>();
-    public DbSet<OrderShippingAddress> OrderShippingAddresses => Set<OrderShippingAddress>();
+    public DbSet<CustomerShippingAddress> CustomerShippingAddresses => Set<CustomerShippingAddress>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
-    public DbSet<CustomerShippingAddress> UserShippingAddresses => Set<CustomerShippingAddress>();
+    public DbSet<SellerShop> SellerShops => Set<SellerShop>();
+    public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
 
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

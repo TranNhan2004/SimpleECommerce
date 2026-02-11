@@ -26,7 +26,6 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(n => n.UserId);
-        builder.HasIndex(n => new { n.UserId, n.IsRead });
         builder.HasIndex(n => n.CreatedAt);
     }
 }

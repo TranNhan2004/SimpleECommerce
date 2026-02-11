@@ -149,7 +149,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
         if (Status != OrderStatus.PendingPayment)
             throw new DomainException("Only pending payment orders can be picked up");
 
-        Status = OrderStatus.ReadyToPickup;
+        SetStatus(OrderStatus.ReadyToPickup);
     }
 
     public void Ship()
@@ -157,15 +157,15 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
         if (Status != OrderStatus.ReadyToPickup)
             throw new DomainException("Only picked up orders can be shipped");
 
-        Status = OrderStatus.Shipped;
+        SetStatus(OrderStatus.Shipped);
     }
 
-    public void AwaitingConfirm()
+    public void AwaitConfirmation()
     {
         if (Status != OrderStatus.Shipped)
             throw new DomainException("Only shipped orders can be awaited confirmation");
 
-        Status = OrderStatus.AwaitingConfirmation;
+        SetStatus(OrderStatus.AwaitingConfirmation);
     }
 
     public void Deliver()
@@ -227,9 +227,9 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
 
         var trimmedName = recipientName.Trim();
 
-        if (trimmedName.Length > AddressConstants.RecipientNameMaxLength)
+        if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
             throw new DomainException(
-                $"Recipient name cannot exceed {AddressConstants.RecipientNameMaxLength} characters");
+                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters");
 
         RecipientName = trimmedName;
     }

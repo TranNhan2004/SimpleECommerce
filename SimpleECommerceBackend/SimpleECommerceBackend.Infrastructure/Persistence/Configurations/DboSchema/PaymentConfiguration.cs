@@ -16,7 +16,7 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.OrderId)
             .IsRequired();
 
-        builder.ComplexProperty(pp => pp.Money, money =>
+        builder.ComplexProperty(p => p.Money, money =>
         {
             money.Property(m => m.Amount)
                 .HasColumnName("Amount")

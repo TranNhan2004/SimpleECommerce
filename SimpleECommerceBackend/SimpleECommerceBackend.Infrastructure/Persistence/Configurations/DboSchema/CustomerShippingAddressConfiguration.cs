@@ -11,37 +11,39 @@ public class CustomerShippingAddressConfiguration : IEntityTypeConfiguration<Cus
     {
         builder.ToTable("CustomerShippingAddresses", "dbo");
 
-        builder.Property(usa => usa.RecipientName)
+        builder.Property(csa => csa.RecipientName)
             .IsRequired()
-            .HasMaxLength(AddressConstants.RecipientNameMaxLength);
+            .HasMaxLength(ShippingAddressConstants.RecipientNameMaxLength);
 
-        builder.Property(usa => usa.PhoneNumber)
+        builder.Property(csa => csa.RecipientPhoneNumber)
             .IsRequired()
-            .HasMaxLength(AddressConstants.PhoneNumberMaxLength);
+            .HasMaxLength(CommonConstants.PhoneNumberMaxLength);
+        
+        builder.ComplexProperty(csa => csa.RecipientAddress, address =>
+        {
+            address.Property(a => a.AddressLine)
+                .HasColumnName("RecipientAddressLine")
+                .IsRequired()
+                .HasMaxLength(AddressConstants.AddressLineMaxLength);
 
-        builder.Property(usa => usa.AddressLine)
+            address.Property(a => a.Province)
+                .HasColumnName("RecipientProvince")
+                .IsRequired();
+
+            address.Property(a => a.Ward)
+                .HasColumnName("RecipientWard")
+                .IsRequired();
+        });
+
+        builder.Property(csa => csa.IsDefault)
             .IsRequired();
-
-        builder.Property(usa => usa.Ward)
-            .IsRequired();
-
-        builder.Property(usa => usa.Province)
-            .IsRequired();
-
-        builder.Property(usa => usa.IsDefault)
-            .IsRequired()
-            .HasDefaultValue(false);
-
-        builder.HasOne(usa => usa.Customer)
+        
+        builder.HasOne(csa => csa.Customer)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(usa => usa.CustomerId)
+            .HasForeignKey(csa => csa.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(usa => usa.CustomerId);
-        builder.HasIndex(usa => new { usa.CustomerId, usa.IsDefault })
-            .HasFilter(
-                $"[{nameof(CustomerShippingAddress.IsDefault)}] = 1 AND [{nameof(CustomerShippingAddress.IsDeleted)}] = 0"
-            );
+        builder.HasIndex(csa => csa.CustomerId);
     }
 }

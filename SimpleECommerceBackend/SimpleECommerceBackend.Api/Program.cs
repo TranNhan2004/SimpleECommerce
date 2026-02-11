@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
 using SimpleECommerceBackend.Api.Extensions;
-using SimpleECommerceBackend.Api.Mapping;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
 
@@ -28,7 +27,6 @@ builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
 
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
-mapsterConfig.Scan(typeof(RoleMappingConfig).Assembly);
 builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SimpleECommerceBackend.Domain.Constants.Auth;
 using SimpleECommerceBackend.Domain.Constants.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 
@@ -17,6 +18,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.Note)
             .HasMaxLength(OrderConstants.NoteMaxLength);
+        
+        builder.ComplexProperty(o => o.ShippingFee, money =>
+        {
+            money.Property(m => m.Amount)
+                .HasColumnName("ShippingAmount")
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+            
+            money.Property(m => m.Currency)
+                .HasColumnName("TotalCurrency")
+                .HasMaxLength(3)
+                .IsRequired();
+        });
 
         builder.ComplexProperty(o => o.TotalPrice, money =>
         {
@@ -26,7 +40,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .IsRequired();
 
             money.Property(m => m.Currency)
-                .HasColumnName("Currency")
+                .HasColumnName("TotalCurrency")
                 .HasMaxLength(3)
                 .IsRequired();
         });
@@ -34,27 +48,70 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.Status)
             .IsRequired();
 
-        builder.Property(o => o.CustomerId)
-            .IsRequired();
+        builder.Property(o => o.ShopName)
+            .IsRequired()
+            .HasMaxLength(SellerShopConstants.NameMaxLength);
+        
+        builder.ComplexProperty(o => o.WarehouseAddress, address =>
+        {
+            address.Property(a => a.AddressLine)
+                .HasColumnName("WarehouseAddressLine")
+                .IsRequired()
+                .HasMaxLength(AddressConstants.AddressLineMaxLength);
 
-        builder.Property(o => o.OrderShippingAddressId);
+            address.Property(a => a.Province)
+                .HasColumnName("WarehouseProvince")
+                .IsRequired();
 
+            address.Property(a => a.Ward)
+                .HasColumnName("WarehouseWard")
+                .IsRequired();
+        });
+        
+        builder.Property(o => o.RecipientName)
+            .IsRequired()
+            .HasMaxLength(ShippingAddressConstants.RecipientNameMaxLength);
+
+        builder.Property(o => o.RecipientPhoneNumber)
+            .IsRequired()
+            .HasMaxLength(CommonConstants.PhoneNumberMaxLength);
+        
+        builder.ComplexProperty(o => o.RecipientAddress, address =>
+        {
+            address.Property(a => a.AddressLine)
+                .HasColumnName("RecipientAddressLine")
+                .IsRequired()
+                .HasMaxLength(AddressConstants.AddressLineMaxLength);
+
+            address.Property(a => a.Province)
+                .HasColumnName("RecipientProvince")
+                .IsRequired();
+
+            address.Property(a => a.Ward)
+                .HasColumnName("RecipientWard")
+                .IsRequired();
+        });
+
+        builder.Property(o => o.ExpiredAt)
+            .HasDefaultValue(null);
+        
         builder.HasOne(o => o.Customer)
             .WithMany()
             .IsRequired()
             .HasForeignKey(o => o.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(o => o.OrderShippingAddress)
-            .WithOne()
+        
+        builder.HasOne(o => o.Seller)
+            .WithMany()
             .IsRequired()
-            .HasForeignKey<Order>(o => o.OrderShippingAddressId)
+            .HasForeignKey(o => o.SellerId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        
         builder.HasIndex(o => o.Code)
             .IsUnique();
-
+        
         builder.HasIndex(o => o.CustomerId);
+        builder.HasIndex(o => o.SellerId);
         builder.HasIndex(o => o.Status);
         builder.HasIndex(o => o.CreatedAt);
     }

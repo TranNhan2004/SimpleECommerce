@@ -42,9 +42,9 @@ public static class DependencyInjection
         services.AddScoped<ICredentialRepository, CredentialRepository>();
 
         // Business
-        services.AddScoped<ICartItemRepository, CartItemRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICustomerShippingAddressRepository, CustomerShippingAddressRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IOrderItemRepository, OrderItemRepository>();
@@ -52,7 +52,7 @@ public static class DependencyInjection
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IUserShippingAddressRepository, UserShippingAddressRepository>();
+        services.AddScoped<ISellerShopRepository, SellerShopRepository>();
         return services;
     }
 }

@@ -31,4 +31,8 @@
         <ProjectReference Include="..\SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Mapping\" />
+    </ItemGroup>
+
 </Project>

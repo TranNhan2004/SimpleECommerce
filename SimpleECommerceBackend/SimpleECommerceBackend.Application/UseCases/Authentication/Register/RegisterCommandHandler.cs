@@ -22,7 +22,7 @@ public sealed partial class RegisterCommandHandler
         var credential = Credential.Create(
             cmd.Email,
             _passwordHasher.Hash(cmd.Password),
-            cmd.RoleId
+            cmd.Role
         );
 
         _credentialRepository.Add(credential);

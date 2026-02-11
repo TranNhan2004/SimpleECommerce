@@ -15,5 +15,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
             .IsRequired()
             .HasForeignKey<Cart>(c => c.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(c => c.CustomerId);
     }
 }

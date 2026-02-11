@@ -14,7 +14,6 @@ public class Notification : EntityBase, ICreatedTime
     {
         SetUserId(userId);
         SetMessage(message);
-        IsRead = false;
     }
 
     public Guid UserId { get; private set; }

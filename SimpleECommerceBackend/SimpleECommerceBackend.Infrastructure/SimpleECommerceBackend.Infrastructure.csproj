@@ -27,6 +27,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.2"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2"/>
+        <PackageReference Include="VN.Address" Version="1.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

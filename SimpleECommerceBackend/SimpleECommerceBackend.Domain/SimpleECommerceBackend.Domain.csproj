@@ -10,4 +10,8 @@
         <PackageReference Include="NodaMoney" Version="2.6.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="Constants\Business\PriceConstants.cs"/>
+    </ItemGroup>
+
 </Project>

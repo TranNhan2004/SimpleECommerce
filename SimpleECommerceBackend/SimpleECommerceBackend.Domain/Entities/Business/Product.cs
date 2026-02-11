@@ -2,13 +2,15 @@ using SimpleECommerceBackend.Domain.Constants.Business;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Interfaces.Entities;
-using SimpleECommerceBackend.Domain.Interfaces.Time;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
+public class Product : EntityBase, ICreatedTime, IUpdatedTime
 {
+    private readonly List<ProductImage> _productImages = [];
+    private readonly List<ProductPrice> _productPrices = [];
+
     private Product()
     {
     }
@@ -33,6 +35,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public Money CurrentPrice { get; private set; } = new(0, "VND");
+    public int TotalInStock { get; private set; }
     public ProductStatus Status { get; private set; }
 
     public Guid CategoryId { get; private set; }
@@ -40,23 +43,13 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
 
     public Guid SellerId { get; private set; }
     public UserProfile? Seller { get; private set; }
+    public IReadOnlyCollection<ProductImage> ProductImages => _productImages;
+    public IReadOnlyCollection<ProductPrice> ProductPrices => _productPrices;
+
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    public bool IsDeleted { get; private set; }
-    public DateTimeOffset? DeletedAt { get; private set; }
-
-    public void SoftDelete(IClock clock)
-    {
-        if (IsDeleted)
-            throw new DomainException("Product is deleted");
-
-        IsDeleted = true;
-        DeletedAt = clock.UtcNow;
-    }
-
     public DateTimeOffset? UpdatedAt { get; private set; }
-
 
     public void SetName(string name)
     {
@@ -108,6 +101,37 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
 
         SellerId = sellerId;
     }
+
+    public void AddImage(ProductImage image)
+    {
+        _productImages.Add(image);
+    }
+
+    public void ChangeImage(ProductImage image)
+    {
+        var existingImage = _productImages.FirstOrDefault(pi => pi.Id == image.Id);
+        if (existingImage is null)
+            throw new DomainException("Image not found");
+
+        existingImage.SetDescription(image.Description);
+        existingImage.SetDisplayOrder(image.DisplayOrder);
+        existingImage.SetIsDisplayed(image.IsDisplayed);
+    }
+
+    public void RemoveImage(Guid imageId)
+    {
+        var existingImage = _productImages.FirstOrDefault(pi => pi.Id == imageId);
+        if (existingImage is null)
+            throw new DomainException("Image not found");
+
+        _productImages.Remove(existingImage);
+    }
+
+    public void AddPrice(ProductPrice price)
+    {
+        _productPrices.Add(price);
+    }
+
 
     public static Product Create(
         string name,

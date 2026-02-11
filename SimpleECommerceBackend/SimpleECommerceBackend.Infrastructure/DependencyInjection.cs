@@ -1,17 +1,16 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces;
 using SimpleECommerceBackend.Application.Interfaces.Security;
+using SimpleECommerceBackend.Application.Interfaces.Services;
 using SimpleECommerceBackend.Domain.Interfaces.Repositories.Auth;
 using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Time;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Security;
-using SystemClock = SimpleECommerceBackend.Infrastructure.Time.SystemClock;
+using SimpleECommerceBackend.Infrastructure.Services;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -22,8 +21,8 @@ public static class DependencyInjection
         // Hasher
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
-        // Time
-        services.AddSingleton<IClock, SystemClock>();
+        // Services
+        services.AddSingleton<IAddressService, VnAddressService>();
 
         // Db
         services.AddScoped<AuditSaveChangesInterceptor>();
@@ -41,12 +40,19 @@ public static class DependencyInjection
         // Repositories
         // Auth
         services.AddScoped<ICredentialRepository, CredentialRepository>();
-        services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IPermissionRepository, PermissionRepository>();
-        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
         // Business
+        services.AddScoped<ICartItemRepository, CartItemRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUserShippingAddressRepository, UserShippingAddressRepository>();
         return services;
     }
 }

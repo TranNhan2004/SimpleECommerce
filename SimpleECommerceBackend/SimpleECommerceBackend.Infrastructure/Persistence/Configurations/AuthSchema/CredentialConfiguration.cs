@@ -17,12 +17,11 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Credential>
             .HasMaxLength(CredentialConstants.EmailMaxLength);
 
         builder.Property(c => c.PasswordHash).IsRequired();
+        builder.Property(c => c.Status).IsRequired();
 
-        builder.HasOne(c => c.Role)
-            .WithMany()
+        builder.Property(c => c.Role)
             .IsRequired()
-            .HasForeignKey(c => c.RoleId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasConversion<string>();
 
         builder.HasIndex(u => u.Email)
             .IsUnique()

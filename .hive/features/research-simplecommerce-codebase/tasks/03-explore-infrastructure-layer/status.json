@@ -1,0 +1,8 @@
+{
+  "status": "pending",
+  "origin": "plan",
+  "planTitle": "Explore Infrastructure Layer",
+  "dependsOn": [
+    "02-explore-application-layer"
+  ]
+}

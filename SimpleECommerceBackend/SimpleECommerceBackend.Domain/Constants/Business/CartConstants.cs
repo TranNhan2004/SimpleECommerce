@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Domain.Constants.Auth;
+namespace SimpleECommerceBackend.Domain.Constants.Business;
 
-public class CartConstants
+public static class CartConstants
 {
-    
+    public const int MaxQuantityPerItem = 999;
 }

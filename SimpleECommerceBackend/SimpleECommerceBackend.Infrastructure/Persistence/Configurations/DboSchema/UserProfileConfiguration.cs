@@ -32,6 +32,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(u => u.Sex).IsRequired();
         builder.Property(u => u.Status).IsRequired();
         builder.Property(u => u.BirthDate).HasDefaultValue(null);
+        builder.Property(u => u.AvatarUrl).HasDefaultValue(null);
 
         builder.HasOne(u => u.Credential)
             .WithOne()

@@ -18,8 +18,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasDefaultValue(null)
             .HasMaxLength(CategoryConstants.DescriptionMaxLength);
 
-        builder.Property(c => c.AdminId);
-
         builder.HasOne(c => c.Admin)
             .WithMany()
             .IsRequired()

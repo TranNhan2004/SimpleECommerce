@@ -16,10 +16,21 @@ public class AppDbContext : DbContext, IUnitOfWork
     }
 
     public DbSet<Credential> Credentials => Set<Credential>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderShippingAddress> OrderShippingAddresses => Set<OrderShippingAddress>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
+    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<CustomerShippingAddress> UserShippingAddresses => Set<CustomerShippingAddress>();
+
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

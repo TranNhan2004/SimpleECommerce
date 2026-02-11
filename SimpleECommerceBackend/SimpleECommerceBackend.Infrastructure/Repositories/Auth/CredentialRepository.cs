@@ -21,13 +21,6 @@ public sealed partial class CredentialRepository : ICredentialRepository
             .FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email)
-    {
-        return await _db.Credentials
-            .AsNoTracking()
-            .AnyAsync(c => c.Email == email);
-    }
-
     public Credential Add(Credential credential)
     {
         _db.Credentials.Add(credential);

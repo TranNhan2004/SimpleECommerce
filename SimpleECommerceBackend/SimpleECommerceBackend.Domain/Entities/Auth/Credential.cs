@@ -12,25 +12,25 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     {
     }
 
-    private Credential(string email, string passwordHash, Guid roleId)
+    private Credential(string email, string passwordHash, CredentialStatus status, Role role)
     {
         SetEmail(email);
         SetPasswordHash(passwordHash);
-        SetRoleId(roleId);
+        SetStatus(status);
+        SetRole(role);
     }
 
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public CredentialStatus Status { get; private set; }
-    public Guid RoleId { get; private set; }
-    public Role? Role { get; private set; }
+    public Role Role { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public static Credential Create(string email, string passwordHash, Guid roleId)
+    public static Credential Create(string email, string passwordHash, Role role)
     {
-        return new Credential(email, passwordHash, roleId);
+        return new Credential(email, passwordHash, CredentialStatus.Inactive, role);
     }
 
     public void SetEmail(string email)
@@ -58,11 +58,37 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
         PasswordHash = passwordHash;
     }
 
-    public void SetRoleId(Guid roleId)
+    private void SetStatus(CredentialStatus status)
     {
-        if (roleId == Guid.Empty)
-            throw new DomainException("Role ID is required");
+        Status = status;
+    }
 
-        RoleId = roleId;
+    public void Activate()
+    {
+        if (Status != CredentialStatus.Inactive)
+            throw new DomainException("Only inactive credentials can be activated");
+
+        Status = CredentialStatus.Active;
+    }
+
+    public void Deactivate()
+    {
+        if (Status != CredentialStatus.Active)
+            throw new DomainException("Only active credentials can be deactivated");
+
+        Status = CredentialStatus.Inactive;
+    }
+
+    public void Archive()
+    {
+        if (Status != CredentialStatus.Inactive)
+            throw new DomainException("Only inactive credentials can be archived");
+
+        Status = CredentialStatus.Archived;
+    }
+
+    public void SetRole(Role role)
+    {
+        Role = role;
     }
 }

@@ -21,7 +21,7 @@
 
     <ItemGroup>
         <Folder Include="UseCases\Category\"/>
-        <Folder Include="UseCases\UserProfile\"/>
+        <Folder Include="UseCases\User\Queries\"/>
     </ItemGroup>
 
 </Project>

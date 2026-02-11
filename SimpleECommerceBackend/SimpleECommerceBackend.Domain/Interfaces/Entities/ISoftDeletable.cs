@@ -1,5 +1,3 @@
-using SimpleECommerceBackend.Domain.Interfaces.Time;
-
 namespace SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 public interface ISoftDeletable
@@ -7,5 +5,5 @@ public interface ISoftDeletable
     bool IsDeleted { get; }
     DateTimeOffset? DeletedAt { get; }
 
-    void SoftDelete(IClock clock);
+    void SoftDelete();
 }

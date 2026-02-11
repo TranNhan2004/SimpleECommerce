@@ -5,7 +5,6 @@ using SimpleECommerceBackend.Domain.Entities.Auth;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Interfaces.Entities;
-using SimpleECommerceBackend.Domain.Interfaces.Time;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
@@ -24,8 +23,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         string? nickName,
         Sex sex,
         DateOnly birthDate,
-        string? avatarUrl,
-        IClock clock
+        string? avatarUrl
     )
     {
         SetCredentialId(credentialId);
@@ -34,7 +32,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         SetLastName(lastName);
         SetNickName(nickName);
         SetSex(sex);
-        SetBirthDate(birthDate, clock);
+        SetBirthDate(birthDate);
         SetAvatarUrl(avatarUrl);
     }
 
@@ -49,7 +47,6 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
     public UserStatus Status { get; private set; }
     public DateOnly BirthDate { get; private set; }
     public string? AvatarUrl { get; private set; }
-
     public DateTimeOffset CreatedAt { get; private set; }
 
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -132,9 +129,9 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         Sex = sex;
     }
 
-    public void SetBirthDate(DateOnly birthDate, IClock clock)
+    public void SetBirthDate(DateOnly birthDate)
     {
-        var today = DateOnly.FromDateTime(clock.UtcNow.UtcDateTime);
+        var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
 
         if (birthDate > today)
             throw new DomainException("Birth date cannot be in the future");
@@ -151,6 +148,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         AvatarUrl = avatarUrl;
     }
 
+
     public static UserProfile Create(
         Guid credentialId,
         string email,
@@ -159,10 +157,18 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         string? nickName,
         Sex sex,
         DateOnly birthDate,
-        string? avatarUrl,
-        IClock clock
+        string? avatarUrl
     )
     {
-        return new UserProfile(credentialId, email, firstName, lastName, nickName, sex, birthDate, avatarUrl, clock);
+        return new UserProfile(
+            credentialId,
+            email,
+            firstName,
+            lastName,
+            nickName,
+            sex,
+            birthDate,
+            avatarUrl
+        );
     }
 }

@@ -1,12 +1,16 @@
+using System.Text;
 using DotNetEnv;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SimpleECommerceBackend.Api.Extensions;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
+using SimpleECommerceBackend.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -23,12 +27,33 @@ if (env.IsDevelopment())
 }
 
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings.Secret))
+        };
+    });
 
 builder.Services.AddControllers();
 
@@ -91,5 +116,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseGlobalExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();

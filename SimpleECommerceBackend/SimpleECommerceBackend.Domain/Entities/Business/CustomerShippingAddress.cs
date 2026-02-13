@@ -7,33 +7,36 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
 {
-    private CustomerShippingAddress() {}
+    private CustomerShippingAddress()
+    {
+    }
 
     private CustomerShippingAddress(
         string recipientName,
         string recipientPhoneNumber,
-        Address recipientAddress, 
-        bool isDefault)
+        Address recipientAddress,
+        bool isDefault
+    )
     {
         SetRecipientName(recipientName);
         SetRecipientPhoneNumber(recipientPhoneNumber);
         SetRecipientAddress(recipientAddress);
         SetIsDefault(isDefault);
     }
-    
+
     public string RecipientName { get; private set; } = string.Empty;
     public string RecipientPhoneNumber { get; private set; } = string.Empty;
     public Address RecipientAddress { get; private set; }
-    
+
     public bool IsDefault { get; private set; }
-    
+
     public Guid CustomerId { get; private set; }
     public UserProfile? Customer { get; private set; }
-    
-    public DateTimeOffset CreatedAt { get; private set;  }
-    public DateTimeOffset? UpdatedAt { get; private set; }
+
+    public DateTimeOffset CreatedAt { get; private set; }
     public bool IsDeleted { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
+
     public void SoftDelete()
     {
         if (IsDeleted)
@@ -42,7 +45,9 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
     }
-    
+
+    public DateTimeOffset? UpdatedAt { get; private set; }
+
     public void SetRecipientName(string recipientName)
     {
         if (string.IsNullOrWhiteSpace(recipientName))
@@ -105,5 +110,4 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     {
         return new CustomerShippingAddress(recipientName, recipientPhoneNumber, recipientAddress, false);
     }
-
 }

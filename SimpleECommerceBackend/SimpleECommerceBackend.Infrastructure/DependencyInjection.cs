@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces;
 using SimpleECommerceBackend.Application.Interfaces.Security;
-using SimpleECommerceBackend.Application.Interfaces.Services;
+using SimpleECommerceBackend.Application.Interfaces.Services.Address;
+using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 using SimpleECommerceBackend.Domain.Interfaces.Repositories.Auth;
 using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
@@ -11,17 +13,30 @@ using SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Security;
 using SimpleECommerceBackend.Infrastructure.Services;
+using SimpleECommerceBackend.Infrastructure.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Email
+        services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
+        services.AddScoped<IEmailProvider, EmailProvider>();
+        services.AddSingleton<BackgroundEmailQueue>();
+        services.AddSingleton<IEmailService, SmtpEmailService>();
+        services.AddSingleton<IEmailSender, SmtpEmailSender>();
+        services.AddHostedService<EmailBackgroundWorker>();
+
         // Hasher
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
-        // Services
+        // Auth Services
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+        // Address
         services.AddSingleton<IAddressService, VnAddressService>();
 
         // Db

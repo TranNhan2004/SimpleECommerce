@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Interfaces.Services;
+namespace SimpleECommerceBackend.Application.Interfaces.Services.Address;
 
 public interface IAddressService
 {

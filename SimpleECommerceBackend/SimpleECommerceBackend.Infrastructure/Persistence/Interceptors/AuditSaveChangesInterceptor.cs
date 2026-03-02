@@ -32,12 +32,12 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
         foreach (var entry in context.ChangeTracker.Entries())
         {
             if (entry.State == EntityState.Added &&
-                entry.Entity is ICreatedTime)
-                entry.Property(nameof(ICreatedTime.CreatedAt)).CurrentValue = now;
+                entry.Entity is ICreatedTrackable)
+                entry.Property(nameof(ICreatedTrackable.CreatedAt)).CurrentValue = now;
 
             if (entry.State == EntityState.Modified &&
-                entry.Entity is IUpdatedTime)
-                entry.Property(nameof(IUpdatedTime.UpdatedAt)).CurrentValue = now;
+                entry.Entity is IUpdatedTrackable)
+                entry.Property(nameof(IUpdatedTrackable.UpdatedAt)).CurrentValue = now;
         }
     }
 }

@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;
 
-public sealed class EmailBackgroundWorker : BackgroundService
+public class EmailBackgroundWorker : BackgroundService
 {
     private readonly IEmailSender _emailSender;
     private readonly ILogger<EmailBackgroundWorker> _logger;

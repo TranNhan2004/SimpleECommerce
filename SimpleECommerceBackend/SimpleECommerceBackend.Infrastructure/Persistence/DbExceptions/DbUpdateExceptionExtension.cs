@@ -10,7 +10,7 @@ public static class DbUpdateExceptionExtensions
     {
         return ex.InnerException switch
         {
-            SqlException sql => sql.Number is 2601 or 2627, // SQL Server
+            SqlException sql => sql.Number == 2601 || sql.Number == 2627, // SQL Server
             _ => false
         };
     }

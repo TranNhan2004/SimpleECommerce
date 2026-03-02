@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
+public class Inventory : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private Inventory()
     {
@@ -19,6 +19,7 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
         SetVersion(1);
     }
 
+    public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
     public Product? Product { get; private set; }
 
@@ -42,7 +43,7 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     private void SetProductId(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new DomainException("Product is required");
+            throw new BusinessException("Product is required");
 
         ProductId = productId;
     }
@@ -50,7 +51,7 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     private void SetSellerWarehouseId(Guid sellerWarehouseId)
     {
         if (sellerWarehouseId == Guid.Empty)
-            throw new DomainException("Seller warehouse is required");
+            throw new BusinessException("Seller warehouse is required");
 
         SellerWarehouseId = sellerWarehouseId;
     }
@@ -59,10 +60,10 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     public void SetQuantityOnHand(int quantityOnHand)
     {
         if (quantityOnHand < 0)
-            throw new DomainException("Quantity on hand cannot be negative");
+            throw new BusinessException("Quantity on hand cannot be negative");
 
         if (quantityOnHand > InventoryConstants.MaxQuantity)
-            throw new DomainException($"Quantity on hand cannot exceed {InventoryConstants.MaxQuantity}");
+            throw new BusinessException($"Quantity on hand cannot exceed {InventoryConstants.MaxQuantity}");
 
         QuantityInStock = quantityOnHand;
     }
@@ -70,10 +71,10 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     public void SetQuantityReserved(int quantityReserved)
     {
         if (quantityReserved < 0)
-            throw new DomainException("Quantity reserved cannot be negative");
+            throw new BusinessException("Quantity reserved cannot be negative");
 
         if (quantityReserved > QuantityInStock)
-            throw new DomainException("Quantity reserved cannot exceed quantity on hand");
+            throw new BusinessException("Quantity reserved cannot exceed quantity on hand");
 
         QuantityReserved = quantityReserved;
     }
@@ -91,7 +92,7 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     public void AddStock(int quantity)
     {
         if (quantity <= 0)
-            throw new DomainException("Quantity to add must be positive");
+            throw new BusinessException("Quantity to add must be positive");
 
         SetQuantityOnHand(QuantityInStock + quantity);
     }
@@ -99,10 +100,10 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     public void ReserveStock(int quantity)
     {
         if (quantity <= 0)
-            throw new DomainException("Quantity to reserve must be positive");
+            throw new BusinessException("Quantity to reserve must be positive");
 
         if (AvailableQuantity < quantity)
-            throw new DomainException("Insufficient available stock");
+            throw new BusinessException("Insufficient available stock");
 
         SetQuantityReserved(QuantityReserved + quantity);
     }
@@ -110,10 +111,10 @@ public class Inventory : EntityBase, ICreatedTime, IUpdatedTime
     public void ReleaseStock(int quantity)
     {
         if (quantity <= 0)
-            throw new DomainException("Quantity to release must be positive");
+            throw new BusinessException("Quantity to release must be positive");
 
         if (QuantityReserved < quantity)
-            throw new DomainException("Cannot release more than reserved quantity");
+            throw new BusinessException("Cannot release more than reserved quantity");
 
         SetQuantityReserved(QuantityReserved - quantity);
     }

@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class SellerShopRepository : ISellerShopRepository
+public partial class SellerShopRepository : ISellerShopRepository
 {
     private readonly AppDbContext _db;
     
-    public async Task<IEnumerable<SellerShop>> FindAllAsync()
+    public async Task<IReadOnlyList<SellerShop>> FindAllAsync()
     {
         return await _db.SellerShops.ToListAsync();
     }

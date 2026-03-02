@@ -8,18 +8,18 @@ public readonly record struct Address
     public Address(string addressLine, string ward, string province)
     {
         if (string.IsNullOrWhiteSpace(addressLine))
-            throw new DomainException("Address line is required");
+            throw new BusinessException("Address line is required");
 
         var trimmedAddress = addressLine.Trim();
         if (trimmedAddress.Length > AddressConstants.AddressLineMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Address line cannot exceed {AddressConstants.AddressLineMaxLength} characters");
 
         if (string.IsNullOrWhiteSpace(ward))
-            throw new DomainException("Ward is required");
+            throw new BusinessException("Ward is required");
 
         if (string.IsNullOrWhiteSpace(province))
-            throw new DomainException("Province is required");
+            throw new BusinessException("Province is required");
 
         AddressLine = trimmedAddress;
         Ward = ward.Trim();

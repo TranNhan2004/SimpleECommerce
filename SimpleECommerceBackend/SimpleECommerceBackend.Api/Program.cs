@@ -1,5 +1,4 @@
 using System.Text;
-using DotNetEnv;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,19 +12,6 @@ using SimpleECommerceBackend.Infrastructure;
 using SimpleECommerceBackend.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
-var env = builder.Environment;
-
-if (env.IsDevelopment())
-{
-    var envFile = Path.Combine(
-        env.ContentRootPath,
-        ".env.development"
-    );
-
-    if (File.Exists(envFile))
-        Env.Load(envFile);
-}
-
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();

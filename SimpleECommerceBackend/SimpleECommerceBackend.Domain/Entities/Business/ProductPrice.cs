@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductPrice : EntityBase, ICreatedTime
+public class ProductPrice : IEntity, ICreatedTrackable
 {
     private ProductPrice()
     {
@@ -16,9 +16,10 @@ public class ProductPrice : EntityBase, ICreatedTime
         SetEffectiveFrom(effectiveFrom);
     }
 
+    public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
     public Product? Product { get; private set; }
-    public Money Money { get; private set; } = new(0, "VND");
+    public Money Money { get; private set; }
     public DateTimeOffset EffectiveFrom { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -30,7 +31,7 @@ public class ProductPrice : EntityBase, ICreatedTime
     private void SetMoney(Money money)
     {
         if (money.Amount <= 0)
-            throw new DomainException("Price amount must be positive");
+            throw new BusinessException("Price amount must be positive");
 
         Money = money;
     }

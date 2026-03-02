@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Infrastructure.Services;
+namespace SimpleECommerceBackend.Infrastructure.Services.Email;
 
-public sealed class SmtpOptions
+public class SmtpOptions
 {
     public string Host { get; init; } = string.Empty;
     public int Port { get; init; }

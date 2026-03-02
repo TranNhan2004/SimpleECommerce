@@ -6,7 +6,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Payment : EntityBase, ICreatedTime, IUpdatedTime
+public class Payment : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private Payment()
     {
@@ -26,6 +26,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
         SetStatus(PaymentStatus.Pending);
     }
 
+    public Guid Id { get; private set; }
     public Guid OrderId { get; private set; }
     public Order? Order { get; private set; }
 
@@ -51,7 +52,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
     private void SetOrderId(Guid orderId)
     {
         if (orderId == Guid.Empty)
-            throw new DomainException("Order ID is required");
+            throw new BusinessException("Order ID is required");
 
         OrderId = orderId;
     }
@@ -77,7 +78,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
         var trimmedProvider = provider.Trim();
 
         if (trimmedProvider.Length > PaymentConstants.ProviderMaxLength)
-            throw new DomainException($"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters");
+            throw new BusinessException($"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters");
 
         Provider = string.IsNullOrWhiteSpace(trimmedProvider) ? null : trimmedProvider;
     }
@@ -98,7 +99,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
         var trimmedId = externalTransactionId.Trim();
 
         if (trimmedId.Length > PaymentConstants.ExternalTransactionIdMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"External transaction ID cannot exceed {PaymentConstants.ExternalTransactionIdMaxLength} characters");
 
         ExternalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
@@ -107,7 +108,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
     public void Complete(string? externalTransactionId = null)
     {
         if (Status != PaymentStatus.Pending)
-            throw new DomainException("Only pending payments can be marked as completed");
+            throw new BusinessException("Only pending payments can be marked as completed");
 
         if (externalTransactionId != null)
             SetExternalTransactionId(externalTransactionId);
@@ -118,7 +119,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
     public void Fail()
     {
         if (Status != PaymentStatus.Pending)
-            throw new DomainException("Only pending payments can be marked as failed");
+            throw new BusinessException("Only pending payments can be marked as failed");
 
         SetStatus(PaymentStatus.Failed);
     }
@@ -126,7 +127,7 @@ public class Payment : EntityBase, ICreatedTime, IUpdatedTime
     public void Refund()
     {
         if (Status != PaymentStatus.Completed)
-            throw new DomainException("Only completed payments can be refunded");
+            throw new BusinessException("Only completed payments can be refunded");
 
         SetStatus(PaymentStatus.Refunded);
     }

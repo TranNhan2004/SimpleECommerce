@@ -2,17 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces;
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Auth;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Auth;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Security;
 using SimpleECommerceBackend.Infrastructure.Services;
+using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure;
@@ -33,7 +35,7 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
         // Auth Services
-        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddSingleton<IJwtGenerator, JwtGenerator>();
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
         // Address
@@ -42,7 +44,7 @@ public static class DependencyInjection
         // Db
         services.AddScoped<AuditSaveChangesInterceptor>();
 
-        var connectionString = DbConnectionStringBuilder.Build();
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString);
@@ -68,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ISellerShopRepository, SellerShopRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         return services;
     }
 }

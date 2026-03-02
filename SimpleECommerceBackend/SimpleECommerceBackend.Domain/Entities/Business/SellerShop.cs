@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
+public class SellerShop : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private List<SellerWarehouse> _sellerWarehouses = [];
     
@@ -26,11 +26,12 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
         SetAvatarUrl(avatarUrl);
     }
 
+    public Guid Id { get; private set; }
     public Guid SellerId { get; private set; }
     public UserProfile? Seller { get; private set; }
 
-    public string Name { get; private set; } = string.Empty;
-    public string PhoneNumber { get; private set; } = string.Empty;
+    public string Name { get; private set; } = null!;
+    public string PhoneNumber { get; private set; } = null!;
     public string? AvatarUrl { get; private set; }
     
     public IReadOnlyCollection<SellerWarehouse> SellerWarehouses => _sellerWarehouses;
@@ -42,12 +43,12 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Seller shop name is required");
+            throw new BusinessException("Seller shop name is required");
 
         var trimmedName = name.Trim();
 
         if (trimmedName.Length > SellerShopConstants.NameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters");
 
         Name = trimmedName;
@@ -56,12 +57,12 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     public void SetPhoneNumber(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
-            throw new DomainException("Phone number is required");
+            throw new BusinessException("Phone number is required");
 
         var trimmedPhoneNumber = phoneNumber.Trim();
 
         if (trimmedPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
 
         PhoneNumber = trimmedPhoneNumber;
@@ -75,7 +76,7 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new DomainException("Seller is required");
+            throw new BusinessException("Seller is required");
 
         SellerId = sellerId;
     }
@@ -89,7 +90,7 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     {
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == sellerWarehouse.Id);
         if (existing is null)
-            throw new DomainException("Warehouse not found");
+            throw new BusinessException("Warehouse not found");
         
         existing.SetFullAddress(sellerWarehouse.FullAddress);
     }
@@ -98,7 +99,7 @@ public class SellerShop : EntityBase, ICreatedTime, IUpdatedTime
     {
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == id);
         if (existing is null)
-            throw new DomainException("Warehouse not found");
+            throw new BusinessException("Warehouse not found");
         
         existing.SoftDelete();
     }

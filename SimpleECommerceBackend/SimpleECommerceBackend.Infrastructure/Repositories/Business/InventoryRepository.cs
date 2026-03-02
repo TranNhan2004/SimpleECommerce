@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class InventoryRepository : IInventoryRepository
+public partial class InventoryRepository : IInventoryRepository
 {
     private readonly AppDbContext _db;
 

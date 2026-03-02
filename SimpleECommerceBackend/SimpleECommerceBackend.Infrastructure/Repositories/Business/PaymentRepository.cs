@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class PaymentRepository : IPaymentRepository
+public partial class PaymentRepository : IPaymentRepository
 {
     private readonly AppDbContext _db;
 
@@ -21,7 +21,7 @@ public sealed partial class PaymentRepository : IPaymentRepository
             .FirstOrDefaultAsync(p => p.OrderId == orderId);
     }
 
-    public async Task<IEnumerable<Payment>> FindAllAsync()
+    public async Task<IReadOnlyList<Payment>> FindAllAsync()
     {
         return await _db.Payments
             .OrderByDescending(p => p.CreatedAt)

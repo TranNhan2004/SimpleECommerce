@@ -10,8 +10,7 @@ public sealed record UserRegisteredEvent(
 ) : INotification;
 
 [AutoConstructor]
-public sealed partial class UserRegisteredEventHandler
-    : INotificationHandler<UserRegisteredEvent>
+public sealed partial class UserRegisteredEventHandler : INotificationHandler<UserRegisteredEvent>
 {
     private readonly IEmailProvider _emailProvider;
     private readonly IEmailService _emailService;

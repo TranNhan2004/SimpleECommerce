@@ -6,7 +6,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : EntityBase, ICreatedTime, IUpdatedTime
+public class Product : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<ProductImage> _productImages = [];
     private readonly List<ProductPrice> _productPrices = [];
@@ -32,9 +32,10 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
         SetSellerId(sellerId);
     }
 
-    public string Name { get; private set; } = string.Empty;
-    public string Description { get; private set; } = string.Empty;
-    public Money CurrentPrice { get; private set; } = new(0, "VND");
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
+    public Money CurrentPrice { get; private set; }
     public int TotalInStock { get; private set; }
     public ProductStatus Status { get; private set; }
 
@@ -54,11 +55,11 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Name is required");
+            throw new BusinessException("Name is required");
 
         var trimmedName = name.Trim();
         if (trimmedName.Length > ProductConstants.NameMaxLength)
-            throw new DomainException($"Name cannot exceed {ProductConstants.NameMaxLength} characters");
+            throw new BusinessException($"Name cannot exceed {ProductConstants.NameMaxLength} characters");
 
         Name = trimmedName;
     }
@@ -66,11 +67,11 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
-            throw new DomainException("Description is required");
+            throw new BusinessException("Description is required");
 
         var trimmedDescription = description.Trim();
         if (trimmedDescription.Length > ProductConstants.DescriptionMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Description cannot exceed {ProductConstants.DescriptionMaxLength} characters");
 
         Description = trimmedDescription;
@@ -89,7 +90,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void Activate()
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Hidden)
-            throw new DomainException("Only draft or hidden product can be activated");
+            throw new BusinessException("Only draft or hidden product can be activated");
 
         Status = ProductStatus.Active;
     }
@@ -97,7 +98,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void Hide()
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Active)
-            throw new DomainException("Only draft or active product can be hidden");
+            throw new BusinessException("Only draft or active product can be hidden");
 
         Status = ProductStatus.Hidden;
     }
@@ -105,7 +106,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void SetCategoryId(Guid categoryId)
     {
         if (categoryId == Guid.Empty)
-            throw new DomainException("Category is required");
+            throw new BusinessException("Category is required");
 
         CategoryId = categoryId;
     }
@@ -113,7 +114,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new DomainException("Seller is required");
+            throw new BusinessException("Seller is required");
 
         SellerId = sellerId;
     }
@@ -127,7 +128,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     {
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == image.Id);
         if (existingImage is null)
-            throw new DomainException("Image not found");
+            throw new BusinessException("Image not found");
 
         existingImage.SetDescription(image.Description);
         existingImage.SetDisplayOrder(image.DisplayOrder);
@@ -138,7 +139,7 @@ public class Product : EntityBase, ICreatedTime, IUpdatedTime
     {
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == imageId);
         if (existingImage is null)
-            throw new DomainException("Image not found");
+            throw new BusinessException("Image not found");
 
         _productImages.Remove(existingImage);
     }

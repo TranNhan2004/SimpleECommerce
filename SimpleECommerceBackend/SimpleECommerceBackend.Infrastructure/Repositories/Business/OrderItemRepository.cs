@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class OrderItemRepository : IOrderItemRepository
+public partial class OrderItemRepository : IOrderItemRepository
 {
     private readonly AppDbContext _db;
 
-    public async Task<IEnumerable<OrderItem>> FindByOrderIdAsync(Guid orderId)
+    public async Task<IReadOnlyList<OrderItem>> FindByOrderIdAsync(Guid orderId)
     {
         return await _db.OrderItems
             .Where(oi => oi.OrderId == orderId)

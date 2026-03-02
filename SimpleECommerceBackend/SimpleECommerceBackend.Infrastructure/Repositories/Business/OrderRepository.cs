@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class OrderRepository : IOrderRepository
+public partial class OrderRepository : IOrderRepository
 {
     private readonly AppDbContext _db;
 
@@ -24,7 +24,7 @@ public sealed partial class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.Code == code);
     }
 
-    public async Task<IEnumerable<Order>> FindByCustomerIdAsync(Guid customerId)
+    public async Task<IReadOnlyList<Order>> FindByCustomerIdAsync(Guid customerId)
     {
         return await _db.Orders
             .Where(o => o.CustomerId == customerId)
@@ -32,7 +32,7 @@ public sealed partial class OrderRepository : IOrderRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Order>> FindAllAsync()
+    public async Task<IReadOnlyList<Order>> FindAllAsync()
     {
         return await _db.Orders
             .OrderByDescending(o => o.CreatedAt)

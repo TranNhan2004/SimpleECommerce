@@ -3,7 +3,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Cart : EntityBase, ICreatedTime, IUpdatedTime
+public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private Cart()
     {
@@ -13,7 +13,8 @@ public class Cart : EntityBase, ICreatedTime, IUpdatedTime
     {
         SetCustomerId(customerId);
     }
-
+    
+    public Guid Id { get; private set; }
     public Guid CustomerId { get; private set; }
     public UserProfile? Customer { get; private set; }
 
@@ -30,7 +31,7 @@ public class Cart : EntityBase, ICreatedTime, IUpdatedTime
     public void SetCustomerId(Guid customerId)
     {
         if (customerId == Guid.Empty)
-            throw new DomainException("Customer ID is required");
+            throw new BusinessException("Customer ID is required");
 
         CustomerId = customerId;
     }

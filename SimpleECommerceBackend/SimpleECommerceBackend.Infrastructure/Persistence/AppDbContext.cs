@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces;
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Domain.Entities.Auth;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Interfaces.Entities;
@@ -75,25 +76,25 @@ public class AppDbContext : DbContext, IUnitOfWork
             }
 
             // ===== ICreatedTime =====
-            if (typeof(ICreatedTime).IsAssignableFrom(clrType))
+            if (typeof(ICreatedTrackable).IsAssignableFrom(clrType))
                 modelBuilder.Entity(clrType)
-                    .Property(nameof(ICreatedTime.CreatedAt))
+                    .Property(nameof(ICreatedTrackable.CreatedAt))
                     .IsRequired();
 
             // ===== IUpdatedTime =====
-            if (typeof(IUpdatedTime).IsAssignableFrom(clrType))
+            if (typeof(IUpdatedTrackable).IsAssignableFrom(clrType))
                 modelBuilder.Entity(clrType)
-                    .Property(nameof(IUpdatedTime.UpdatedAt));
+                    .Property(nameof(IUpdatedTrackable.UpdatedAt));
 
             // ===== ISoftDeletable =====
-            if (typeof(ISoftDeletable).IsAssignableFrom(clrType))
+            if (typeof(ISoftDeleteTrackable).IsAssignableFrom(clrType))
             {
                 modelBuilder.Entity(clrType)
-                    .Property(nameof(ISoftDeletable.IsDeleted))
+                    .Property(nameof(ISoftDeleteTrackable.IsDeleted))
                     .HasDefaultValue(false);
 
                 modelBuilder.Entity(clrType)
-                    .Property(nameof(ISoftDeletable.DeletedAt));
+                    .Property(nameof(ISoftDeleteTrackable.DeletedAt));
             }
         }
     }

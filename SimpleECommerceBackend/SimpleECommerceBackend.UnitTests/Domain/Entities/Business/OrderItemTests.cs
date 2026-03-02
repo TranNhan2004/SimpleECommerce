@@ -41,7 +41,7 @@ public class OrderItemTests
         var act = () => OrderItem.Create(productId, orderId, quantity, currentPrice);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Quantity must be greater than zero");
     }
 

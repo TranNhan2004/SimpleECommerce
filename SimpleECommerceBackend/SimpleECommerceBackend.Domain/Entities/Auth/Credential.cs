@@ -6,7 +6,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Auth;
 
-public class Credential : EntityBase, ICreatedTime, IUpdatedTime
+public class Credential : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private Credential()
     {
@@ -20,6 +20,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
         SetRole(role);
     }
 
+    public Guid Id { get; private set; }
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public CredentialStatus Status { get; private set; }
@@ -36,16 +37,15 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     public void SetEmail(string email)
     {
         if (string.IsNullOrEmpty(email))
-            throw new DomainException("Email is required");
+            throw new BusinessException("Email is required");
 
         var trimmedEmail = email.Trim();
 
         if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
-            throw new DomainException(
-                $"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
+            throw new BusinessException($"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
 
         if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
-            throw new DomainException("Email is invalid");
+            throw new BusinessException("Email is invalid");
 
         Email = trimmedEmail;
     }
@@ -53,7 +53,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     public void SetPasswordHash(string passwordHash)
     {
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException("Password hash is required");
+            throw new BusinessException("Password hash is required");
 
         PasswordHash = passwordHash;
     }
@@ -66,7 +66,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     public void Activate()
     {
         if (Status != CredentialStatus.Inactive)
-            throw new DomainException("Only inactive credentials can be activated");
+            throw new BusinessException("Only inactive credentials can be activated");
 
         Status = CredentialStatus.Active;
     }
@@ -74,7 +74,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     public void Deactivate()
     {
         if (Status != CredentialStatus.Active)
-            throw new DomainException("Only active credentials can be deactivated");
+            throw new BusinessException("Only active credentials can be deactivated");
 
         Status = CredentialStatus.Inactive;
     }
@@ -82,7 +82,7 @@ public class Credential : EntityBase, ICreatedTime, IUpdatedTime
     public void Archive()
     {
         if (Status != CredentialStatus.Inactive)
-            throw new DomainException("Only inactive credentials can be archived");
+            throw new BusinessException("Only inactive credentials can be archived");
 
         Status = CredentialStatus.Archived;
     }

@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class ProductRepository : IProductRepository
+public partial class ProductRepository : IProductRepository
 {
     private readonly AppDbContext _db;
 
@@ -19,7 +19,7 @@ public sealed partial class ProductRepository : IProductRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Product>> FindAllAsync()
+    public async Task<IReadOnlyList<Product>> FindAllAsync()
     {
         return await _db.Products
             .Include(p => p.Category)

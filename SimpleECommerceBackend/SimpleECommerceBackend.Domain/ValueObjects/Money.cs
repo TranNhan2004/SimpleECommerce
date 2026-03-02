@@ -8,10 +8,10 @@ public readonly record struct Money
     public Money(decimal amount, string currency)
     {
         if (amount < 0)
-            throw new DomainException("Money amount cannot be negative");
+            throw new BusinessException("Money amount cannot be negative");
 
         if (string.IsNullOrWhiteSpace(currency))
-            throw new DomainException("Currency is required");
+            throw new BusinessException("Currency is required");
 
         try
         {
@@ -22,7 +22,7 @@ public readonly record struct Money
         }
         catch (Exception)
         {
-            throw new DomainException($"Currency '{currency}' is not supported");
+            throw new BusinessException($"Currency '{currency}' is not supported");
         }
     }
 
@@ -33,7 +33,7 @@ public readonly record struct Money
     private static void CheckSameCurrency(Money a, Money b)
     {
         if (a.Currency != b.Currency)
-            throw new DomainException($"Currency mismatch: Cannot operate between {a.Currency} and {b.Currency}");
+            throw new BusinessException($"Currency mismatch: Cannot operate between {a.Currency} and {b.Currency}");
     }
 
     public override string ToString()
@@ -54,7 +54,7 @@ public readonly record struct Money
     {
         CheckSameCurrency(a, b);
         var result = a.Amount - b.Amount;
-        if (result < 0) throw new DomainException("Result of subtraction cannot be negative");
+        if (result < 0) throw new BusinessException("Result of subtraction cannot be negative");
         return new Money(result, a.Currency);
     }
 

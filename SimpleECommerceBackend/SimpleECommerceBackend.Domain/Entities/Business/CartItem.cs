@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
+public class CartItem : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private CartItem()
     {
@@ -16,7 +16,8 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
         SetCartId(cartId);
         SetQuantity(quantity);
     }
-
+    
+    public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
     public Product? Product { get; private set; }
 
@@ -36,7 +37,7 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
     private void SetProductId(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new DomainException("Product ID is required");
+            throw new BusinessException("Product ID is required");
 
         ProductId = productId;
     }
@@ -44,7 +45,7 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
     private void SetCartId(Guid cartId)
     {
         if (cartId == Guid.Empty)
-            throw new DomainException("Cart ID is required");
+            throw new BusinessException("Cart ID is required");
 
         CartId = cartId;
     }
@@ -52,10 +53,10 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
     public void SetQuantity(int quantity)
     {
         if (quantity <= 0)
-            throw new DomainException("Quantity must be greater than zero");
+            throw new BusinessException("Quantity must be greater than zero");
 
         if (quantity > CartConstants.MaxQuantityPerItem)
-            throw new DomainException($"Quantity cannot exceed {CartConstants.MaxQuantityPerItem}");
+            throw new BusinessException($"Quantity cannot exceed {CartConstants.MaxQuantityPerItem}");
 
         Quantity = quantity;
     }
@@ -63,7 +64,7 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
     public void IncreaseQuantity(int amount)
     {
         if (amount <= 0)
-            throw new DomainException("Amount must be positive");
+            throw new BusinessException("Amount must be positive");
 
         SetQuantity(Quantity + amount);
     }
@@ -71,8 +72,10 @@ public class CartItem : EntityBase, ICreatedTime, IUpdatedTime
     public void DecreaseQuantity(int amount)
     {
         if (amount <= 0)
-            throw new DomainException("Amount must be positive");
+            throw new BusinessException("Amount must be positive");
 
         SetQuantity(Quantity - amount);
     }
+
+    
 }

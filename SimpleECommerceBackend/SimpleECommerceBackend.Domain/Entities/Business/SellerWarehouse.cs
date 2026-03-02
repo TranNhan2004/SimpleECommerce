@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerWarehouse : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
+public class SellerWarehouse : IEntity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
     private SellerWarehouse()
     {
@@ -19,6 +19,7 @@ public class SellerWarehouse : EntityBase, ICreatedTime, IUpdatedTime, ISoftDele
         SetSellerShopId(sellerShopId);
     }
 
+    public Guid Id { get; private set; }
     public Address FullAddress { get; private set; }
 
     public Guid SellerShopId { get; private set; }
@@ -32,7 +33,7 @@ public class SellerWarehouse : EntityBase, ICreatedTime, IUpdatedTime, ISoftDele
     public void SoftDelete()
     {
         if (IsDeleted)
-            throw new DomainException("Warehouse is already deleted");
+            throw new BusinessException("Warehouse is already deleted");
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
@@ -59,7 +60,7 @@ public class SellerWarehouse : EntityBase, ICreatedTime, IUpdatedTime, ISoftDele
     private void SetSellerShopId(Guid sellerShopId)
     {
         if (sellerShopId == Guid.Empty)
-            throw new DomainException("Seller shop is required");
+            throw new BusinessException("Seller shop is required");
 
         SellerShopId = sellerShopId;
     }

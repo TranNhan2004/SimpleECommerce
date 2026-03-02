@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, ISoftDeletable
+public class CustomerShippingAddress : IEntity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
     private CustomerShippingAddress()
     {
@@ -24,8 +24,9 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
         SetIsDefault(isDefault);
     }
 
-    public string RecipientName { get; private set; } = string.Empty;
-    public string RecipientPhoneNumber { get; private set; } = string.Empty;
+    public Guid Id { get; private set; }
+    public string RecipientName { get; private set; } = null!;
+    public string RecipientPhoneNumber { get; private set; } = null!;
     public Address RecipientAddress { get; private set; }
 
     public bool IsDefault { get; private set; }
@@ -40,7 +41,7 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     public void SoftDelete()
     {
         if (IsDeleted)
-            throw new DomainException("Address has beed deleted");
+            throw new BusinessException("Address has beed deleted");
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
@@ -51,12 +52,12 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     public void SetRecipientName(string recipientName)
     {
         if (string.IsNullOrWhiteSpace(recipientName))
-            throw new DomainException("Recipient name is required");
+            throw new BusinessException("Recipient name is required");
 
         var trimmedName = recipientName.Trim();
 
         if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters");
 
         RecipientName = trimmedName;
@@ -65,12 +66,12 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     public void SetRecipientPhoneNumber(string recipientPhoneNumber)
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new DomainException("Recipient phone number is required");
+            throw new BusinessException("Recipient phone number is required");
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
         if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
 
         RecipientPhoneNumber = trimmedRecipientPhoneNumber;
@@ -89,7 +90,7 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     public void MarkAsDefault()
     {
         if (IsDefault)
-            throw new DomainException("Address is default");
+            throw new BusinessException("Address is default");
 
         SetIsDefault(true);
     }
@@ -97,7 +98,7 @@ public class CustomerShippingAddress : EntityBase, ICreatedTime, IUpdatedTime, I
     public void RemoveDefault()
     {
         if (!IsDefault)
-            throw new DomainException("Address is not default");
+            throw new BusinessException("Address is not default");
 
         SetIsDefault(false);
     }

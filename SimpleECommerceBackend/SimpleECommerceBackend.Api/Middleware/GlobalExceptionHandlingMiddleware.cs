@@ -55,7 +55,7 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         switch (exception)
         {
-            case DomainException:
+            case BusinessException:
             case NotFoundException:
             case ConflictException:
                 // Expected exceptions - log as warning
@@ -88,7 +88,7 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         return exception switch
         {
-            DomainException domainException => (
+            BusinessException domainException => (
                 StatusCodes.Status422UnprocessableEntity,
                 new ErrorResponse
                 {

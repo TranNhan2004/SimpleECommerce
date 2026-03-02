@@ -9,7 +9,7 @@ using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
+public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private UserProfile()
     {
@@ -36,12 +36,12 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         SetAvatarUrl(avatarUrl);
     }
 
-
+        public Guid Id { get; private set; }
     public Guid CredentialId { get; private set; }
     public Credential? Credential { get; private set; }
-    public string Email { get; private set; } = string.Empty;
-    public string FirstName { get; private set; } = string.Empty;
-    public string LastName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = null!;
+    public string FirstName { get; private set; } = null!;
+    public string LastName { get; private set; } = null!;
     public string? NickName { get; private set; }
     public Sex Sex { get; private set; }
     public UserStatus Status { get; private set; }
@@ -55,7 +55,7 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
     public void SetCredentialId(Guid credentialId)
     {
         if (credentialId == Guid.Empty)
-            throw new DomainException("Credential is required");
+            throw new BusinessException("Credential is required");
 
         CredentialId = credentialId;
     }
@@ -63,15 +63,15 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
     public void SetEmail(string email)
     {
         if (string.IsNullOrEmpty(email))
-            throw new DomainException("Email is required");
+            throw new BusinessException("Email is required");
 
         var trimmedEmail = email.Trim();
 
         if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
-            throw new DomainException($"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
+            throw new BusinessException($"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
 
         if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
-            throw new DomainException("Email is invalid");
+            throw new BusinessException("Email is invalid");
 
         Email = trimmedEmail;
     }
@@ -80,12 +80,12 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
     public void SetFirstName(string firstName)
     {
         if (string.IsNullOrEmpty(firstName))
-            throw new DomainException("First name is required");
+            throw new BusinessException("First name is required");
 
         var trimmedFirstName = firstName.Trim();
 
         if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
 
         FirstName = trimmedFirstName;
@@ -94,12 +94,12 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
     public void SetLastName(string lastName)
     {
         if (string.IsNullOrEmpty(lastName))
-            throw new DomainException("Last name is required");
+            throw new BusinessException("Last name is required");
 
         var trimmedLastName = lastName.Trim();
 
         if (trimmedLastName.Length > UserProfileConstants.LastNameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Last name cannot exceed {UserProfileConstants.LastNameMaxLength} characters");
 
         LastName = trimmedLastName;
@@ -114,12 +114,12 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         }
 
         if (string.IsNullOrWhiteSpace(nickName))
-            throw new DomainException("Nick name is not blank");
+            throw new BusinessException("Nick name is not blank");
 
         var trimmedNickName = nickName.Trim();
 
         if (trimmedNickName.Length > UserProfileConstants.NickNameMaxLength)
-            throw new DomainException($"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters");
+            throw new BusinessException($"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters");
 
         NickName = trimmedNickName;
     }
@@ -134,10 +134,13 @@ public class UserProfile : EntityBase, ICreatedTime, IUpdatedTime
         var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
 
         if (birthDate > today)
-            throw new DomainException("Birth date cannot be in the future");
+            throw new BusinessException("Birth date cannot be in the future");
 
-        if (AgeCalculator.Calculate(birthDate, today) < UserProfileConstants.MinAge)
-            throw new DomainException($"Age cannot be less than {UserProfileConstants.MinAge} years");
+        if (AgeUtils.Calculate(birthDate, today) < UserProfileConstants.MinAge)
+            throw new BusinessException($"Age cannot be less than {UserProfileConstants.MinAge} years");
+        
+        if (AgeUtils.Calculate(birthDate, today) > UserProfileConstants.MaxAge)
+            throw new BusinessException($"Age cannot exceed than {UserProfileConstants.MaxAge} years");
 
         BirthDate = birthDate;
     }

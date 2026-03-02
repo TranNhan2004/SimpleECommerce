@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Notification : EntityBase, ICreatedTime
+public class Notification : IEntity, ICreatedTrackable
 {
     private Notification()
     {
@@ -16,10 +16,11 @@ public class Notification : EntityBase, ICreatedTime
         SetMessage(message);
     }
 
+    public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public UserProfile? User { get; private set; }
 
-    public string Message { get; private set; } = string.Empty;
+    public string Message { get; private set; } = null!;
     public bool IsRead { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -32,7 +33,7 @@ public class Notification : EntityBase, ICreatedTime
     private void SetUserId(Guid userId)
     {
         if (userId == Guid.Empty)
-            throw new DomainException("User ID is required");
+            throw new BusinessException("User ID is required");
 
         UserId = userId;
     }
@@ -40,12 +41,12 @@ public class Notification : EntityBase, ICreatedTime
     private void SetMessage(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
-            throw new DomainException("Message is required");
+            throw new BusinessException("Message is required");
 
         var trimmedMessage = message.Trim();
 
         if (trimmedMessage.Length > NotificationConstants.MessageMaxLength)
-            throw new DomainException($"Message cannot exceed {NotificationConstants.MessageMaxLength} characters");
+            throw new BusinessException($"Message cannot exceed {NotificationConstants.MessageMaxLength} characters");
 
         Message = trimmedMessage;
     }
@@ -53,7 +54,7 @@ public class Notification : EntityBase, ICreatedTime
     public void MarkAsRead()
     {
         if (IsRead)
-            throw new DomainException("Notification is already marked as read");
+            throw new BusinessException("Notification is already marked as read");
 
         IsRead = true;
     }

@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Auth;
 using SimpleECommerceBackend.Domain.Entities.Auth;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Auth;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 
 [AutoConstructor]
-public sealed partial class CredentialRepository : ICredentialRepository
+public partial class CredentialRepository : ICredentialRepository
 {
     private readonly AppDbContext _db;
 

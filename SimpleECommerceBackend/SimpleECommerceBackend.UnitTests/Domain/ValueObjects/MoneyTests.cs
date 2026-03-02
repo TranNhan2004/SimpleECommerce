@@ -40,7 +40,7 @@ public class MoneyTests
         var act = () => new Money(-1, "VND");
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Money amount cannot be negative");
     }
 
@@ -53,7 +53,7 @@ public class MoneyTests
         var act = () => new Money(100, currencyCode);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Currency is required");
     }
 
@@ -64,7 +64,7 @@ public class MoneyTests
         var act = () => new Money(100, "INVALID");
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Currency 'INVALID' is not supported");
     }
 
@@ -99,7 +99,7 @@ public class MoneyTests
         };
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Currency mismatch: Cannot operate between VND and USD");
     }
 
@@ -131,7 +131,7 @@ public class MoneyTests
         };
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Result of subtraction cannot be negative");
     }
 

@@ -7,7 +7,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Order : EntityBase, ICreatedTime, IUpdatedTime
+public class Order : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<OrderItem> _orderItems = [];
 
@@ -43,7 +43,8 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
         SetSellerId(sellerId);
     }
 
-    public string Code { get; private set; } = string.Empty;
+    public Guid Id { get; private set; }
+    public string Code { get; private set; } = null!;
     public string? Note { get; private set; }
     public Money ShippingFee { get; private set; }
     public Money TotalPrice { get; private set; }
@@ -54,11 +55,11 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public Guid SellerId { get; private set; }
     public UserProfile? Seller { get; private set; }
 
-    public string ShopName { get; private set; } = string.Empty;
+    public string ShopName { get; private set; } = null!;
     public Address WarehouseAddress { get; private set; }
 
-    public string RecipientName { get; private set; } = string.Empty;
-    public string RecipientPhoneNumber { get; private set; } = string.Empty;
+    public string RecipientName { get; private set; } = null!;
+    public string RecipientPhoneNumber { get; private set; } = null!;
     public Address RecipientAddress { get; private set; }
 
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
@@ -100,12 +101,12 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetCode(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
-            throw new DomainException("Order code is required");
+            throw new BusinessException("Order code is required");
 
         var trimmedCode = code.Trim();
 
         if (trimmedCode.Length > OrderConstants.CodeMaxLength)
-            throw new DomainException($"Order code cannot exceed {OrderConstants.CodeMaxLength} characters");
+            throw new BusinessException($"Order code cannot exceed {OrderConstants.CodeMaxLength} characters");
 
         Code = trimmedCode;
     }
@@ -119,12 +120,12 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
         }
 
         if (string.IsNullOrWhiteSpace(note))
-            throw new DomainException("Note is not blank");
+            throw new BusinessException("Note is not blank");
 
         var trimmedNote = note.Trim();
 
         if (trimmedNote.Length > OrderConstants.NoteMaxLength)
-            throw new DomainException($"Note cannot exceed {OrderConstants.NoteMaxLength} characters");
+            throw new BusinessException($"Note cannot exceed {OrderConstants.NoteMaxLength} characters");
 
         Note = trimmedNote;
     }
@@ -147,7 +148,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Pickup()
     {
         if (Status != OrderStatus.PendingPayment)
-            throw new DomainException("Only pending payment orders can be picked up");
+            throw new BusinessException("Only pending payment orders can be picked up");
 
         SetStatus(OrderStatus.ReadyToPickup);
     }
@@ -155,7 +156,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Ship()
     {
         if (Status != OrderStatus.ReadyToPickup)
-            throw new DomainException("Only picked up orders can be shipped");
+            throw new BusinessException("Only picked up orders can be shipped");
 
         SetStatus(OrderStatus.Shipped);
     }
@@ -163,7 +164,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void AwaitConfirmation()
     {
         if (Status != OrderStatus.Shipped)
-            throw new DomainException("Only shipped orders can be awaited confirmation");
+            throw new BusinessException("Only shipped orders can be awaited confirmation");
 
         SetStatus(OrderStatus.AwaitingConfirmation);
     }
@@ -171,7 +172,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Deliver()
     {
         if (Status != OrderStatus.AwaitingConfirmation)
-            throw new DomainException("Only awaiting confirmation orders can be delivered");
+            throw new BusinessException("Only awaiting confirmation orders can be delivered");
 
         SetStatus(OrderStatus.Delivered);
     }
@@ -179,7 +180,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Cancel()
     {
         if (Status != OrderStatus.PendingPayment && Status != OrderStatus.ReadyToPickup)
-            throw new DomainException("Only pending payment or picked up orders can be cancelled");
+            throw new BusinessException("Only pending payment or picked up orders can be cancelled");
 
         SetStatus(OrderStatus.Cancelled);
     }
@@ -187,7 +188,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Return()
     {
         if (Status != OrderStatus.AwaitingConfirmation)
-            throw new DomainException("Only awaiting confirmation orders can be returned");
+            throw new BusinessException("Only awaiting confirmation orders can be returned");
 
         SetStatus(OrderStatus.Returned);
     }
@@ -195,7 +196,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void Expire()
     {
         if (Status != OrderStatus.PendingPayment)
-            throw new DomainException("Only pending payment orders can be expired");
+            throw new BusinessException("Only pending payment orders can be expired");
 
         SetStatus(OrderStatus.Expired);
         ExpiredAt = DateTimeOffset.UtcNow.AddDays(1);
@@ -204,12 +205,12 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetShopName(string shopName)
     {
         if (string.IsNullOrWhiteSpace(shopName))
-            throw new DomainException("Shop name is required");
+            throw new BusinessException("Shop name is required");
 
         var trimmedName = shopName.Trim();
 
         if (trimmedName.Length > SellerShopConstants.NameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters");
 
         ShopName = shopName;
@@ -223,12 +224,12 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetRecipientName(string recipientName)
     {
         if (string.IsNullOrWhiteSpace(recipientName))
-            throw new DomainException("Recipient name is required");
+            throw new BusinessException("Recipient name is required");
 
         var trimmedName = recipientName.Trim();
 
         if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters");
 
         RecipientName = trimmedName;
@@ -237,12 +238,12 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetRecipientPhoneNumber(string recipientPhoneNumber)
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new DomainException("Recipient phone number is required");
+            throw new BusinessException("Recipient phone number is required");
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
         if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
 
         RecipientPhoneNumber = trimmedRecipientPhoneNumber;
@@ -256,7 +257,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetCustomerId(Guid customerId)
     {
         if (customerId == Guid.Empty)
-            throw new DomainException("Customer is required");
+            throw new BusinessException("Customer is required");
 
         CustomerId = customerId;
     }
@@ -264,7 +265,7 @@ public class Order : EntityBase, ICreatedTime, IUpdatedTime
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new DomainException("Seller is required");
+            throw new BusinessException("Seller is required");
 
         SellerId = sellerId;
     }

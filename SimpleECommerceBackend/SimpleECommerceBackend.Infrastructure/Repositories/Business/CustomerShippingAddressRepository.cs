@@ -1,19 +1,19 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 [AutoConstructor]
-public sealed partial class CustomerShippingAddressRepository : ICustomerShippingAddressRepository
+public partial class CustomerShippingAddressRepository : ICustomerShippingAddressRepository
 {
     private readonly AppDbContext _db;
 
-    public async Task<IEnumerable<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId)
+    public async Task<IReadOnlyList<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId)
     {
         return await _db.CustomerShippingAddresses
-            .Where(a => a.CustomerId == customerId && !a.IsDeleted)
+            .Where(csa => csa.CustomerId == customerId)
             .ToListAsync();
     }
 

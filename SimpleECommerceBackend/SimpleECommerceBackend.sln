@@ -8,17 +8,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.Appl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.Infrastructure", "SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj", "{E0DF7393-4ECD-468F-B61B-B03EFD87A4EF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6AD5D289-C7C6-4DAA-A03E-A413B090D683}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6AD5D289-C7C6-4DAA-A03E-A413B090D683}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.UnitTests", "SimpleECommerceBackend.UnitTests\SimpleECommerceBackend.UnitTests.csproj", "{84DE3351-C45A-4420-BB16-F73B79D9CD72}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{15D21EEC-6E42-4F88-BCE5-F313143F8CB1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main", "Main", "{15D21EEC-6E42-4F88-BCE5-F313143F8CB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.IntegrationTest", "SimpleECommerceBackend.IntegrationTest\SimpleECommerceBackend.IntegrationTest.csproj", "{00DAA7A7-54F9-4A60-86F8-98630558367C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{889AEAED-ACE6-4947-A445-4908391502F5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{889AEAED-ACE6-4947-A445-4908391502F5}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Global

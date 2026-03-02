@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductImage : EntityBase, ICreatedTime
+public class ProductImage : IEntity, ICreatedTrackable
 {
     private ProductImage()
     {
@@ -23,9 +23,10 @@ public class ProductImage : EntityBase, ICreatedTime
         SetDescription(description);
     }
 
+    public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
     public Product? Product { get; private set; }
-    public string ImageUrl { get; private set; } = string.Empty;
+    public string ImageUrl { get; private set; } = null!;
     public int DisplayOrder { get; private set; }
     public bool IsDisplayed { get; private set; }
     public string? Description { get; private set; }
@@ -50,7 +51,7 @@ public class ProductImage : EntityBase, ICreatedTime
     public void SetImageUrl(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new DomainException("Image URL is required");
+            throw new BusinessException("Image URL is required");
 
         ImageUrl = imageUrl.Trim();
     }
@@ -58,7 +59,7 @@ public class ProductImage : EntityBase, ICreatedTime
     public void SetDisplayOrder(int displayOrder)
     {
         if (displayOrder < 0)
-            throw new DomainException("Display order cannot be negative");
+            throw new BusinessException("Display order cannot be negative");
 
         DisplayOrder = displayOrder;
     }
@@ -77,12 +78,12 @@ public class ProductImage : EntityBase, ICreatedTime
         }
 
         if (string.IsNullOrWhiteSpace(description))
-            throw new DomainException("Description is not blank");
+            throw new BusinessException("Description is not blank");
 
         var trimmedDescription = description.Trim();
 
         if (trimmedDescription.Length > ProductImageConstants.DescriptionMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
 
         Description = trimmedDescription;

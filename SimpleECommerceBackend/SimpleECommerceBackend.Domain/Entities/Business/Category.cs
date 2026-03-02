@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Interfaces.Entities;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Category : EntityBase, ICreatedTime, IUpdatedTime
+public class Category : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     private Category()
     {
@@ -19,6 +19,7 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
         SetAdminId(adminId);
     }
 
+    public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
     public CategoryStatus Status { get; private set; }
@@ -32,12 +33,12 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Name is required");
+            throw new BusinessException("Name is required");
 
         var trimmedName = name.Trim();
 
         if (trimmedName.Length > CategoryConstants.NameMaxLength)
-            throw new DomainException($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
+            throw new BusinessException($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
 
         Name = trimmedName;
     }
@@ -51,12 +52,12 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
         }
 
         if (string.IsNullOrWhiteSpace(description))
-            throw new DomainException("Description is not blank");
+            throw new BusinessException("Description is not blank");
 
         var trimmedDescription = description.Trim();
 
         if (trimmedDescription.Length > CategoryConstants.DescriptionMaxLength)
-            throw new DomainException(
+            throw new BusinessException(
                 $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
 
         Description = trimmedDescription;
@@ -70,7 +71,7 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     public void Activate()
     {
         if (Status == CategoryStatus.Archived)
-            throw new DomainException("Archived category cannot be activated");
+            throw new BusinessException("Archived category cannot be activated");
 
         if (Status != CategoryStatus.Active)
             SetStatus(CategoryStatus.Active);
@@ -79,7 +80,7 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     public void Deactivate()
     {
         if (Status == CategoryStatus.Archived)
-            throw new DomainException("Archived category cannot be deactivated");
+            throw new BusinessException("Archived category cannot be deactivated");
 
         if (Status != CategoryStatus.Inactive)
             SetStatus(CategoryStatus.Inactive);
@@ -88,7 +89,7 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     public void Archive()
     {
         if (Status == CategoryStatus.Archived)
-            throw new DomainException("Category already archived");
+            throw new BusinessException("Category already archived");
 
         SetStatus(CategoryStatus.Archived);
     }
@@ -96,7 +97,7 @@ public class Category : EntityBase, ICreatedTime, IUpdatedTime
     public void SetAdminId(Guid adminId)
     {
         if (adminId == Guid.Empty)
-            throw new DomainException("Admin is required");
+            throw new BusinessException("Admin is required");
 
         AdminId = adminId;
     }

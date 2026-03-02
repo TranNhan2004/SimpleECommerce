@@ -66,7 +66,7 @@ public class CategoryTests
         var act = () => Category.Create(name, "desc", adminId);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Name is required");
     }
 
@@ -81,7 +81,7 @@ public class CategoryTests
         var act = () => Category.Create(name, "desc", adminId);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
     }
 
@@ -96,7 +96,7 @@ public class CategoryTests
         var act = () => Category.Create("name", description, adminId);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should().Be("Description is not blank");
     }
 
@@ -113,7 +113,7 @@ public class CategoryTests
         var act = () => Category.Create("Books", description, adminId);
 
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should()
             .Be($"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
     }
@@ -128,7 +128,7 @@ public class CategoryTests
 
         // Assert
         // Assert
-        var exception = act.Should().Throw<DomainException>().Which;
+        var exception = act.Should().Throw<BusinessException>().Which;
         exception.Message.Should()
             .Be("Admin is required");
     }

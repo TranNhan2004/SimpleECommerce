@@ -1,8 +1,0 @@
-{
-  "status": "pending",
-  "origin": "plan",
-  "planTitle": "Compile Comprehensive Report",
-  "dependsOn": [
-    "04-explore-api-layer"
-  ]
-}

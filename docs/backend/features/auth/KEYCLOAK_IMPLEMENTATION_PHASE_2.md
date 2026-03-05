@@ -1,6 +1,6 @@
 # Phase 2: Backend Configuration
 
-**Status**: ⬜ Not Started  
+**Status**: ✅ Completed  
 **Duration**: 0.5-1 day  
 **Phase Overview**: [KEYCLOAK_IMPLEMENTATION_PLAN.md](./KEYCLOAK_IMPLEMENTATION_PLAN.md)
 
@@ -30,10 +30,13 @@
 
 ## Prerequisites
 
-- [ ] Phase 1 completed successfully
-- [ ] Keycloak client secret available
-- [ ] .NET 10 SDK installed
-- [ ] Access to the backend code
+- [x] Phase 1 completed successfully
+- [x] Keycloak client secret available from Phase 1, Step 1.4
+  - Client ID: `simple-e-commerce-backend`
+  - Realm: `SimpleECommerce`
+  - Keycloak URL: `http://localhost:8080`
+- [x] .NET 10 SDK installed
+- [x] Access to the backend code
 
 ---
 
@@ -69,7 +72,7 @@ Add the following `Keycloak` section to your appsettings.json:
     "realm": "SimpleECommerce",
     "auth-server-url": "http://localhost:8080/",
     "ssl-required": "external",
-    "resource": "simple-ecommerce-backend",
+    "resource": "simple-e-commerce-backend",
     "credentials": {
       "secret": "<YOUR_CLIENT_SECRET>"
     },
@@ -78,7 +81,8 @@ Add the following `Keycloak` section to your appsettings.json:
     "token-endpoint": "http://localhost:8080/realms/SimpleECommerce/protocol/openid-connect/token",
     "userinfo-endpoint": "http://localhost:8080/realms/SimpleECommerce/protocol/openid-connect/userinfo",
     "introspection-endpoint": "http://localhost:8080/realms/SimpleECommerce/protocol/openid-connect/token/introspect",
-    "admin-url": "http://localhost:8080/admin/realms/SimpleECommerce"
+    "admin-url": "http://localhost:8080/admin/realms/SimpleECommerce",
+    "timeout-seconds": 30
   },
   "SmtpOptions": {
     "Host": "smtp.gmail.com",
@@ -109,10 +113,10 @@ Add the following `Keycloak` section to your appsettings.json:
 
 Create a strongly-typed configuration model for dependency injection.
 
-**File**: `SimpleECommerceBackend.Infrastructure/Security/KeycloakSettings.cs`
+**File**: `SimpleECommerceBackend.Infrastructure/Services/Keycloak/KeycloakSettings.cs`
 
 ```csharp
-namespace SimpleECommerceBackend.Infrastructure.Security;
+namespace SimpleECommerceBackend.Infrastructure.Services.Keycloak;
 
 public class KeycloakSettings
 {
@@ -125,6 +129,7 @@ public class KeycloakSettings
     public string IntrospectionEndpoint { get; init; } = null!;
     public string AdminUrl { get; init; } = null!;
     public bool VerifyTokenAudience { get; init; }
+    public int TimeoutSeconds { get; init; }
 }
 
 public class KeycloakCredentials
@@ -133,11 +138,11 @@ public class KeycloakCredentials
 }
 ```
 
-**File Location**: Create the `Security` folder if it doesn't exist in the Infrastructure project.
+**File Location**: Create the `Services/Keycloak` folder if it doesn't exist in the Infrastructure project.
 
 ```bash
 cd SimpleECommerceBackend.Infrastructure
-mkdir -p Security
+mkdir -p Services/Keycloak
 ```
 
 ---
@@ -188,15 +193,15 @@ info : PackageReference for package 'Keycloak.AuthServices.Authentication' versi
 
 Complete this checklist before proceeding to Phase 3:
 
-- [ ] Old JWT settings removed from appsettings.json
-- [ ] Keycloak configuration added to appsettings.json
-- [ ] Client secret correctly set in configuration
-- [ ] KeycloakSettings.cs created in Infrastructure/Security folder
-- [ ] Both classes (KeycloakSettings and KeycloakCredentials) defined
-- [ ] Keycloak.AuthServices.Authentication package installed (v2.5.2)
-- [ ] Keycloak.AuthServices.Authorization package installed (v2.5.2)
-- [ ] `dotnet restore` completed successfully
-- [ ] Project still builds: `dotnet build`
+- [x] Old JWT settings removed from appsettings.json
+- [x] Keycloak configuration added to appsettings.json
+- [ ] Client secret correctly set in configuration (⚠️ Replace `<YOUR_CLIENT_SECRET>` with actual secret)
+- [x] KeycloakSettings.cs created in Infrastructure/Security folder
+- [x] Both classes (KeycloakSettings and KeycloakCredentials) defined
+- [x] Keycloak.AuthServices.Authentication package installed (v2.5.2)
+- [x] Keycloak.AuthServices.Authorization package installed (v2.5.2)
+- [x] `dotnet restore` completed successfully
+- [x] Project still builds: `dotnet build`
 
 **Test Build**:
 
@@ -215,17 +220,18 @@ Expected: Build succeeds with no errors.
 
 ### Settings Explanation
 
-| Setting                  | Purpose                                    |
-| ------------------------ | ------------------------------------------ |
-| `realm`                  | The Keycloak realm name created in Phase 1 |
-| `auth-server-url`        | Base URL of your Keycloak server           |
-| `resource`               | Client ID from Phase 1                     |
-| `credentials.secret`     | Client secret from Phase 1                 |
-| `token-endpoint`         | Endpoint for obtaining tokens              |
-| `userinfo-endpoint`      | Endpoint for user information              |
-| `introspection-endpoint` | Endpoint for token validation              |
-| `admin-url`              | Admin API base URL for user management     |
-| `verify-token-audience`  | Validate token audience claim              |
+| Setting                  | Purpose                                      |
+| ------------------------ | -------------------------------------------- |
+| `realm`                  | The Keycloak realm name created in Phase 1   |
+| `auth-server-url`        | Base URL of your Keycloak server             |
+| `resource`               | Client ID from Phase 1                       |
+| `credentials.secret`     | Client secret from Phase 1                   |
+| `token-endpoint`         | Endpoint for obtaining tokens                |
+| `userinfo-endpoint`      | Endpoint for user information                |
+| `introspection-endpoint` | Endpoint for token validation                |
+| `admin-url`              | Admin API base URL for user management       |
+| `verify-token-audience`  | Validate token audience claim                |
+| `timeout-seconds`        | HTTP client timeout in seconds (default: 30) |
 
 ### Production Considerations
 

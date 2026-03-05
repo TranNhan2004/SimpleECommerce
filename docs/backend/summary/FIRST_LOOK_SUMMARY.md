@@ -135,8 +135,9 @@ builder.Services.AddAuthentication(options =>
 |----------|--------|---------|
 | `/api/v1/auth/register` | POST | Register new user |
 | `/api/v1/auth/login` | POST | Login user |
+| `/api/v1/auth/refresh` | POST | Refresh access token |
 
-**Implementation**: Both endpoints handle full authentication flow internally using custom JWT generation and BCrypt password hashing.
+**Implementation**: Uses Keycloak OAuth2/OIDC for authentication. Endpoints proxy requests to Keycloak server and maintain local UserProfile synchronization.
 
 ---
 
@@ -144,16 +145,21 @@ builder.Services.AddAuthentication(options =>
 
 **Location**: `SimpleECommerceBackend.Application/UseCases/Auth/Login/LoginCommandHandler.cs`
 
+**Models**:
+
+- Command: `SimpleECommerceBackend.Application.Models.Auth.Login.LoginCommand`
+- Result: `SimpleECommerceBackend.Application.Models.Auth.Login.LoginResult`
+
 **Current Flow**:
 
-1. Find credential by email
-2. Check credential status (must be Active)
-3. Verify password using BCrypt
-4. Find associated user profile
-5. Generate JWT access token and refresh token
-6. Return user profile with tokens
+1. Authenticate with Keycloak via `IKeycloakTokenService`
+2. Get user information from Keycloak token
+3. Find local UserProfile by Keycloak user ID
+4. Auto-create UserProfile if not exists (for existing Keycloak users)
+5. Extract role from Keycloak token claims
+6. Return user profile with Keycloak tokens
 
-**Security**: Password verification using BCrypt, JWT tokens generated with 10-minute access token and 7.5-day refresh token expiration.
+**Security**: Authentication handled by Keycloak OAuth2/OIDC. Tokens are JWT format with configurable expiration times.
 
 ---
 
@@ -161,101 +167,163 @@ builder.Services.AddAuthentication(options =>
 
 **Location**: `SimpleECommerceBackend.Application/UseCases/Auth/Register/RegisterCommandHandler.cs`
 
+**Models**:
+
+- Command: `SimpleECommerceBackend.Application.Models.Auth.Register.RegisterCommand`
+- Result: `SimpleECommerceBackend.Application.Models.Auth.Register.RegisterResult`
+
 **Current Flow**:
 
-1. Create Credential entity with email and hashed password
-2. Save to database
-3. Generate account verification token
-4. Publish UserRegisteredEvent (triggers verification email)
+1. Check if user exists in Keycloak
+2. Validate role (customer, seller, admin)
+3. Create user in Keycloak via `IKeycloakAdminService`
+4. Create local UserProfile with Keycloak user UUID
+5. Save to database
+6. Return success response
 
-**Post-Registration**: User accounts start as Inactive and must be verified via email verification token before becoming Active.
+**Post-Registration**: User accounts are immediately active in Keycloak. Email verification can be configured in Keycloak realm settings.
+
+---
+
+#### **Refresh Token Use Case**
+
+**Location**: `SimpleECommerceBackend.Application/UseCases/Auth/RefreshToken/RefreshTokenCommandHandler.cs`
+
+**Models**:
+
+- Command: `SimpleECommerceBackend.Application.Models.Auth.RefreshToken.RefreshTokenCommand`
+- Result: `SimpleECommerceBackend.Application.Models.Auth.RefreshToken.RefreshTokenResult`
+
+**Current Flow**:
+
+1. Receive refresh token from client
+2. Send refresh request to Keycloak via `IKeycloakTokenService`
+3. Return new access token and refresh token
+
+**Security**: Stateless token refresh handled entirely by Keycloak.
 
 ---
 
 #### **Other Auth Use Cases**
 
-Located in `SimpleECommerceBackend.Application/UseCases/Auth/`:
+Deprecated use cases from custom authentication system:
 
-| Use Case       | Location          | Purpose                                              |
-| -------------- | ----------------- | ---------------------------------------------------- |
-| VerifyAccount  | `VerifyAccount/`  | Activate registered account using verification token |
-| RefreshToken   | `RefreshToken/`   | Generate new access token from refresh token         |
-| ChangePassword | `ChangePassword/` | Change user password with old password verification  |
-| ResetPassword  | `ResetPassword/`  | Reset forgotten password using reset token           |
+| Use Case       | Status     | Notes                                                  |
+| -------------- | ---------- | ------------------------------------------------------ |
+| VerifyAccount  | Deprecated | Handled by Keycloak email verification                 |
+| ChangePassword | Deprecated | Users can change password via Keycloak account console |
+| ResetPassword  | Deprecated | Handled by Keycloak forgot password flow               |
 
 ---
 
 ### 5. Security Infrastructure Components
 
-#### **BCryptPasswordHasher**
+#### **Keycloak Integration Services**
 
-**Location**: `SimpleECommerceBackend.Infrastructure/Security/BCryptPasswordHasher.cs`
+**Location**: `SimpleECommerceBackend.Infrastructure/Services/Keycloak/`
 
-**Current Responsibility**: Hash and verify passwords using BCrypt
+**Services**:
 
-**Configuration**: Uses work factor of 12 for BCrypt hashing algorithm.
+- **KeycloakTokenService**: Token generation, refresh, and user info retrieval
+- **KeycloakAdminService**: User management operations (create, update, delete, role assignment)
+
+**Configuration**: Configured via `appsettings.json` with Keycloak server URL, realm, and client credentials.
 
 ---
 
-#### **Credential Entity**
+#### **UserProfile Entity**
 
-**Location**: `SimpleECommerceBackend.Domain/Entities/Auth/Credential.cs`
+**Location**: `SimpleECommerceBackend.Domain/Entities.Business/UserProfile.cs`
 
 **Current Properties**:
 
-- `Id` (Guid)
+- `Id` (Guid) - Maps to Keycloak user UUID
 - `Email` (string)
-- `PasswordHash` (string)
-- `Status` (CredentialStatus: Inactive, Active, Archived)
-- `Role` (enum)
+- `FirstName`, `LastName` (string)
+- `NickName` (string, nullable)
+- `Sex` (enum)
+- `BirthDate` (DateOnly)
+- `AvatarUrl` (string, nullable)
 - `CreatedAt`, `UpdatedAt`
 
-**Business Logic**: Entity provides methods to Activate(), Deactivate(), and Archive() credentials. Email validation uses regex pattern validation.
+**Business Logic**: Entity synchronized with Keycloak users. ID field stores Keycloak user UUID for mapping between systems.
 
 ---
 
-### 6. Token Types & Claims
+### 6. Authentication Architecture
 
-**Location**: `SimpleECommerceBackend.Application/Interfaces/Security/IJwtGenerator.cs`
+**Previous System** (Deprecated):
 
-**Current Token Types**:
+- Custom JWT generation via `IJwtGenerator`
+- BCrypt password hashing via `IPasswordHasher`
+- Credential entity for storing passwords
+- Custom token claims
 
-```csharp
-enum TokenType
-{
-    AccessToken = 0,
-    RefreshToken = 1,
-    AccountVerificationToken = 2,
-    PasswordResetToken = 3
-}
-```
+**Current System** (Keycloak):
 
-**Current Claims Structure**:
+- OAuth2/OIDC standard protocol
+- Keycloak token service for token operations
+- Keycloak admin service for user management
+- Role-based authorization with Keycloak roles
+- No password storage in application database
 
-- `email` (Email)
-- `jti` (JWT ID)
-- `role` (Role)
-- `token_type` (Custom claim)
+**Token Flow**:
 
-**Usage**: Token types are used to validate that the correct token is being used for each operation (e.g., can't use refresh token for account verification).
+1. Client sends credentials to `/api/v1/auth/login`
+2. Backend proxies request to Keycloak token endpoint
+3. Keycloak validates credentials and returns JWT access token + refresh token
+4. Backend syncs local UserProfile with Keycloak user data
+5. Returns tokens and user profile to client
+6. Client uses access token in Authorization header for protected endpoints
+7. On token expiration, client uses refresh token at `/api/v1/auth/refresh`
+
+**Token Claims** (managed by Keycloak):
+
+- `sub` (Subject - Keycloak user UUID)
+- `email` (User email)
+- `given_name` (First name)
+- `family_name` (Last name)
+- `realm_access.roles` (Array of realm roles)
+- `azp` (Authorized party - client ID)
+- `exp` (Expiration time)
+- `iat` (Issued at time)
+- Additional custom claims can be configured in Keycloak
+
+**Authorization Policies**:
+
+Three policies defined in `Program.cs`:
+
+- `CustomerPolicy` - Requires "customer" role
+- `SellerPolicy` - Requires "seller" role
+- `AdminPolicy` - Requires "admin" role
 
 ---
 
-### 7. Password Hashing Interface
+### 7. Application Models Structure
 
-**Location**: `SimpleECommerceBackend.Application/Interfaces/Security/IPasswordHasher.cs`
+**Location**: `SimpleECommerceBackend.Application/Models/Auth/`
 
-**Current Interface**:
+**Organization**: Commands and Results are organized in separate files by feature
 
-```csharp
-public interface IPasswordHasher
-{
-    string Hash(string plainPassword);
-    bool Verify(string plainPassword, string passwordHash);
-}
+```
+Models/Auth/
+├── Register/
+│   ├── RegisterCommand.cs
+│   └── RegisterResult.cs
+├── Login/
+│   ├── LoginCommand.cs
+│   └── LoginResult.cs
+└── RefreshToken/
+    ├── RefreshTokenCommand.cs
+    └── RefreshTokenResult.cs
 ```
 
-**Implementation**: BCryptPasswordHasher implements this interface with work factor 12.
+**Benefits**:
+
+- Clear separation of concerns
+- Easy to locate and modify models
+- Consistent with other model organization (Keycloak, Users)
+- Supports MediatR CQRS pattern
 
 ---
 
@@ -267,10 +335,18 @@ public interface IPasswordHasher
 
 - SQL Server database
 - Entity Framework Core
-- Credentials table with email, password hash, status, role
-- UserProfile table with personal information
+- UserProfile table with personal information (linked to Keycloak user UUID)
 
-**Data Storage**: All user credentials (email, password hash, role, status) are stored locally in SQL Server. UserProfile table stores additional personal information linked to credentials.
+**Data Storage**:
+
+- **Authentication data** (credentials, passwords, roles) stored in Keycloak
+- **User profile data** (personal info, preferences) stored locally in SQL Server
+- **Mapping**: UserProfile.Id = Keycloak user UUID
+
+**Removed Tables** (deprecated):
+
+- Credentials table (moved to Keycloak)
+- Token tables (Keycloak manages tokens)
 
 ---
 
@@ -281,12 +357,34 @@ public interface IPasswordHasher
 **Current Registrations**:
 
 ```csharp
-services.AddSingleton<IJwtGenerator, JwtGenerator>();
-services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+// Keycloak Services
+services.AddScoped<IKeycloakTokenService, KeycloakTokenService>();
+services.AddScoped<IKeycloakAdminService, KeycloakAdminService>();
+services.AddHttpClient<IKeycloakTokenService, KeycloakTokenService>();
+services.AddHttpClient<IKeycloakAdminService, KeycloakAdminService>();
+
+// Keycloak Settings
+services.Configure<KeycloakSettings>(configuration.GetSection("Keycloak"));
 ```
 
-**Architecture**: All authentication services are registered as singletons for performance, repositories as scoped for per-request lifecycle.
+**API Layer** (`Program.cs`):
+
+```csharp
+// Keycloak Authentication
+builder.Services
+    .AddKeycloakWebApiAuthentication(builder.Configuration)
+    .AddAuthorization(options =>
+    {
+        options.AddPolicy("CustomerPolicy", policy =>
+            policy.RequireRole("customer"));
+        options.AddPolicy("SellerPolicy", policy =>
+            policy.RequireRole("seller"));
+        options.AddPolicy("AdminPolicy", policy =>
+            policy.RequireRole("admin"));
+    });
+```
+
+**Architecture**: Keycloak services registered as scoped for per-request lifecycle with HttpClient integration for external API calls.
 
 ---
 
@@ -320,18 +418,29 @@ services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
 ## Key Components Summary
 
-| Component                 | Location                                          | Purpose                             |
-| ------------------------- | ------------------------------------------------- | ----------------------------------- |
-| **Authentication Setup**  | `Program.cs`                                      | Configure JWT Bearer authentication |
-| **JWT Generator**         | `Infrastructure/Security/JwtGenerator.cs`         | Generate and validate JWT tokens    |
-| **Password Hasher**       | `Infrastructure/Security/BCryptPasswordHasher.cs` | Hash and verify passwords           |
-| **Auth Controller**       | `Api/Controllers/AuthController.cs`               | Login and Register endpoints        |
-| **Login Handler**         | `Application/UseCases/Auth/Login/`                | Business logic for login            |
-| **Register Handler**      | `Application/UseCases/Auth/Register/`             | Business logic for registration     |
-| **Credential Entity**     | `Domain/Entities/Auth/Credential.cs`              | User credential domain model        |
-| **Credential Repository** | `Infrastructure/Repositories/Auth/`               | Data access for credentials         |
-| **JWT Settings**          | `appsettings.json`                                | Configuration for JWT               |
-| **Database Context**      | `Infrastructure/Persistence/AppDbContext.cs`      | EF Core database context            |
+| Component                       | Location                                                               | Purpose                                   |
+| ------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| **Authentication Setup**        | `Api/Program.cs`                                                       | Configure Keycloak OAuth2 authentication  |
+| **Keycloak Token Service**      | `Infrastructure/Services/Keycloak/KeycloakTokenService.cs`             | Token operations with Keycloak            |
+| **Keycloak Admin Service**      | `Infrastructure/Services/Keycloak/KeycloakAdminService.cs`             | User management via Keycloak Admin API    |
+| **Auth Controller**             | `Api/Controllers/AuthController.cs`                                    | Auth endpoints (register, login, refresh) |
+| **Login Handler**               | `Application/UseCases/Auth/Login/LoginCommandHandler.cs`               | Business logic for login                  |
+| **Login Command/Result**        | `Application/Models/Auth/Login/`                                       | Login request/response models             |
+| **Register Handler**            | `Application/UseCases/Auth/Register/RegisterCommandHandler.cs`         | Business logic for registration           |
+| **Register Command/Result**     | `Application/Models/Auth/Register/`                                    | Register request/response models          |
+| **RefreshToken Handler**        | `Application/UseCases/Auth/RefreshToken/RefreshTokenCommandHandler.cs` | Token refresh logic                       |
+| **RefreshToken Command/Result** | `Application/Models/Auth/RefreshToken/`                                | Refresh token request/response models     |
+| **UserProfile Entity**          | `Domain/Entities/Business/UserProfile.cs`                              | User profile domain model                 |
+| **UserProfile Repository**      | `Infrastructure/Repositories/Business/`                                | Data access for user profiles             |
+| **Keycloak Settings**           | `appsettings.json`                                                     | Keycloak configuration                    |
+| **Database Context**            | `Infrastructure/Persistence/AppDbContext.cs`                           | EF Core database context                  |
+
+**Deprecated/Removed Components**:
+
+- ~~JWT Generator~~ (Replaced by Keycloak)
+- ~~Password Hasher~~ (Replaced by Keycloak)
+- ~~Credential Entity~~ (Moved to Keycloak)
+- ~~Credential Repository~~ (No longer needed)
 
 ---
 
@@ -339,52 +448,42 @@ services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
 ### Registration Flow:
 
-1. User submits email, password, and role
-2. Password is hashed using BCrypt (work factor 12)
-3. Credential created with Inactive status
-4. Saved to database
-5. Verification email sent with JWT token
-6. User clicks verification link
-7. Account activated to Active status
-8. UserProfile created with default values
+1. User submits email, password, role, first name, last name
+2. Backend checks if user exists in Keycloak
+3. User created in Keycloak with hashed password
+4. Role assigned to user in Keycloak
+5. Local UserProfile created with Keycloak user UUID
+6. Success response returned
+
+**Note**: Email verification can be configured in Keycloak realm settings.
 
 ### Login Flow:
 
 1. User submits email and password
-2. Credential retrieved from database
-3. Status checked (must be Active)
-4. Password verified using BCrypt
-5. UserProfile retrieved
-6. Access token generated (10 min expiration)
-7. Refresh token generated (7.5 day expiration)
-8. Tokens and user profile returned
+2. Backend sends authentication request to Keycloak
+3. Keycloak validates credentials
+4. Keycloak returns access token and refresh token
+5. Backend retrieves user info from Keycloak token
+6. Backend finds or creates local UserProfile
+7. Tokens and user profile returned to client
 
 ### Token Refresh Flow:
 
 1. Client submits refresh token
-2. Token validated (must be RefreshToken type)
-3. Claims extracted from token
-4. New access token generated
-5. New access token returned
+2. Backend forwards request to Keycloak
+3. Keycloak validates refresh token
+4. Keycloak returns new access token and refresh token
+5. New tokens returned to client
+
+**Token Management**: All tokens are JWTs issued and managed by Keycloak. Backend validates tokens using Keycloak's public key.
 
 ---
 
 ## Database Schema (Authentication-Related)
 
-### Credentials Table
+### UserProfiles Table (Current)
 
-- `Id` (Guid, Primary Key)
-- `Email` (string, unique)
-- `PasswordHash` (string)
-- `Status` (enum: Inactive, Active, Archived)
-- `Role` (enum: Customer, Seller, Admin, etc.)
-- `CreatedAt` (DateTimeOffset)
-- `UpdatedAt` (DateTimeOffset, nullable)
-
-### UserProfiles Table
-
-- `Id` (Guid, Primary Key)
-- `CredentialId` (Guid, Foreign Key to Credentials)
+- `Id` (Guid, Primary Key) - **Maps to Keycloak user UUID**
 - `Email` (string)
 - `FirstName` (string)
 - `LastName` (string)
@@ -394,6 +493,17 @@ services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 - `AvatarUrl` (string, nullable)
 - `CreatedAt` (DateTimeOffset)
 - `UpdatedAt` (DateTimeOffset, nullable)
+
+**Key Change**: UserProfile.Id now stores the Keycloak user UUID instead of a separate credential FK.
+
+### Credentials Table (Deprecated/Removed)
+
+This table has been removed as all authentication data is now managed by Keycloak:
+
+- ~~Email~~ (moved to Keycloak)
+- ~~PasswordHash~~ (managed by Keycloak)
+- ~~Status~~ (managed by Keycloak)
+- ~~Role~~ (managed by Keycloak realm roles)
 
 ---
 

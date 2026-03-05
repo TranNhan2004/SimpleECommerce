@@ -1,34 +1,26 @@
 using MediatR;
-using SimpleECommerceBackend.Application.Interfaces.Security;
-using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
 
 namespace SimpleECommerceBackend.Application.UseCases.Auth.RefreshToken;
-
-public record RefreshTokenCommand(
-    string RefreshToken
-) : IRequest<RefreshTokenResult>;
-
-public class RefreshTokenResult
-{
-    public string AccessToken { get; init; } = null!;
-}
 
 [AutoConstructor]
 public partial class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>
 {
-    private readonly IJwtGenerator _jwtGenerator;
+    private readonly IKeycloakTokenService _keycloakTokenService;
 
-    public Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
+    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
     {
-        var claimsInfo = _jwtGenerator.ValidateToken(request.RefreshToken);
-        var role = claimsInfo.Role ?? throw new UnauthorizedException("Invalid token");
-        if (claimsInfo.TokenType != TokenType.RefreshToken)
-            throw new UnauthorizedException("Invalid token");
-        
-        var accessToken = _jwtGenerator.GenerateAccessToken(claimsInfo.Email, role);
-        return Task.FromResult(new RefreshTokenResult
+        var tokenResponse = await _keycloakTokenService.RefreshTokenAsync(
+            request.RefreshToken,
+            cancellationToken
+        );
+
+        return new RefreshTokenResult
         {
-            AccessToken = accessToken
-        });
+            AccessToken = tokenResponse.AccessToken,
+            RefreshToken = tokenResponse.RefreshToken,
+            ExpiresIn = tokenResponse.ExpiresIn
+        };
     }
 }

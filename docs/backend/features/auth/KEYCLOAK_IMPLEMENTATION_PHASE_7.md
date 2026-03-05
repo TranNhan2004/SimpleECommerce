@@ -36,11 +36,14 @@
 
 ## Prerequisites
 
-- [ ] Phase 1-6 completed
+- [x] Phase 1 completed (Keycloak Setup)
+  - Test users available: admin@test.com, customer@test.com, seller@test.com
+  - Passwords: Admin@123, Customer@123, Seller@123
+  - Roles properly assigned in Keycloak
+- [ ] Phase 2-6 completed
 - [ ] Application builds successfully
-- [ ] Keycloak instance running
+- [ ] Keycloak instance running on http://localhost:8080
 - [ ] Postman or equivalent API testing tool installed
-- [ ] Test users created in Keycloak
 - [ ] Understanding of xUnit and Moq
 
 ---
@@ -75,11 +78,11 @@ public class MockKeycloakTokenService : IKeycloakTokenService
         { "customer@example.com", "customer123" }
     };
 
-    private readonly Dictionary<string, KeycloakUserInfo> _userInfoMap = new()
+    private readonly Dictionary<string, KeycloakUserInfoResponse> _userInfoMap = new()
     {
         {
             "mock_access_token_test",
-            new KeycloakUserInfo
+            new KeycloakUserInfoResponse
             {
                 Sub = "550e8400-e29b-41d4-a716-446655440000",
                 Email = "test@example.com",
@@ -92,7 +95,7 @@ public class MockKeycloakTokenService : IKeycloakTokenService
         },
         {
             "mock_access_token_admin",
-            new KeycloakUserInfo
+            new KeycloakUserInfoResponse
             {
                 Sub = "550e8400-e29b-41d4-a716-446655440001",
                 Email = "admin@example.com",
@@ -148,7 +151,7 @@ public class MockKeycloakTokenService : IKeycloakTokenService
         });
     }
 
-    public Task<KeycloakUserInfo> GetUserInfoAsync(
+    public Task<KeycloakUserInfoResponse> GetUserInfoAsync(
         string accessToken,
         CancellationToken cancellationToken = default)
     {

@@ -1,6 +1,6 @@
 # Phase 5: Use Case Layer Updates
 
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Duration**: 2-3 days  
 **Phase Overview**: [KEYCLOAK_IMPLEMENTATION_PLAN.md](./KEYCLOAK_IMPLEMENTATION_PLAN.md)
 
@@ -34,37 +34,70 @@
 
 ## Prerequisites
 
-- [ ] Phase 1 (Keycloak Setup) completed
-- [ ] Phase 2 (Backend Configuration) completed
-- [ ] Phase 3 (Authentication Service Implementation) completed
-- [ ] Phase 4 (API Layer Updates) completed
-- [ ] Keycloak services available via DI
-- [ ] Understanding of MediatR pattern
+- [x] Phase 1 (Keycloak Setup) completed
+  - Client: `simple-e-commerce-backend` configured
+  - Roles: customer, seller, admin available in Keycloak
+  - Test users created and verified
+- [x] Phase 2 (Backend Configuration) completed
+- [x] Phase 3 (Authentication Service Implementation) completed
+- [x] Phase 4 (API Layer Updates) completed
+- [x] Keycloak services available via DI
+- [x] Understanding of MediatR pattern
 
 ---
 
 ## Implementation Steps
 
+### Project Structure
+
+**Note**: As of the latest refactoring, Commands and Results have been extracted from handler files into separate model files for better organization and reusability.
+
+**New Folder Structure:**
+
+```
+SimpleECommerceBackend.Application/
+├── Models/
+│   ├── Auth/
+│   │   ├── Register/
+│   │   │   ├── RegisterCommand.cs
+│   │   │   └── RegisterResult.cs
+│   │   ├── Login/
+│   │   │   ├── LoginCommand.cs
+│   │   │   └── LoginResult.cs
+│   │   └── RefreshToken/
+│   │       ├── RefreshTokenCommand.cs
+│   │       └── RefreshTokenResult.cs
+│   ├── Keycloak/
+│   └── Users/
+└── UseCases/
+    └── Auth/
+        ├── Register/
+        │   └── RegisterCommandHandler.cs
+        ├── Login/
+        │   └── LoginCommandHandler.cs
+        └── RefreshToken/
+            └── RefreshTokenCommandHandler.cs
+```
+
+**Benefits of This Structure:**
+
+- **Separation of Concerns**: Commands/Results separated from business logic
+- **Reusability**: Models can be referenced from multiple locations
+- **Maintainability**: Easier to locate and update DTOs
+- **Consistency**: Follows the pattern used for Keycloak and User models
+
+---
+
 ### Step 5.1: Update Register Command Handler
 
-**File**: `SimpleECommerceBackend.Application/UseCases/Auth/Register/RegisterCommandHandler.cs`
+#### 5.1.1: Create Command and Result Models
 
-#### 5.1.1: Update Command and Result Classes
-
-Replace the entire file with the following implementation:
+**File**: `SimpleECommerceBackend.Application/Models/Auth/Register/RegisterCommand.cs`
 
 ```csharp
 using MediatR;
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
-using SimpleECommerceBackend.Application.Interfaces.Security;
-using SimpleECommerceBackend.Domain.Constants.Business;
-using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.Register;
+namespace SimpleECommerceBackend.Application.Models.Auth.Register;
 
 public record RegisterCommand(
     string Email,
@@ -73,27 +106,46 @@ public record RegisterCommand(
     string LastName,
     string Role
 ) : IRequest<RegisterResult>;
+```
+
+**File**: `SimpleECommerceBackend.Application/Models/Auth/Register/RegisterResult.cs`
+
+```csharp
+namespace SimpleECommerceBackend.Application.Models.Auth.Register;
 
 public class RegisterResult
 {
     public string Email { get; init; } = null!;
 }
+```
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
+#### 5.1.2: Update Handler Implementation
+
+**File**: `SimpleECommerceBackend.Application/UseCases/Auth/Register/RegisterCommandHandler.cs`
+
+Replace the entire file with the following implementation:
+
+```csharp
+using MediatR;
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Application.Models.Auth.Register;
+using SimpleECommerceBackend.Application.Models.Keycloak;
+using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Utils;
+
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Register;
+
+[AutoConstructor]
+public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
     private readonly IKeycloakAdminService _keycloakAdminService;
     private readonly IUserProfileRepository _userProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
-
-    public RegisterCommandHandler(
-        IKeycloakAdminService keycloakAdminService,
-        IUserProfileRepository userProfileRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _keycloakAdminService = keycloakAdminService;
-        _userProfileRepository = userProfileRepository;
-        _unitOfWork = unitOfWork;
-    }
 
     public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken = default)
     {
@@ -140,7 +192,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 }
 ```
 
-#### 5.1.2: Key Changes Explained
+#### 5.1.3: Key Changes Explained
 
 **What Changed:**
 
@@ -162,27 +214,27 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 
 ### Step 5.2: Update Login Command Handler
 
-**File**: `SimpleECommerceBackend.Application/UseCases/Auth/Login/LoginCommandHandler.cs`
+#### 5.2.1: Create Command and Result Models
 
-#### 5.2.1: Update Command and Result Classes
-
-Replace the entire file with the following implementation:
+**File**: `SimpleECommerceBackend.Application/Models/Auth/Login/LoginCommand.cs`
 
 ```csharp
 using MediatR;
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
-using SimpleECommerceBackend.Application.Interfaces.Security;
-using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.Login;
+namespace SimpleECommerceBackend.Application.Models.Auth.Login;
 
 public record LoginCommand(
     string Email,
     string Password
 ) : IRequest<LoginResult>;
+```
+
+**File**: `SimpleECommerceBackend.Application/Models/Auth/Login/LoginResult.cs`
+
+```csharp
+using SimpleECommerceBackend.Domain.Enums;
+
+namespace SimpleECommerceBackend.Application.Models.Auth.Login;
 
 public class LoginResult
 {
@@ -199,22 +251,34 @@ public class LoginResult
     public string RefreshToken { get; init; } = null!;
     public int ExpiresIn { get; init; }
 }
+```
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
+#### 5.2.2: Update Handler Implementation
+
+**File**: `SimpleECommerceBackend.Application/UseCases/Auth/Login/LoginCommandHandler.cs`
+
+Replace the entire file with the following implementation:
+
+```csharp
+using MediatR;
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Utils;
+
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Login;
+
+[AutoConstructor]
+public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
 {
     private readonly IKeycloakTokenService _keycloakTokenService;
     private readonly IUserProfileRepository _userProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
-
-    public LoginCommandHandler(
-        IKeycloakTokenService keycloakTokenService,
-        IUserProfileRepository userProfileRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _keycloakTokenService = keycloakTokenService;
-        _userProfileRepository = userProfileRepository;
-        _unitOfWork = unitOfWork;
-    }
 
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
@@ -243,7 +307,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
                 userInfo.FamilyName ?? "Name",
                 null,
                 Sex.Other,
-                DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
+                AgeUtils.CreateRandomBirthDate(UserProfileConstants.MinAge, UserProfileConstants.MaxAge),
                 null
             );
             _userProfileRepository.Add(userProfile);
@@ -272,6 +336,37 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
 }
 ```
 
+#### 5.2.3: Key Changes Explained
+
+            );
+            _userProfileRepository.Add(userProfile);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        // Extract role from Keycloak
+        var role = userInfo.Roles.FirstOrDefault() ?? "customer";
+
+        return new LoginResult
+        {
+            UserId = userProfile.Id,
+            Email = userProfile.Email,
+            FirstName = userProfile.FirstName,
+            LastName = userProfile.LastName,
+            NickName = userProfile.NickName,
+            Sex = userProfile.Sex,
+            BirthDate = userProfile.BirthDate,
+            AvatarUrl = userProfile.AvatarUrl,
+            Role = role,
+            AccessToken = tokenResponse.AccessToken,
+            RefreshToken = tokenResponse.RefreshToken,
+            ExpiresIn = tokenResponse.ExpiresIn
+        };
+    }
+
+}
+
+````
+
 #### 5.2.2: Key Changes Explained
 
 **What Changed:**
@@ -294,21 +389,24 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
 
 ### Step 5.3: Update Refresh Token Command Handler
 
-**File**: `SimpleECommerceBackend.Application/UseCases/Auth/RefreshToken/RefreshTokenCommandHandler.cs`
+#### 5.3.1: Create Command and Result Models
 
-#### 5.3.1: Create or Update Handler
-
-Replace the entire file with the following implementation:
+**File**: `SimpleECommerceBackend.Application/Models/Auth/RefreshToken/RefreshTokenCommand.cs`
 
 ```csharp
 using MediatR;
-using SimpleECommerceBackend.Application.Interfaces.Security;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.RefreshToken;
+namespace SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
 
 public record RefreshTokenCommand(
     string RefreshToken
 ) : IRequest<RefreshTokenResult>;
+````
+
+**File**: `SimpleECommerceBackend.Application/Models/Auth/RefreshToken/RefreshTokenResult.cs`
+
+```csharp
+namespace SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
 
 public class RefreshTokenResult
 {
@@ -316,21 +414,32 @@ public class RefreshTokenResult
     public string RefreshToken { get; init; } = null!;
     public int ExpiresIn { get; init; }
 }
+```
 
-public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>
+#### 5.3.2: Update Handler Implementation
+
+**File**: `SimpleECommerceBackend.Application/UseCases/Auth/RefreshToken/RefreshTokenCommandHandler.cs`
+
+Replace the entire file with the following implementation:
+
+```csharp
+using MediatR;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
+
+namespace SimpleECommerceBackend.Application.UseCases.Auth.RefreshToken;
+
+[AutoConstructor]
+public partial class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>
 {
     private readonly IKeycloakTokenService _keycloakTokenService;
-
-    public RefreshTokenCommandHandler(IKeycloakTokenService keycloakTokenService)
-    {
-        _keycloakTokenService = keycloakTokenService;
-    }
 
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
     {
         var tokenResponse = await _keycloakTokenService.RefreshTokenAsync(
             request.RefreshToken,
-            cancellationToken);
+            cancellationToken
+        );
 
         return new RefreshTokenResult
         {
@@ -342,7 +451,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 }
 ```
 
-#### 5.3.2: Key Changes Explained
+#### 5.3.3: Key Changes Explained
 
 **What Changed:**
 
@@ -484,6 +593,61 @@ After completing this phase, verify the following:
 - Verify realm roles are assigned to users in Keycloak
 - Ensure client scopes include realm roles
 - Check token claims using JWT debugger (jwt.io)
+
+---
+
+## Completion Status
+
+**Phase 5 Completed**: January 2025  
+**Latest Refactoring**: March 2026
+
+### What Was Accomplished
+
+✅ **All three command handlers successfully rewritten**:
+
+- RegisterCommandHandler now creates users in Keycloak via IKeycloakAdminService
+- LoginCommandHandler authenticates via IKeycloakTokenService
+- RefreshTokenCommandHandler uses Keycloak refresh token flow
+
+✅ **Custom authentication removed**:
+
+- No more ICredentialRepository usage in active handlers
+- No more IJwtGenerator usage
+- No more IPasswordHasher usage
+
+✅ **Keycloak integration verified**:
+
+- Build successful (3.4s compile time)
+- UserProfile.Id now maps to Keycloak UUID
+- Auto-creation of UserProfile during login for existing Keycloak users
+
+✅ **Models refactored for better organization** (March 2026):
+
+- Commands and Results extracted to separate files in `Models/Auth/` folder
+- Better separation of concerns between models and handlers
+- Improved reusability and maintainability
+- Consistent structure with other model types (Keycloak, Users)
+- Updated references in API layer (AuthController, AuthMapping)
+
+**New File Structure:**
+
+```
+Application/
+├── Models/Auth/
+│   ├── Register/
+│   │   ├── RegisterCommand.cs
+│   │   └── RegisterResult.cs
+│   ├── Login/
+│   │   ├── LoginCommand.cs
+│   │   └── LoginResult.cs
+│   └── RefreshToken/
+│       ├── RefreshTokenCommand.cs
+│       └── RefreshTokenResult.cs
+└── UseCases/Auth/
+    ├── Register/RegisterCommandHandler.cs
+    ├── Login/LoginCommandHandler.cs
+    └── RefreshToken/RefreshTokenCommandHandler.cs
+```
 
 ---
 

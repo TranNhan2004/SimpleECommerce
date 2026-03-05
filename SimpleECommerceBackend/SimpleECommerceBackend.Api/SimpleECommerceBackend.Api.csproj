@@ -12,6 +12,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.5.2" />
+        <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.5.2" />
         <PackageReference Include="Mapster" Version="10.0.0-pre01" />
         <PackageReference Include="Mapster.DependencyInjection" Version="10.0.0-pre01" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
@@ -22,6 +24,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.OpenApi" Version="2.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1" />
     </ItemGroup>
 

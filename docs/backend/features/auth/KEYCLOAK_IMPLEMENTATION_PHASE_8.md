@@ -39,7 +39,11 @@
 
 ## Prerequisites
 
-- [ ] Phase 1-7 completed successfully
+- [x] Phase 1 completed (Keycloak Setup)
+  - Development Keycloak running and tested
+  - Client `simple-e-commerce-backend` configuration known
+  - Realm `SimpleECommerce` configuration documented
+- [ ] Phase 2-7 completed successfully
 - [ ] All tests passing
 - [ ] Production environment prepared
 - [ ] Keycloak hosting solution selected
@@ -213,7 +217,7 @@ Follow the same steps as Phase 1, but with production settings:
 1. Create `SimpleECommerce` realm
 2. Configure email settings (SMTP for production)
 3. Enable email verification
-4. Create `simple-ecommerce-backend` client
+4. Create `simple-e-commerce-backend` client
 5. Generate and save client secret
 6. Create roles: customer, seller, admin
 7. Configure token lifespans (shorter for production)
@@ -243,7 +247,7 @@ Follow the same steps as Phase 1, but with production settings:
     "realm": "SimpleECommerce",
     "auth-server-url": "https://auth.yourdomain.com/",
     "ssl-required": "all",
-    "resource": "simple-ecommerce-backend",
+    "resource": "simple-e-commerce-backend",
     "verify-token-audience": true,
     "credentials": {
       "secret": "${KEYCLOAK_CLIENT_SECRET}"

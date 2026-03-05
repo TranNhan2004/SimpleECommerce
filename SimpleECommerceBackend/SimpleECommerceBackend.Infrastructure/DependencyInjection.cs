@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleECommerceBackend.Application.Interfaces;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Auth;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
@@ -13,9 +12,10 @@ using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories.Auth;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Security;
-using SimpleECommerceBackend.Infrastructure.Services;
+using SimpleECommerceBackend.Infrastructure.Services.Keycloak;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -38,13 +38,30 @@ public static class DependencyInjection
         services.AddSingleton<IJwtGenerator, JwtGenerator>();
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
+        // Keycloak Services
+        services.Configure<KeycloakSettings>(configuration.GetSection("Keycloak"));
+
+        services.AddHttpClient<IKeycloakTokenService, KeycloakTokenService>((sp, client) =>
+        {
+            var keycloakSettings = configuration.GetSection("Keycloak").Get<KeycloakSettings>();
+            client.BaseAddress = new Uri(keycloakSettings!.AuthServerUrl);
+            client.Timeout = TimeSpan.FromSeconds(keycloakSettings!.TimeoutSeconds);
+        });
+
+        services.AddHttpClient<IKeycloakAdminService, KeycloakAdminService>((sp, client) =>
+        {
+            var keycloakSettings = configuration.GetSection("Keycloak").Get<KeycloakSettings>();
+            client.BaseAddress = new Uri(keycloakSettings!.AuthServerUrl);
+            client.Timeout = TimeSpan.FromSeconds(keycloakSettings!.TimeoutSeconds);
+        });
+
         // Address
         services.AddSingleton<IAddressService, VnAddressService>();
 
         // Db
         services.AddScoped<AuditSaveChangesInterceptor>();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString);

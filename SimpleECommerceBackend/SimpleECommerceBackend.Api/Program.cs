@@ -1,15 +1,12 @@
-using System.Text;
+using Keycloak.AuthServices.Authentication;
 using Mapster;
 using MapsterMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SimpleECommerceBackend.Api.Extensions;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
-using SimpleECommerceBackend.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,26 +17,25 @@ var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.Secret))
-        };
-    });
+// Keycloak Authentication
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, options =>
+{
+    options.Audience = builder.Configuration["Keycloak:resource"];
+    options.RequireHttpsMetadata = false; // Set to true in production
+});
+
+// Keycloak Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireCustomerRole", policy =>
+        policy.RequireRole("customer"));
+
+    options.AddPolicy("RequireSellerRole", policy =>
+        policy.RequireRole("seller"));
+
+    options.AddPolicy("RequireAdminRole", policy =>
+        policy.RequireRole("admin"));
+});
 
 builder.Services.AddControllers();
 
@@ -88,6 +84,19 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Simple E-Commerce API",
         Version = "v1"
     });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter your token below.",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
 });
 
 
@@ -101,8 +110,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseGlobalExceptionHandler();
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseGlobalExceptionHandler();
 app.MapControllers();
+
 app.Run();

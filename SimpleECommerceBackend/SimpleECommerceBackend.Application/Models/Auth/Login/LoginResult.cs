@@ -1,8 +1,8 @@
 using SimpleECommerceBackend.Domain.Enums;
 
-namespace SimpleECommerceBackend.Api.DTOs.Auth;
+namespace SimpleECommerceBackend.Application.Models.Auth.Login;
 
-public class LoginResponse
+public class LoginResult
 {
     public Guid UserId { get; init; }
     public string Email { get; init; } = null!;

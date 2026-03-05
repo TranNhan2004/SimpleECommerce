@@ -15,8 +15,10 @@
    - [Step 6.2: Remove or Archive Credential Entity](#step-62-remove-or-archive-credential-entity)
    - [Step 6.3: Remove Password Hasher](#step-63-remove-password-hasher)
    - [Step 6.4: Remove/Update JWT Generator](#step-64-removeupdate-jwt-generator)
-   - [Step 6.5: Update DependencyInjection](#step-65-update-dependencyinjection)
-   - [Step 6.6: Database Migration](#step-66-database-migration)
+   - [Step 6.5: Remove dbo Schema from Entity Configurations](#step-65-remove-dbo-schema-from-entity-configurations)
+   - [Step 6.6: Update DependencyInjection](#step-66-update-dependencyinjection)
+   - [Step 6.7: Clean Up Old Migrations](#step-67-clean-up-old-migrations)
+   - [Step 6.8: Create New Migration](#step-68-create-new-migration)
 4. [Verification Checklist](#verification-checklist)
 5. [Troubleshooting](#troubleshooting)
 6. [Next Steps](#next-steps)
@@ -29,15 +31,20 @@
 - ✅ Remove or archive Credential entity
 - ✅ Remove password hashing infrastructure
 - ✅ Remove custom JWT generation logic
+- ✅ Remove dbo schema configuration from entity configurations
 - ✅ Update dependency injection configuration
-- ✅ Create and apply database migration
+- ✅ Delete old migrations to start fresh
+- ✅ Create and apply new clean migration
 - ✅ Clean up authentication-related code
 
 ---
 
 ## Prerequisites
 
-- [ ] Phase 1-5 completed
+- [x] Phase 1 completed (Keycloak Setup)
+  - Keycloak managing users with IDs (sub claim)
+  - Roles managed in Keycloak realm
+- [ ] Phase 2-5 completed
 - [ ] Backup of current database
 - [ ] Understanding of Entity Framework migrations
 - [ ] Git commit of current working state (for easy rollback)
@@ -267,11 +274,132 @@ public class KeycloakTokenValidator
 
 ---
 
-### Step 6.5: Update DependencyInjection
+### Step 6.5: Remove dbo Schema from Entity Configurations
+
+Before creating new migrations, we need to remove the explicit `dbo` schema configuration from all entity type configurations to ensure proper database schema management.
+
+#### 6.5.1: Locate Entity Configurations
+
+Entity configurations are typically in:
+
+```
+SimpleECommerceBackend.Infrastructure/Persistence/Configurations/
+```
+
+#### 6.5.2: Remove dbo Schema References
+
+Search for all `ToTable` calls that specify the `dbo` schema and remove the schema parameter.
+
+**Example - Before:**
+
+```csharp
+builder.ToTable("UserProfiles", "dbo");
+builder.ToTable("Credentials", "dbo");
+builder.ToTable("Orders", "dbo");
+```
+
+**Example - After:**
+
+```csharp
+builder.ToTable("UserProfiles");
+// builder.ToTable("Credentials"); // This line should be removed entirely
+builder.ToTable("Orders");
+```
+
+#### 6.5.3: Files to Update
+
+Update all entity configuration files in the Configurations folder:
+
+**Auth Configurations** (if they still exist):
+
+- `CredentialConfiguration.cs` - Remove entirely or comment out
+
+**Business Configurations:**
+
+- `UserProfileConfiguration.cs` - Remove `"dbo"` schema
+- `OrderConfiguration.cs` - Remove `"dbo"` schema
+- `CartConfiguration.cs` - Remove `"dbo"` schema
+- `CustomerShippingAddressConfiguration.cs` - Remove `"dbo"` schema
+- `SellerShopConfiguration.cs` - Remove `"dbo"` schema
+- And any other entity configurations
+
+**Command:**
+
+```bash
+# Use find and replace in your IDE to remove all instances of:
+# From: .ToTable("TableName", "dbo")
+# To: .ToTable("TableName")
+
+# Or use command line (Linux/Mac):
+cd SimpleECommerceBackend.Infrastructure/Persistence/Configurations
+find . -name "*.cs" -exec sed -i 's/, "dbo"//g' {} +
+
+# Or use command line (Windows PowerShell):
+cd SimpleECommerceBackend.Infrastructure\Persistence\Configurations
+Get-ChildItem -Filter *.cs -Recurse | ForEach-Object {
+    (Get-Content $_.FullName) -replace ', "dbo"', '' | Set-Content $_.FullName
+}
+```
+
+#### 6.5.4: Example Configuration File Update
+
+**Before:**
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SimpleECommerceBackend.Domain.Entities.Business;
+
+namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
+
+public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
+{
+    public void Configure(EntityTypeBuilder<UserProfile> builder)
+    {
+        builder.ToTable("UserProfiles", "dbo");
+
+        builder.HasKey(x => x.Id);
+        // ... other configurations
+    }
+}
+```
+
+**After:**
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SimpleECommerceBackend.Domain.Entities.Business;
+
+namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
+
+public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
+{
+    public void Configure(EntityTypeBuilder<UserProfile> builder)
+    {
+        builder.ToTable("UserProfiles");
+
+        builder.HasKey(x => x.Id);
+        // ... other configurations
+    }
+}
+```
+
+#### 6.5.5: Verify Changes
+
+After making changes, build the project to ensure no errors:
+
+```bash
+dotnet build
+```
+
+---
+
+### Step 6.6: Update DependencyInjection
 
 **File**: `SimpleECommerceBackend.Infrastructure/DependencyInjection.cs`
 
-#### 6.5.1: Update Infrastructure Registration
+#### 6.6.1: Update Infrastructure Registration
 
 Replace the entire file content to remove old authentication services:
 
@@ -350,7 +478,7 @@ public static class DependencyInjection
 }
 ```
 
-#### 6.5.2: Key Changes
+#### 6.6.2: Key Changes
 
 **Added:**
 
@@ -368,9 +496,101 @@ public static class DependencyInjection
 
 ---
 
-### Step 6.6: Database Migration
+### Step 6.7: Clean Up Old Migrations
 
-#### 6.6.1: Create Migration to Remove Credentials Table
+Before creating new migrations with the updated schema (without Credentials and without dbo schema), we should delete the old migrations to start fresh. This prevents conflicts and ensures a clean migration history.
+
+#### 6.7.1: Delete Old Migration Files
+
+**Location**: `SimpleECommerceBackend.Infrastructure/Persistence/Migrations/`
+
+Delete all existing migration files:
+
+```bash
+cd SimpleECommerceBackend.Infrastructure/Persistence/Migrations
+
+# Delete all migration files
+rm -rf *
+
+# On Windows PowerShell:
+# Remove-Item * -Recurse -Force
+```
+
+**Alternative - Keep for Reference:**
+
+If you want to keep old migrations for reference, move them to an archive folder:
+
+```bash
+cd SimpleECommerceBackend.Infrastructure/Persistence
+
+# Create archive folder
+mkdir MigrationsArchive
+
+# Move old migrations
+mv Migrations/* MigrationsArchive/
+
+# On Windows PowerShell:
+# New-Item -ItemType Directory -Path MigrationsArchive
+# Move-Item Migrations\* MigrationsArchive\
+```
+
+#### 6.7.2: Delete Migration History from Database
+
+The `__EFMigrationsHistory` table in your database tracks applied migrations. Since we're starting fresh, we need to clear this or drop and recreate the database.
+
+**Option 1: Drop and Recreate Database (Recommended for Development)**
+
+```bash
+cd SimpleECommerceBackend.Api
+
+# Drop the existing database
+dotnet ef database drop --force
+
+# The database will be recreated when we apply the new migration in Step 6.8
+```
+
+**Option 2: Clear Migration History Table (If you want to keep data)**
+
+```sql
+-- Connect to your database and run:
+DELETE FROM __EFMigrationsHistory;
+```
+
+⚠️ **Warning**: This approach can cause issues if your current database schema doesn't match the new initial migration. Use Option 1 for development.
+
+#### 6.7.3: Remove Migration Snapshot
+
+Also delete the model snapshot file:
+
+```bash
+cd SimpleECommerceBackend.Infrastructure/Persistence/Migrations
+
+# Delete the snapshot
+rm *ModelSnapshot.cs
+
+# On Windows PowerShell:
+# Remove-Item *ModelSnapshot.cs
+```
+
+#### 6.7.4: Verify Cleanup
+
+Ensure the Migrations folder is empty:
+
+```bash
+ls SimpleECommerceBackend.Infrastructure/Persistence/Migrations/
+
+# Should show no files
+```
+
+---
+
+### Step 6.8: Create New Migration
+
+### Step 6.8: Create New Migration
+
+Now that we've cleaned up old migrations and removed the Credential entity and dbo schema references, we can create a fresh initial migration.
+
+#### 6.8.1: Create Initial Migration
 
 Navigate to the Infrastructure project:
 
@@ -378,17 +598,28 @@ Navigate to the Infrastructure project:
 cd SimpleECommerceBackend.Infrastructure
 ```
 
-Create a new migration:
+Create a new initial migration:
 
 ```bash
-dotnet ef migrations add RemoveCredentialsTable --startup-project ../SimpleECommerceBackend.Api
+dotnet ef migrations add InitialCreate --startup-project ../SimpleECommerceBackend.Api
 ```
 
-#### 6.6.2: Review Generated Migration
+This will create a clean migration without the Credentials table and without dbo schema references.
 
-**File**: `SimpleECommerceBackend.Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_RemoveCredentialsTable.cs`
+#### 6.8.2: Review Generated Migration
 
-The migration should look similar to this:
+**File**: `SimpleECommerceBackend.Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_InitialCreate.cs`
+
+The migration should create tables for your business entities (UserProfiles, Orders, Carts, etc.) but **NOT** include a Credentials table.
+
+Verify that:
+
+- ✅ No Credentials table is created
+- ✅ No dbo schema is specified in any table
+- ✅ UserProfile table is created with Id as Guid (will store Keycloak user ID)
+- ✅ All your business tables are included
+
+**Example migration (should look similar):**
 
 ```csharp
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -398,86 +629,42 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveCredentialsTable : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Drop foreign key from UserProfiles if exists
-            migrationBuilder.DropForeignKey(
-                name: "FK_UserProfiles_Credentials_CredentialId",
-                table: "UserProfiles");
+            // Create UserProfiles table (no Credentials table!)
+            migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    // ... other columns
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
+                });
 
-            // Drop index if exists
-            migrationBuilder.DropIndex(
-                name: "IX_UserProfiles_CredentialId",
-                table: "UserProfiles");
-
-            // Drop CredentialId column from UserProfiles if exists
-            migrationBuilder.DropColumn(
-                name: "CredentialId",
-                table: "UserProfiles");
-
-            // Drop Credentials table
-            migrationBuilder.DropTable(
-                name: "Credentials");
+            // Create other tables (Orders, Carts, etc.)
+            // ...
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Recreate Credentials table for rollback
-            migrationBuilder.CreateTable(
-                name: "Credentials",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Credentials", x => x.Id);
-                });
-
-            // Recreate unique index on Email
-            migrationBuilder.CreateIndex(
-                name: "IX_Credentials_Email",
-                table: "Credentials",
-                column: "Email",
-                unique: true);
-
-            // Recreate CredentialId column in UserProfiles if needed
-            migrationBuilder.AddColumn<Guid>(
-                name: "CredentialId",
-                table: "UserProfiles",
-                type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: Guid.Empty);
-
-            // Recreate foreign key
-            migrationBuilder.CreateIndex(
-                name: "IX_UserProfiles_CredentialId",
-                table: "UserProfiles",
-                column: "CredentialId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_UserProfiles_Credentials_CredentialId",
-                table: "UserProfiles",
-                column: "CredentialId",
-                principalTable: "Credentials",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.DropTable(name: "UserProfiles");
+            // Drop other tables
         }
     }
 }
 ```
 
-#### 6.6.3: Apply Migration
+#### 6.8.3: Apply Migration
 
 **For Development:**
 
@@ -485,52 +672,47 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 dotnet ef database update --startup-project ../SimpleECommerceBackend.Api
 ```
 
-**For Production:**
+This will create your database with the new clean schema.
+
+#### 6.8.4: Verify Database Schema
+
+After applying the migration, verify in your database that:
+
+- ✅ Credentials table does NOT exist
+- ✅ UserProfiles table exists with Id column (uniqueidentifier)
+- ✅ All tables are in the default dbo schema (or no explicit schema)
+- ✅ All business tables are created correctly
+- ✅ Foreign keys and indexes are properly set up
+
+**Using Azure Data Studio or SQL Server Management Studio:**
+
+```sql
+-- Check if Credentials table exists (should return 0)
+SELECT COUNT(*)
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_NAME = 'Credentials';
+
+-- Check UserProfiles table structure
+SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'UserProfiles';
+
+-- List all tables
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+ORDER BY TABLE_NAME;
+```
+
+#### 6.8.5: For Production
+
+Generate a SQL script for review before applying to production:
 
 ```bash
-# Generate SQL script for review
-dotnet ef migrations script --startup-project ../SimpleECommerceBackend.Api --output migration.sql
+dotnet ef migrations script --startup-project ../SimpleECommerceBackend.Api --output InitialCreate.sql
 
 # Review the SQL script before applying to production
 # Apply using your preferred database deployment tool
-```
-
-#### 6.6.4: Alternative - Manual Migration
-
-If you prefer manual control, create the migration file manually:
-
-```csharp
-using Microsoft.EntityFrameworkCore.Migrations;
-
-public partial class RemoveCredentialsForKeycloak : Migration
-{
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
-        // IMPORTANT: Backup data before dropping tables
-
-        // Drop Credentials table
-        migrationBuilder.Sql(@"
-            IF OBJECT_ID('dbo.Credentials', 'U') IS NOT NULL
-                DROP TABLE dbo.Credentials;
-        ");
-
-        // Add comment to UserProfiles.Id column
-        migrationBuilder.Sql(@"
-            EXEC sp_addextendedproperty
-                @name = N'MS_Description',
-                @value = N'Keycloak User ID (sub claim)',
-                @level0type = N'SCHEMA', @level0name = N'dbo',
-                @level1type = N'TABLE', @level1name = N'UserProfiles',
-                @level2type = N'COLUMN', @level2name = N'Id';
-        ");
-    }
-
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-        // Cannot easily rollback - would need to recreate entire Credentials infrastructure
-        throw new NotSupportedException("Rolling back from Keycloak to custom authentication is not supported.");
-    }
-}
 ```
 
 ---
@@ -539,17 +721,24 @@ public partial class RemoveCredentialsForKeycloak : Migration
 
 After completing this phase, verify the following:
 
-- [ ] UserProfile entity uses Keycloak user ID
+- [ ] UserProfile entity updated with documentation about Keycloak user ID
 - [ ] Credential entity removed or archived
 - [ ] IPasswordHasher interface removed
 - [ ] BCryptPasswordHasher implementation removed
 - [ ] IJwtGenerator interface removed (or kept for validation only)
 - [ ] JwtGenerator implementation removed (or updated)
+- [ ] dbo schema removed from all entity configurations
+- [ ] All `.ToTable("TableName", "dbo")` changed to `.ToTable("TableName")`
 - [ ] DependencyInjection.cs updated with Keycloak services
 - [ ] DependencyInjection.cs has no references to removed services
-- [ ] Database migration created successfully
-- [ ] Migration script reviewed
+- [ ] Old migrations folder cleaned up (deleted or archived)
+- [ ] Old database dropped or migration history cleared
+- [ ] New InitialCreate migration created successfully
+- [ ] Migration script reviewed (no Credentials table, no dbo schema)
 - [ ] Database migration applied to development database
+- [ ] Credentials table does NOT exist in database
+- [ ] All tables created without explicit dbo schema
+- [ ] UserProfiles.Id is uniqueidentifier (for Keycloak user ID)
 - [ ] No foreign key constraints errors
 - [ ] Application builds successfully
 - [ ] No compilation errors in any layer
@@ -558,21 +747,22 @@ After completing this phase, verify the following:
 
 ## Troubleshooting
 
-### Issue: "Cannot drop table because it is referenced by a foreign key"
+### Issue: "Cannot find entity configurations"
 
 **Solution:**
 
-- Ensure you drop foreign keys before dropping the table
-- Check if any other tables reference Credentials
-- Update migration to drop all foreign keys first
+- Check the correct path: `SimpleECommerceBackend.Infrastructure/Persistence/Configurations/`
+- Entity configurations might be in subdirectories (Auth, Business, etc.)
+- Use IDE's find in files feature to search for `.ToTable(`
 
-### Issue: "Credentials table does not exist"
+### Issue: "Migration creates Credentials table"
 
 **Solution:**
 
-- Check if table was already removed
-- Review previous migrations
-- This is not an error if the table was never created
+- Ensure Credential entity is removed from Domain layer
+- Ensure CredentialConfiguration is removed or not applied
+- Check DbContext doesn't have `DbSet<Credential>`
+- Delete migration and recreate after fixing
 
 ### Issue: "Build errors after removing interfaces"
 
@@ -581,6 +771,7 @@ After completing this phase, verify the following:
 - Search project for references to removed interfaces
 - Remove all using statements for removed namespaces
 - Check if any use cases still reference old services
+- Phases 3-5 should have already updated these references
 
 ### Issue: "DbContext still references Credentials"
 
@@ -588,15 +779,24 @@ After completing this phase, verify the following:
 
 - Remove `DbSet<Credential>` from AppDbContext
 - Remove any configuration for Credentials in `OnModelCreating`
+- Remove CredentialConfiguration.cs file
 - Rebuild the solution
 
-### Issue: "Migration fails with constraint errors"
+### Issue: "EF Core can't find migrations"
 
 **Solution:**
 
-- Backup your database first
-- Drop constraints manually before running migration
-- Review migration SQL script for correct order of operations
+- Ensure you're in the correct directory when running commands
+- Use `--startup-project` flag to specify the API project
+- Check that AppDbContext is properly registered in DI
+
+### Issue: "Database still has Credentials table after migration"
+
+**Solution:**
+
+- You may have applied old migration before cleaning up
+- Solution: Drop database and recreate with new migration
+- Or manually drop Credentials table from database
 
 ---
 

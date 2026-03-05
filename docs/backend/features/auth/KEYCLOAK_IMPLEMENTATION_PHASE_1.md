@@ -221,7 +221,7 @@ docker-compose down
 #### Step 1: General Settings
 
 - **Client type**: `OpenID Connect`
-- **Client ID**: `simple-ecommerce-backend`
+- **Client ID**: `simple-e-commerce-backend`
 - **Name**: `SimpleECommerce Backend API`
 - **Description**: `Backend API client for SimpleECommerce`
 - **Always display in console**: OFF
@@ -287,7 +287,7 @@ Configure URLs for both development and production environments:
 
 If your frontend will authenticate users directly (rather than through the backend), you should create a separate **public client** for the frontend:
 
-1. Create another client: `simple-ecommerce-frontend`
+1. Create another client: `simple-e-commerce-frontend`
 2. **Client authentication**: **OFF** (public client - no secret)
 3. **Authentication flow**:
    - ☑️ **Standard flow**: ON
@@ -334,7 +334,7 @@ This allows your Angular frontend to use Keycloak's login page for authenticatio
 
 #### Assign Scope to Client
 
-1. Navigate to: **Clients** → `simple-ecommerce-backend`
+1. Navigate to: **Clients** → `simple-e-commerce-backend`
 2. Go to **Client scopes** tab
 3. Click **Add client scope** button
 4. Select `simple-e-commerce-roles` from the list
@@ -456,7 +456,7 @@ Headers:
 
 ```
 grant_type: password
-client_id: simple-ecommerce-backend
+client_id: simple-e-commerce-backend
 client_secret: <YOUR_CLIENT_SECRET>
 username: admin@test.com
 password: Admin@123
@@ -466,7 +466,7 @@ scope: openid profile email simple-e-commerce-roles
 **📝 Where to find the client secret:**
 
 - You saved this in **Step 1.4** under "Retrieve Client Secret"
-- If you didn't save it, go back to Keycloak Admin Console → **Clients** → `simple-ecommerce-backend` → **Credentials** tab → Copy the secret
+- If you didn't save it, go back to Keycloak Admin Console → **Clients** → `simple-e-commerce-backend` → **Credentials** tab → Copy the secret
 
 **Send the request**
 
@@ -499,7 +499,7 @@ scope: openid profile email simple-e-commerce-roles
   "iat": 1234567890,
   "sub": "...",
   "typ": "Bearer",
-  "azp": "simple-ecommerce-backend",
+  "azp": "simple-e-commerce-backend",
   "preferred_username": "admin@test.com",
   "email": "admin@test.com",
   "email_verified": true,
@@ -628,7 +628,7 @@ export const environment = {
   apiUrl: "http://localhost:5000",
   keycloakUrl: "http://localhost:8080",
   keycloakRealm: "SimpleECommerce",
-  keycloakClientId: "simple-ecommerce-frontend",
+  keycloakClientId: "simple-e-commerce-frontend",
 };
 
 // Production
@@ -637,7 +637,7 @@ export const environment = {
   apiUrl: "https://api.your-domain.com",
   keycloakUrl: "https://auth.your-domain.com", // or use same domain with path
   keycloakRealm: "SimpleECommerce",
-  keycloakClientId: "simple-ecommerce-frontend",
+  keycloakClientId: "simple-e-commerce-frontend",
 };
 ```
 
@@ -723,7 +723,7 @@ Complete this checklist before proceeding to Phase 2:
 - Verify client secret is correct
 - Check username and password are correct
 - Ensure user is enabled in Keycloak
-- Verify client ID is `simple-ecommerce-backend`
+- Verify client ID is `simple-e-commerce-backend`
 - Check that "Direct access grants" is enabled for the client
 
 ### Issue: "Realm does not exist" error
@@ -740,7 +740,7 @@ This error occurs when the realm name in your token request URL doesn't match th
 2. **Check realm name spelling**:
    - Realm names are **case-sensitive**
    - Must be exactly: `SimpleECommerce` (capital S, capital E, no spaces)
-   - Common mistakes: `simpleecommerce`, `simple-ecommerce`, `SimpleEcommerce`
+   - Common mistakes: `simplee-commerce`, `simple-e-commerce`, `SimpleEcommerce`
 
 3. **Verify token endpoint URL**:
    - Correct: `http://localhost:8080/realms/SimpleECommerce/protocol/openid-connect/token`
@@ -777,7 +777,7 @@ http://localhost:8080/realms/SimpleECommerce/.well-known/openid-configuration
 - Ensure Docker Desktop is running
 - Check available disk space
 - Stop containers: `docker-compose down`
-- Remove volumes: `docker volume rm simpleecommerce_keycloak_data` (if needed)
+- Remove volumes: `docker volume rm simplee-commerce_keycloak_data` (if needed)
 - Pull images again: `docker-compose pull keycloak keycloak-db`
 - Start fresh: `docker-compose up -d keycloak-db keycloak`
 

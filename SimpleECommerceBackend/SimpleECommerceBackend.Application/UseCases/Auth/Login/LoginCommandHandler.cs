@@ -1,12 +1,10 @@
 using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Auth.Login;
 using SimpleECommerceBackend.Domain.Constants.Business;
-using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.Auth.Login;

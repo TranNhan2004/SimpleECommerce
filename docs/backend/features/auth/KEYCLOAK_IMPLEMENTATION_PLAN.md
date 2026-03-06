@@ -308,9 +308,9 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 
 ### Notifications
 
-- ⚠️ **Data Loss**: Credentials table will be dropped (backup recommended)
+- ⚠️ **Data Loss**: Old migrations and database will be dropped and recreated
 - 🔥 **Breaking Change**: Old authentication completely removed
-- ✅ **Validation**: Run database migration in test environment first
+- ✅ **Validation**: Run database migration in development environment
 
 ---
 
@@ -396,7 +396,7 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 
 ### Critical Warnings
 
-- 🔴 **Data Loss Risk**: Dropping Credentials table is irreversible (Phase 6)
+- 🔴 **Database Reset**: Old migrations will be deleted and database recreated (Phase 6)
 - 🔴 **Breaking Changes**: Frontend must be updated simultaneously (Phase 4)
 - 🔴 **Secret Management**: Never commit Keycloak client secrets to Git
 
@@ -421,18 +421,20 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 If critical issues occur during deployment:
 
 1. **Revert Deployment**
-   - Roll back to previous application version
-   - Restore database from pre-migration backup
+   - Roll back to previous application version using Git
+   - Recreate database with old migration
    - Switch load balancer to old instance
 
 2. **Restore Configuration**
+   - Checkout previous Git commit with old auth system
    - Restore old `appsettings.json` with JWT settings
    - Restore old `Program.cs` authentication configuration
    - Restore old auth handlers and services
 
 3. **Database Rollback**
-   - If Credentials table dropped, restore from backup
-   - Revert EF Core migration: `dotnet ef database update PreviousMigration`
+   - Drop current database: `dotnet ef database drop --force`
+   - Checkout old migrations from Git history
+   - Recreate with old migrations: `dotnet ef database update`
 
 ### Gradual Rollback (Hybrid Mode)
 
@@ -446,9 +448,9 @@ Support both authentication methods temporarily:
 ### Phase-Specific Rollback
 
 - **Phase 1-2**: Simple - just stop using Keycloak, no code changes yet
-- **Phase 3-5**: Revert code changes, services not yet integrated
-- **Phase 6**: Critical - requires database restore
-- **Phase 7-8**: Full rollback required
+- **Phase 3-5**: Revert code changes via Git, services not yet integrated
+- **Phase 6**: Git rollback to previous commit, recreate database
+- **Phase 7-8**: Full rollback required via Git, redeploy old version
 
 ---
 

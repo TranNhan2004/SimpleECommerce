@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using SimpleECommerceBackend.Domain.Interfaces.Entities;
+using SimpleECommerceBackend.Domain.Entities.Abstracts;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 

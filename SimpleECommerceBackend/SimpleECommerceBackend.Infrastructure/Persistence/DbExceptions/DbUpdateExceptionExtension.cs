@@ -17,7 +17,8 @@ public static class DbUpdateExceptionExtensions
 
     public static ConflictException ToConflictException(
         this DbUpdateException ex,
-        DbContext dbContext)
+        DbContext dbContext
+    )
     {
         var entry = ex.Entries.FirstOrDefault();
         if (entry is null)

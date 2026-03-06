@@ -1,22 +1,18 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Application.Interfaces;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Domain.Entities.Auth;
-using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Interfaces.Entities;
+using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Infrastructure.Persistence.DbExceptions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 
 public class AppDbContext : DbContext, IUnitOfWork
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    public DbSet<Credential> Credentials => Set<Credential>();
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
@@ -48,9 +44,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            Assembly.GetExecutingAssembly()
-        );
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         ApplyCommonConventions(modelBuilder);
 
@@ -71,8 +65,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
                 modelBuilder.Entity(clrType)
                     .Property(nameof(IEntity.Id))
-                    .HasDefaultValueSql("NEWSEQUENTIALID()")
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedNever();
             }
 
             // ===== ICreatedTime =====

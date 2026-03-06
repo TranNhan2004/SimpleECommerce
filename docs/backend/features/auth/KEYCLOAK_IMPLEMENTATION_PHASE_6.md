@@ -45,9 +45,60 @@
   - Keycloak managing users with IDs (sub claim)
   - Roles managed in Keycloak realm
 - [ ] Phase 2-5 completed
-- [ ] Backup of current database
 - [ ] Understanding of Entity Framework migrations
+- [ ] Understanding of Domain entity patterns (see Domain Analysis section below)
 - [ ] Git commit of current working state (for easy rollback)
+
+### Domain Entity Pattern Analysis
+
+Before making changes, understand the Domain layer entity structure:
+
+**Entity Pattern**:
+
+- All entities implement `IEntity` interface (provides `Guid Id` property)
+- Optional interfaces: `ICreatedTrackable`, `IUpdatedTrackable`, `ISoftDeleteTrackable`
+- Private parameterless constructor for EF Core
+- Private parameterized constructor with validation logic
+- Public static `Create()` factory method
+- Public setter methods with business validation rules
+
+**Example Entity Structure**:
+
+```csharp
+public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
+{
+    private Cart() { }  // For EF Core
+
+    private Cart(Guid customerId)
+    {
+        SetCustomerId(customerId);
+    }
+
+    public Guid Id { get; private set; }
+    public Guid CustomerId { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
+
+    public static Cart Create(Guid customerId)
+    {
+        return new Cart(customerId);
+    }
+
+    public void SetCustomerId(Guid customerId)
+    {
+        if (customerId == Guid.Empty)
+            throw new BusinessException("Customer ID is required");
+        CustomerId = customerId;
+    }
+}
+```
+
+**Current UserProfile Issues**:
+
+- ❌ Has `CredentialId` foreign key referencing deprecated Credential entity
+- ❌ Has `Credential` navigation property
+- ❌ `Create()` method accepts `credentialId` parameter
+- ✅ Needs refactoring to use Keycloak user ID directly as primary key
 
 ---
 
@@ -59,37 +110,85 @@
 
 #### 6.1.1: Review Current Entity Structure
 
-The UserProfile entity should already be using `Id` as the primary key. Ensure it's documented that this `Id` now represents the Keycloak user ID.
-
-#### 6.1.2: Add Documentation Comment
-
-Update the entity with clear documentation:
+Current UserProfile structure:
 
 ```csharp
+public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
+{
+    public Guid Id { get; private set; }
+    public Guid CredentialId { get; private set; }  // ❌ Remove this
+    public Credential? Credential { get; private set; }  // ❌ Remove this
+    public string Email { get; private set; }
+    // ... other properties
+}
+```
+
+**Changes Required**:
+
+1. Remove `CredentialId` property
+2. Remove `Credential` navigation property
+3. Update `Create()` factory method to accept Keycloak user ID
+4. Update constructor to accept Keycloak user ID
+5. Remove `SetCredentialId()` validation method
+6. Update using statements to remove Credential reference
+
+#### 6.1.2: Refactor UserProfile Entity
+
+Replace the entire UserProfile entity with this updated implementation:
+
+```csharp
+using System.Text.RegularExpressions;
+using SimpleECommerceBackend.Domain.Constants.Auth;
+using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Interfaces.Entities;
+using SimpleECommerceBackend.Domain.Utils;
+
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 /// <summary>
 /// Represents a user's business profile in the application.
-/// The Id field stores the Keycloak user ID (sub claim) for authentication correlation.
+/// The Id property stores the Keycloak user ID (sub claim) for authentication correlation.
 /// </summary>
-public class UserProfile : Entity
+public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
-    // Id inherited from Entity - represents Keycloak user ID
+    private UserProfile()
+    {
+    }
+
+    private UserProfile(
+        Guid keycloakUserId,
+        string email,
+        string firstName,
+        string lastName,
+        string? nickName,
+        Sex sex,
+        DateOnly birthDate,
+        string? avatarUrl
+    )
+    {
+        Id = keycloakUserId; // Set Keycloak user ID as primary key
+        SetEmail(email);
+        SetFirstName(firstName);
+        SetLastName(lastName);
+        SetNickName(nickName);
+        SetSex(sex);
+        SetBirthDate(birthDate);
+        SetAvatarUrl(avatarUrl);
+    }
+
+    public Guid Id { get; private set; }
     public string Email { get; private set; } = null!;
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
     public string? NickName { get; private set; }
     public Sex Sex { get; private set; }
+    public UserStatus Status { get; private set; }
     public DateOnly BirthDate { get; private set; }
     public string? AvatarUrl { get; private set; }
-
-    // Navigation properties
-    public ICollection<Order> Orders { get; private set; } = null!;
-    public ICollection<CustomerShippingAddress> ShippingAddresses { get; private set; } = null!;
-    public Cart? Cart { get; private set; }
-    public SellerShop? SellerShop { get; private set; }
-
-    private UserProfile() { } // For EF Core
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public static UserProfile Create(
         Guid keycloakUserId,
@@ -99,45 +198,124 @@ public class UserProfile : Entity
         string? nickName,
         Sex sex,
         DateOnly birthDate,
-        string? avatarUrl)
+        string? avatarUrl
+    )
     {
-        return new UserProfile
-        {
-            Id = keycloakUserId, // Set Keycloak user ID as primary key
-            Email = email,
-            FirstName = firstName,
-            LastName = lastName,
-            NickName = nickName,
-            Sex = sex,
-            BirthDate = birthDate,
-            AvatarUrl = avatarUrl
-        };
+        return new UserProfile(
+            keycloakUserId,
+            email,
+            firstName,
+            lastName,
+            nickName,
+            sex,
+            birthDate,
+            avatarUrl
+        );
     }
 
-    // Update methods remain the same
-    public void UpdateProfile(
-        string firstName,
-        string lastName,
-        string? nickName,
-        Sex sex,
-        DateOnly birthDate,
-        string? avatarUrl)
+    public void SetEmail(string email)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        NickName = nickName;
+        if (string.IsNullOrEmpty(email))
+            throw new BusinessException("Email is required");
+
+        var trimmedEmail = email.Trim();
+
+        if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
+            throw new BusinessException($"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
+
+        if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
+            throw new BusinessException("Email is invalid");
+
+        Email = trimmedEmail;
+    }
+
+    public void SetFirstName(string firstName)
+    {
+        if (string.IsNullOrEmpty(firstName))
+            throw new BusinessException("First name is required");
+
+        var trimmedFirstName = firstName.Trim();
+
+        if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
+            throw new BusinessException(
+                $"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
+
+        FirstName = trimmedFirstName;
+    }
+
+    public void SetLastName(string lastName)
+    {
+        if (string.IsNullOrEmpty(lastName))
+            throw new BusinessException("Last name is required");
+
+        var trimmedLastName = lastName.Trim();
+
+        if (trimmedLastName.Length > UserProfileConstants.LastNameMaxLength)
+            throw new BusinessException(
+                $"Last name cannot exceed {UserProfileConstants.LastNameMaxLength} characters");
+
+        LastName = trimmedLastName;
+    }
+
+    public void SetNickName(string? nickName)
+    {
+        if (nickName is null)
+        {
+            NickName = null;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nickName))
+            throw new BusinessException("Nick name is not blank");
+
+        var trimmedNickName = nickName.Trim();
+
+        if (trimmedNickName.Length > UserProfileConstants.NickNameMaxLength)
+            throw new BusinessException($"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters");
+
+        NickName = trimmedNickName;
+    }
+
+    public void SetSex(Sex sex)
+    {
         Sex = sex;
+    }
+
+    public void SetBirthDate(DateOnly birthDate)
+    {
+        var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
+
+        if (birthDate > today)
+            throw new BusinessException("Birth date cannot be in the future");
+
+        if (AgeUtils.Calculate(birthDate, today) < UserProfileConstants.MinAge)
+            throw new BusinessException($"Age cannot be less than {UserProfileConstants.MinAge} years");
+
+        if (AgeUtils.Calculate(birthDate, today) > UserProfileConstants.MaxAge)
+            throw new BusinessException($"Age cannot exceed than {UserProfileConstants.MaxAge} years");
+
         BirthDate = birthDate;
+    }
+
+    public void SetAvatarUrl(string? avatarUrl)
+    {
         AvatarUrl = avatarUrl;
     }
 }
 ```
 
-#### 6.1.3: Key Points
+#### 6.1.3: Key Changes Made
 
-- **No structural changes needed** - The entity already uses `Id` as the primary key
-- **Semantic change only** - `Id` now represents Keycloak user ID instead of custom generated ID
-- **Documentation added** - Clear comments about the Keycloak relationship
+- ✅ **Removed** `CredentialId` property
+- ✅ **Removed** `Credential` navigation property
+- ✅ **Removed** `SetCredentialId()` method
+- ✅ **Removed** using statement for `SimpleECommerceBackend.Domain.Entities.Auth`
+- ✅ **Updated** constructor to accept `keycloakUserId` directly
+- ✅ **Updated** `Create()` factory method signature
+- ✅ **Set** `Id` directly from Keycloak user ID in constructor
+- ✅ **Maintained** all validation logic in setter methods
+- ✅ **Maintained** `UserStatus` property for business logic
+- ✅ **Maintained** audit properties (`CreatedAt`, `UpdatedAt`)
 
 ---
 
@@ -500,6 +678,8 @@ public static class DependencyInjection
 
 Before creating new migrations with the updated schema (without Credentials and without dbo schema), we should delete the old migrations to start fresh. This prevents conflicts and ensures a clean migration history.
 
+⚠️ **Note**: Since we're starting fresh with no production data yet, we'll simply delete old migrations without backup.
+
 #### 6.7.1: Delete Old Migration Files
 
 **Location**: `SimpleECommerceBackend.Infrastructure/Persistence/Migrations/`
@@ -516,29 +696,11 @@ rm -rf *
 # Remove-Item * -Recurse -Force
 ```
 
-**Alternative - Keep for Reference:**
+#### 6.7.2: Drop and Recreate Database
 
-If you want to keep old migrations for reference, move them to an archive folder:
+The `__EFMigrationsHistory` table in your database tracks applied migrations. Since we're starting fresh, we need to drop and recreate the database.
 
-```bash
-cd SimpleECommerceBackend.Infrastructure/Persistence
-
-# Create archive folder
-mkdir MigrationsArchive
-
-# Move old migrations
-mv Migrations/* MigrationsArchive/
-
-# On Windows PowerShell:
-# New-Item -ItemType Directory -Path MigrationsArchive
-# Move-Item Migrations\* MigrationsArchive\
-```
-
-#### 6.7.2: Delete Migration History from Database
-
-The `__EFMigrationsHistory` table in your database tracks applied migrations. Since we're starting fresh, we need to clear this or drop and recreate the database.
-
-**Option 1: Drop and Recreate Database (Recommended for Development)**
+**Drop the existing database:**
 
 ```bash
 cd SimpleECommerceBackend.Api
@@ -549,14 +711,7 @@ dotnet ef database drop --force
 # The database will be recreated when we apply the new migration in Step 6.8
 ```
 
-**Option 2: Clear Migration History Table (If you want to keep data)**
-
-```sql
--- Connect to your database and run:
-DELETE FROM __EFMigrationsHistory;
-```
-
-⚠️ **Warning**: This approach can cause issues if your current database schema doesn't match the new initial migration. Use Option 1 for development.
+✅ **Development Note**: This approach is ideal for development environments where data loss is acceptable.
 
 #### 6.7.3: Remove Migration Snapshot
 

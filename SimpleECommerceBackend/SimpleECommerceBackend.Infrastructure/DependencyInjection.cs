@@ -2,20 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Application.Interfaces.Repositories.Auth;
-using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
-using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
+using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
-using SimpleECommerceBackend.Infrastructure.Repositories.Auth;
-using SimpleECommerceBackend.Infrastructure.Repositories.Business;
-using SimpleECommerceBackend.Infrastructure.Security;
-using SimpleECommerceBackend.Infrastructure.Services.Keycloak;
+using SimpleECommerceBackend.Infrastructure.Repositories;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
-using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Infrastructure.Services.Keycloak;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -23,20 +18,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Email
+        // Email Services
         services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
         services.AddScoped<IEmailProvider, EmailProvider>();
         services.AddSingleton<BackgroundEmailQueue>();
         services.AddSingleton<IEmailService, SmtpEmailService>();
         services.AddSingleton<IEmailSender, SmtpEmailSender>();
         services.AddHostedService<EmailBackgroundWorker>();
-
-        // Hasher
-        services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
-
-        // Auth Services
-        services.AddSingleton<IJwtGenerator, JwtGenerator>();
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
         // Keycloak Services
         services.Configure<KeycloakSettings>(configuration.GetSection("Keycloak"));
@@ -55,10 +43,10 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromSeconds(keycloakSettings!.TimeoutSeconds);
         });
 
-        // Address
+        // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
 
-        // Db
+        // Database
         services.AddScoped<AuditSaveChangesInterceptor>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -68,14 +56,10 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
         });
 
-        // Unit of work
+        // Unit of Work
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
 
-        // Repositories
-        // Auth
-        services.AddScoped<ICredentialRepository, CredentialRepository>();
-
-        // Business
+        // Business Repositories
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICustomerShippingAddressRepository, CustomerShippingAddressRepository>();
@@ -85,9 +69,9 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ISellerShopRepository, SellerShopRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
         return services;
     }
 }

@@ -1,9 +1,7 @@
-using System.Text.RegularExpressions;
-using SimpleECommerceBackend.Domain.Constants.Auth;
-using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities;

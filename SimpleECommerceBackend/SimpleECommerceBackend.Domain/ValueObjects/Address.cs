@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.ValueObjects;

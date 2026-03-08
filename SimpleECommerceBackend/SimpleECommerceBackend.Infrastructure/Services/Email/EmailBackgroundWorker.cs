@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;

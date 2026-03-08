@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+
 using Microsoft.Extensions.Options;
+
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Keycloak;
 using SimpleECommerceBackend.Domain.Exceptions;

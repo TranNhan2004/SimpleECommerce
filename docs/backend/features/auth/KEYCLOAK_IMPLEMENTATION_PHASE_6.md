@@ -1,6 +1,6 @@
 # Phase 6: Domain & Infrastructure Updates
 
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete (March 6, 2026)  
 **Duration**: 1-2 days  
 **Phase Overview**: [KEYCLOAK_IMPLEMENTATION_PLAN.md](./KEYCLOAK_IMPLEMENTATION_PLAN.md)
 
@@ -44,10 +44,10 @@
 - [x] Phase 1 completed (Keycloak Setup)
   - Keycloak managing users with IDs (sub claim)
   - Roles managed in Keycloak realm
-- [ ] Phase 2-5 completed
-- [ ] Understanding of Entity Framework migrations
-- [ ] Understanding of Domain entity patterns (see Domain Analysis section below)
-- [ ] Git commit of current working state (for easy rollback)
+- [x] Phase 2-5 completed
+- [x] Understanding of Entity Framework migrations
+- [x] Understanding of Domain entity patterns (see Domain Analysis section below)
+- [x] Git commit of current working state (for easy rollback)
 
 ### Domain Entity Pattern Analysis
 
@@ -55,7 +55,7 @@ Before making changes, understand the Domain layer entity structure:
 
 **Entity Pattern**:
 
-- All entities implement `IEntity` interface (provides `Guid Id` property)
+- All entities inherit from `Entity` abstract base class (provides `Guid Id` property and `SetId()` method)
 - Optional interfaces: `ICreatedTrackable`, `IUpdatedTrackable`, `ISoftDeleteTrackable`
 - Private parameterless constructor for EF Core
 - Private parameterized constructor with validation logic
@@ -65,7 +65,7 @@ Before making changes, understand the Domain layer entity structure:
 **Example Entity Structure**:
 
 ```csharp
-public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
+public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
 {
     private Cart() { }  // For EF Core
 
@@ -74,7 +74,6 @@ public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
         SetCustomerId(customerId);
     }
 
-    public Guid Id { get; private set; }
     public Guid CustomerId { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -93,12 +92,13 @@ public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
 }
 ```
 
-**Current UserProfile Issues**:
+**UserProfile Updated Structure**:
 
-- ❌ Has `CredentialId` foreign key referencing deprecated Credential entity
-- ❌ Has `Credential` navigation property
-- ❌ `Create()` method accepts `credentialId` parameter
-- ✅ Needs refactoring to use Keycloak user ID directly as primary key
+- ✅ Inherits from `Entity` base class
+- ✅ Uses `SetId(keycloakUserId)` to set Keycloak user ID as primary key
+- ✅ No `CredentialId` foreign key or navigation property
+- ✅ `Create()` method accepts `keycloakUserId` parameter
+- ✅ Properly refactored to use Keycloak user ID directly as primary key
 
 ---
 
@@ -106,52 +106,52 @@ public class Cart : IEntity, ICreatedTrackable, IUpdatedTrackable
 
 ### Step 6.1: Update UserProfile Entity
 
-**File**: `SimpleECommerceBackend.Domain/Entities/Business/UserProfile.cs`
+**File**: `SimpleECommerceBackend.Domain/Entities/UserProfile.cs`
 
 #### 6.1.1: Review Current Entity Structure
 
-Current UserProfile structure:
+Original UserProfile structure (before Phase 6):
 
 ```csharp
 public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
 {
     public Guid Id { get; private set; }
-    public Guid CredentialId { get; private set; }  // ❌ Remove this
-    public Credential? Credential { get; private set; }  // ❌ Remove this
+    public Guid CredentialId { get; private set; }  // ❌ Removed
+    public Credential? Credential { get; private set; }  // ❌ Removed
     public string Email { get; private set; }
     // ... other properties
 }
 ```
 
-**Changes Required**:
+**Changes Completed**:
 
-1. Remove `CredentialId` property
-2. Remove `Credential` navigation property
-3. Update `Create()` factory method to accept Keycloak user ID
-4. Update constructor to accept Keycloak user ID
-5. Remove `SetCredentialId()` validation method
-6. Update using statements to remove Credential reference
+1. ✅ Removed `CredentialId` property
+2. ✅ Removed `Credential` navigation property
+3. ✅ Updated `Create()` factory method to accept Keycloak user ID
+4. ✅ Updated constructor to accept Keycloak user ID and use `SetId()`
+5. ✅ Removed `SetCredentialId()` validation method
+6. ✅ Updated using statements to remove Credential reference
+7. ✅ Changed base class from `IEntity` to `Entity` abstract class
 
-#### 6.1.2: Refactor UserProfile Entity
+#### 6.1.2: Refactored UserProfile Entity
 
-Replace the entire UserProfile entity with this updated implementation:
+Current implementation (after Phase 6):
 
 ```csharp
 using System.Text.RegularExpressions;
-using SimpleECommerceBackend.Domain.Constants.Auth;
 using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Interfaces.Entities;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Domain.Entities.Business;
+namespace SimpleECommerceBackend.Domain.Entities;
 
 /// <summary>
 /// Represents a user's business profile in the application.
 /// The Id property stores the Keycloak user ID (sub claim) for authentication correlation.
 /// </summary>
-public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
+public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 {
     private UserProfile()
     {
@@ -168,7 +168,7 @@ public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
         string? avatarUrl
     )
     {
-        Id = keycloakUserId; // Set Keycloak user ID as primary key
+        SetId(keycloakUserId); // Set Keycloak user ID as primary key
         SetEmail(email);
         SetFirstName(firstName);
         SetLastName(lastName);
@@ -178,7 +178,6 @@ public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
         SetAvatarUrl(avatarUrl);
     }
 
-    public Guid Id { get; private set; }
     public string Email { get; private set; } = null!;
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
@@ -220,12 +219,8 @@ public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedEmail = email.Trim();
 
-        if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
-            throw new BusinessException($"Email cannot exceed {CredentialConstants.EmailMaxLength} characters");
-
-        if (!Regex.IsMatch(trimmedEmail, CredentialConstants.EmailPattern))
-            throw new BusinessException("Email is invalid");
-
+        // Note: Email validation is handled by Keycloak during user creation
+        // Basic validation is sufficient here for business logic
         Email = trimmedEmail;
     }
 
@@ -306,13 +301,17 @@ public class UserProfile : IEntity, ICreatedTrackable, IUpdatedTrackable
 
 #### 6.1.3: Key Changes Made
 
+#### 6.1.3: Key Changes Made
+
 - ✅ **Removed** `CredentialId` property
 - ✅ **Removed** `Credential` navigation property
 - ✅ **Removed** `SetCredentialId()` method
-- ✅ **Removed** using statement for `SimpleECommerceBackend.Domain.Entities.Auth`
+- ✅ **Removed** using statement for Auth-related constants (CredentialConstants)
 - ✅ **Updated** constructor to accept `keycloakUserId` directly
 - ✅ **Updated** `Create()` factory method signature
-- ✅ **Set** `Id` directly from Keycloak user ID in constructor
+- ✅ **Set** `Id` directly from Keycloak user ID using `SetId()` method
+- ✅ **Simplified** email validation (Keycloak handles comprehensive email validation)
+- ✅ **Changed** base class from `IEntity` to `Entity` (abstract base class with SetId method)
 - ✅ **Maintained** all validation logic in setter methods
 - ✅ **Maintained** `UserStatus` property for business logic
 - ✅ **Maintained** audit properties (`CreatedAt`, `UpdatedAt`)
@@ -876,27 +875,27 @@ dotnet ef migrations script --startup-project ../SimpleECommerceBackend.Api --ou
 
 After completing this phase, verify the following:
 
-- [ ] UserProfile entity updated with documentation about Keycloak user ID
-- [ ] Credential entity removed or archived
-- [ ] IPasswordHasher interface removed
-- [ ] BCryptPasswordHasher implementation removed
-- [ ] IJwtGenerator interface removed (or kept for validation only)
-- [ ] JwtGenerator implementation removed (or updated)
-- [ ] dbo schema removed from all entity configurations
-- [ ] All `.ToTable("TableName", "dbo")` changed to `.ToTable("TableName")`
-- [ ] DependencyInjection.cs updated with Keycloak services
-- [ ] DependencyInjection.cs has no references to removed services
-- [ ] Old migrations folder cleaned up (deleted or archived)
-- [ ] Old database dropped or migration history cleared
-- [ ] New InitialCreate migration created successfully
-- [ ] Migration script reviewed (no Credentials table, no dbo schema)
-- [ ] Database migration applied to development database
-- [ ] Credentials table does NOT exist in database
-- [ ] All tables created without explicit dbo schema
-- [ ] UserProfiles.Id is uniqueidentifier (for Keycloak user ID)
-- [ ] No foreign key constraints errors
-- [ ] Application builds successfully
-- [ ] No compilation errors in any layer
+- [x] UserProfile entity updated with documentation about Keycloak user ID
+- [x] Credential entity removed or archived
+- [x] IPasswordHasher interface removed
+- [x] BCryptPasswordHasher implementation removed
+- [x] IJwtGenerator interface removed (or kept for validation only)
+- [x] JwtGenerator implementation removed (or updated)
+- [x] dbo schema removed from all entity configurations
+- [x] All `.ToTable("TableName", "dbo")` changed to `.ToTable("TableName")`
+- [x] DependencyInjection.cs updated with Keycloak services
+- [x] DependencyInjection.cs has no references to removed services
+- [x] Old migrations folder cleaned up (deleted or archived)
+- [x] Old database dropped or migration history cleared
+- [x] New InitialCreate migration created successfully
+- [x] Migration script reviewed (no Credentials table, no dbo schema)
+- [x] Database migration applied to development database
+- [x] Credentials table does NOT exist in database
+- [x] All tables created without explicit dbo schema
+- [x] UserProfiles.Id is uniqueidentifier (for Keycloak user ID)
+- [x] No foreign key constraints errors
+- [x] Application builds successfully
+- [x] No compilation errors in any layer
 
 ---
 

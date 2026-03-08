@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Domain.Constants.Business;
+namespace SimpleECommerceBackend.Domain.Constants;
 
 public class CommonConstants
 {

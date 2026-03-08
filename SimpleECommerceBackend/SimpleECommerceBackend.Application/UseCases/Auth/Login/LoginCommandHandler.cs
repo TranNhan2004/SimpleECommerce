@@ -37,8 +37,8 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
             userProfile = UserProfile.Create(
                 keycloakUserId,
                 userInfo.Email,
-                userInfo.GivenName ?? "User",
-                userInfo.FamilyName ?? "Name",
+                string.IsNullOrWhiteSpace(userInfo.GivenName) ? "User" : userInfo.GivenName,
+                string.IsNullOrWhiteSpace(userInfo.FamilyName) ? "Name" : userInfo.FamilyName,
                 null,
                 Sex.Other,
                 AgeUtils.CreateRandomBirthDate(UserProfileConstants.MinAge, UserProfileConstants.MaxAge),

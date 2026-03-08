@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -62,20 +63,17 @@ public class KeycloakAdminService : IKeycloakAdminService
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                if (response.StatusCode == HttpStatusCode.Conflict)
                     throw new BusinessException("User with this email already exists");
 
                 throw new BusinessException($"Failed to create user in Keycloak: {errorContent}");
             }
 
-            // Get user ID from location header
             var locationHeader = response.Headers.Location?.ToString();
             if (string.IsNullOrEmpty(locationHeader))
                 throw new BusinessException("Failed to retrieve user ID from Keycloak");
 
             var userId = locationHeader.Split('/').Last();
-
-            // Assign role
             await AssignRoleToUserAsync(userId, request.Role, cancellationToken);
 
             return new CreateKeycloakUserResponse
@@ -93,11 +91,11 @@ public class KeycloakAdminService : IKeycloakAdminService
     public async Task AssignRoleToUserAsync(
         string userId,
         string roleName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await EnsureAdminTokenAsync(cancellationToken);
 
-        // Get role by name
         var rolesUrl = $"{_settings.AdminUrl}/roles/{roleName}";
         var getRoleRequest = new HttpRequestMessage(HttpMethod.Get, rolesUrl);
         getRoleRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
@@ -112,10 +110,9 @@ public class KeycloakAdminService : IKeycloakAdminService
             PropertyNameCaseInsensitive = true
         });
 
-        if (role == null)
+        if (role is null)
             throw new BusinessException($"Failed to deserialize role '{roleName}'");
 
-        // Assign role to user
         var assignRoleUrl = $"{_settings.AdminUrl}/users/{userId}/role-mappings/realm";
         var assignRequest = new HttpRequestMessage(HttpMethod.Post, assignRoleUrl);
         assignRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
@@ -132,7 +129,10 @@ public class KeycloakAdminService : IKeycloakAdminService
         }
     }
 
-    public async Task DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task DeleteUserAsync(
+        string userId,
+        CancellationToken cancellationToken = default
+    )
     {
         await EnsureAdminTokenAsync(cancellationToken);
 
@@ -147,7 +147,10 @@ public class KeycloakAdminService : IKeycloakAdminService
         }
     }
 
-    public async Task<bool> UserExistsAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<bool> UserExistsAsync(
+        string email,
+        CancellationToken cancellationToken = default
+    )
     {
         await EnsureAdminTokenAsync(cancellationToken);
 

@@ -3,7 +3,7 @@ using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
-namespace SimpleECommerceBackend.UnitTests.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Tests.Entities;
 
 public class OrderItemTests
 {

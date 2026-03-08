@@ -1,7 +1,6 @@
-using SimpleECommerceBackend.Domain.Constants.Auth;
-using SimpleECommerceBackend.Domain.Constants.Business;
-using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities;
 

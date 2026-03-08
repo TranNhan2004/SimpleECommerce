@@ -1,9 +1,9 @@
 using FluentAssertions;
-using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.UnitTests.Domain.Entities;
+namespace SimpleECommerceBackend.Domain.Tests.Entities;
 
 public class CategoryTests
 {

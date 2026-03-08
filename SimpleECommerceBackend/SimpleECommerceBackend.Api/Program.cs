@@ -1,9 +1,13 @@
 using Keycloak.AuthServices.Authentication;
+
 using Mapster;
+
 using MapsterMapper;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
+
 using SimpleECommerceBackend.Api.Extensions;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;

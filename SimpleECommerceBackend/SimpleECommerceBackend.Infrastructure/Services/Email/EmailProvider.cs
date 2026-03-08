@@ -1,4 +1,5 @@
 using System.Net;
+
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;

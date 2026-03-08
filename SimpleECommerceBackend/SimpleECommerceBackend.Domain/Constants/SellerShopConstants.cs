@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Domain.Constants.Auth;
+namespace SimpleECommerceBackend.Domain.Constants;
 
 public class SellerShopConstants
 {

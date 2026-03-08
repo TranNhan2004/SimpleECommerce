@@ -3,7 +3,7 @@ using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Auth.Register;
 using SimpleECommerceBackend.Application.Models.Keycloak;
-using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;

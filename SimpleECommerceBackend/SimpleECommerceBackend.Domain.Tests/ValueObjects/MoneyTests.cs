@@ -2,7 +2,7 @@ using FluentAssertions;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
-namespace SimpleECommerceBackend.UnitTests.Domain.ValueObjects;
+namespace SimpleECommerceBackend.Domain.Tests.ValueObjects;
 
 public class MoneyTests
 {

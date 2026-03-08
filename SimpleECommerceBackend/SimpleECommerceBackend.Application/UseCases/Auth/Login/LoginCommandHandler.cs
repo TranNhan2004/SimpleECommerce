@@ -2,7 +2,7 @@ using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Auth.Login;
-using SimpleECommerceBackend.Domain.Constants.Business;
+using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Utils;
@@ -18,22 +18,20 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
 
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
-        // Authenticate with Keycloak
         var tokenResponse = await _keycloakTokenService.GetTokenAsync(
             request.Email,
             request.Password,
-            cancellationToken);
+            cancellationToken
+        );
 
-        // Get user info from Keycloak
         var userInfo = await _keycloakTokenService.GetUserInfoAsync(
             tokenResponse.AccessToken,
-            cancellationToken);
+            cancellationToken
+        );
 
-        // Find local user profile by Keycloak user ID
         var keycloakUserId = Guid.Parse(userInfo.Sub);
         var userProfile = await _userProfileRepository.FindByIdAsync(keycloakUserId);
 
-        // If user profile doesn't exist, create it (for existing Keycloak users)
         if (userProfile == null)
         {
             userProfile = UserProfile.Create(
@@ -50,7 +48,6 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        // Extract role from Keycloak
         var role = userInfo.Roles.FirstOrDefault() ?? "customer";
 
         return new LoginResult

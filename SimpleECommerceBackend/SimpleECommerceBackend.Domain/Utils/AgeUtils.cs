@@ -10,14 +10,14 @@ public static class AgeUtils
 
         return age;
     }
-    
+
     public static DateOnly CreateRandomBirthDate(int minAge, int maxAge)
     {
         if (minAge < 0 || maxAge < 0 || minAge > maxAge)
             throw new ArgumentException("Invalid age range.");
 
         var current = DateOnly.FromDateTime(DateTime.UtcNow);
-        
+
         var minDate = current.AddYears(-maxAge);
         var maxDate = current.AddYears(-minAge);
 

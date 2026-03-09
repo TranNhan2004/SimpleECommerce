@@ -170,6 +170,45 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.ToTable("CustomerShippingAddresses", (string)null);
                 });
 
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.EmailVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ConfirmedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerifications", (string)null);
+                });
+
             modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -789,6 +828,17 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.EmailVerification", b =>
+                {
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Inventory", b =>

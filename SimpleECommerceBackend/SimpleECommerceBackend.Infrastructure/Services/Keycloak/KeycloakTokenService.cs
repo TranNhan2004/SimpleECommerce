@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.Options;
 
@@ -59,6 +60,10 @@ public class KeycloakTokenService : IKeycloakTokenService
             if (tokenResponse == null)
                 throw new UnauthorizedException("Invalid token response from Keycloak");
 
+            if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken) ||
+                string.IsNullOrWhiteSpace(tokenResponse.RefreshToken))
+                throw new UnauthorizedException("Token response from Keycloak was missing required fields");
+
             return new KeycloakTokenResponse
             {
                 AccessToken = tokenResponse.AccessToken,
@@ -105,10 +110,11 @@ public class KeycloakTokenService : IKeycloakTokenService
             var tokenResponse = JsonSerializer.Deserialize<KeycloakTokenResponseDto>(content, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-            });
+            }) ?? throw new UnauthorizedException("Invalid token response from Keycloak");
 
-            if (tokenResponse == null)
-                throw new UnauthorizedException("Invalid token response from Keycloak");
+            if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken) ||
+                string.IsNullOrWhiteSpace(tokenResponse.RefreshToken))
+                throw new UnauthorizedException("Token response from Keycloak was missing required fields");
 
             return new KeycloakTokenResponse
             {
@@ -147,10 +153,7 @@ public class KeycloakTokenService : IKeycloakTokenService
             var userInfo = JsonSerializer.Deserialize<KeycloakUserInfoDto>(content, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-            });
-
-            if (userInfo == null)
-                throw new UnauthorizedException("Invalid user info response");
+            }) ?? throw new UnauthorizedException("Invalid user info response");
 
             return new KeycloakUserInfoResponse
             {
@@ -209,22 +212,46 @@ public class KeycloakTokenService : IKeycloakTokenService
     // DTOs for deserialization
     private class KeycloakTokenResponseDto
     {
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; } = null!;
+
+        [JsonPropertyName("refresh_token")]
         public string RefreshToken { get; set; } = null!;
+
+        [JsonPropertyName("expires_in")]
         public int ExpiresIn { get; set; }
+
+        [JsonPropertyName("refresh_expires_in")]
         public int RefreshExpiresIn { get; set; }
+
+        [JsonPropertyName("token_type")]
         public string TokenType { get; set; } = null!;
+
+        [JsonPropertyName("scope")]
         public string Scope { get; set; } = null!;
     }
 
     private class KeycloakUserInfoDto
     {
+        [JsonPropertyName("sub")]
         public string Sub { get; set; } = null!;
+
+        [JsonPropertyName("email")]
         public string Email { get; set; } = null!;
+
+        [JsonPropertyName("email_verified")]
         public bool EmailVerified { get; set; }
+
+        [JsonPropertyName("preferred_username")]
         public string PreferredUsername { get; set; } = null!;
+
+        [JsonPropertyName("given_name")]
         public string? GivenName { get; set; }
+
+        [JsonPropertyName("family_name")]
         public string? FamilyName { get; set; }
+
+        [JsonPropertyName("roles")]
         public List<string>? Roles { get; set; }
     }
 

@@ -97,7 +97,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Status = StatusCodes.Status422UnprocessableEntity,
                     Detail = domainException.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null
                 }
             ),
 
@@ -126,12 +126,12 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Status = StatusCodes.Status404NotFound,
                     Detail = notFoundEx.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
-                    Extensions = new Dictionary<string, object>
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
+                    Extensions = _environment.IsDevelopment() ? new Dictionary<string, object>
                     {
                         ["entityName"] = notFoundEx.EntityName,
                         ["entityId"] = notFoundEx.EntityId
-                    }
+                    } : null
                 }
             ),
 
@@ -144,8 +144,10 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Status = StatusCodes.Status409Conflict,
                     Detail = conflictEx.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
-                    Extensions = conflictEx.EntityName is not null && conflictEx.ConflictingField is not null
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
+                    Extensions = (_environment.IsDevelopment()
+                        && conflictEx.EntityName is not null
+                        && conflictEx.ConflictingField is not null)
                         ? new Dictionary<string, object>
                         {
                             ["entityName"] = conflictEx.EntityName,
@@ -165,7 +167,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Status = StatusCodes.Status401Unauthorized,
                     Detail = unauthorizedEx.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null
                 }
             ),
 
@@ -178,8 +180,8 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Status = StatusCodes.Status403Forbidden,
                     Detail = forbiddenEx.Message,
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
-                    Extensions = forbiddenEx.Resource is not null
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
+                    Extensions = (_environment.IsDevelopment() && forbiddenEx.Resource is not null)
                         ? new Dictionary<string, object>
                         {
                             ["resource"] = forbiddenEx.Resource,
@@ -201,7 +203,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                         ? exception.Message
                         : "An unexpected error occurred. Please try again later.",
                     Instance = context.Request.Path,
-                    TraceId = context.TraceIdentifier,
+                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
                     // Include stack trace only in development
                     Extensions = _environment.IsDevelopment()
                         ? new Dictionary<string, object>

@@ -1,3 +1,5 @@
+using SimpleECommerceBackend.Domain.Enums;
+
 namespace SimpleECommerceBackend.Application.Models.Keycloak;
 
 public class CreateKeycloakUserRequest
@@ -6,6 +8,6 @@ public class CreateKeycloakUserRequest
     public string Password { get; init; } = null!;
     public string FirstName { get; init; } = null!;
     public string LastName { get; init; } = null!;
-    public string Role { get; init; } = null!;
+    public Role Role { get; init; }
 }
 

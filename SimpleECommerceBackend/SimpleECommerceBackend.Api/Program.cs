@@ -1,14 +1,11 @@
 using Keycloak.AuthServices.Authentication;
-
 using Mapster;
-
 using MapsterMapper;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
-
 using SimpleECommerceBackend.Api.Extensions;
+using SimpleECommerceBackend.Api.Mapping;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
 
@@ -18,6 +15,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(typeof(AuthMapping).Assembly);
 builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
@@ -28,19 +26,7 @@ builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, options 
     options.RequireHttpsMetadata = false; // Set to true in production
 });
 
-// Keycloak Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireCustomerRole", policy =>
-        policy.RequireRole("customer"));
-
-    options.AddPolicy("RequireSellerRole", policy =>
-        policy.RequireRole("seller"));
-
-    options.AddPolicy("RequireAdminRole", policy =>
-        policy.RequireRole("admin"));
-});
-
+builder.Services.AddKeycloakPolicies();
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>

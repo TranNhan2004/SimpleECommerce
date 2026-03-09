@@ -1,6 +1,6 @@
 using SimpleECommerceBackend.Domain.Enums;
 
-namespace SimpleECommerceBackend.Application.Models.Auth.Login;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public class LoginResult
 {
@@ -12,7 +12,7 @@ public class LoginResult
     public Sex Sex { get; init; }
     public DateOnly BirthDate { get; init; }
     public string? AvatarUrl { get; init; }
-    public string Role { get; init; } = null!;
+    public Role Role { get; init; }
     public string AccessToken { get; init; } = null!;
     public string RefreshToken { get; init; } = null!;
     public int ExpiresIn { get; init; }

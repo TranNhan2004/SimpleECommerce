@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public class ConfirmEmailResult
 {

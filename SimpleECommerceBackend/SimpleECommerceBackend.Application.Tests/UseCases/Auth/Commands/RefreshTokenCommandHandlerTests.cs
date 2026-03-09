@@ -1,11 +1,11 @@
 using FluentAssertions;
 using Moq;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Application.Models.Keycloak;
-using SimpleECommerceBackend.Application.UseCases.Auth.RefreshToken;
+using SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 
-namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth;
+namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth.Commands;
 
 public class RefreshTokenCommandHandlerTests
 {

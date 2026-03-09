@@ -1,10 +1,7 @@
 using Mapster;
 using SimpleECommerceBackend.Api.DTOs.Auth;
-using SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
-using SimpleECommerceBackend.Application.Models.Users.Update;
-using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
-using SimpleECommerceBackend.Application.Models.Auth.Register;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Application.Models.Auth;
+using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Api.Mapping;
 
@@ -23,7 +20,8 @@ public class AuthMapping : IRegister
         config.NewConfig<RegisterResult, RegisterResponse>();
         config
             .NewConfig<LoginResult, LoginResponse>()
-            .Map(dest => dest.Sex, src => src.Sex.ToString());
+            .Map(dest => dest.Sex, src => src.Sex.ToString())
+            .Map(dest => dest.Role, src => RoleUtils.ToKeycloakRoleName(src.Role));
 
         config.NewConfig<RefreshTokenResult, RefreshTokenResponse>();
     }

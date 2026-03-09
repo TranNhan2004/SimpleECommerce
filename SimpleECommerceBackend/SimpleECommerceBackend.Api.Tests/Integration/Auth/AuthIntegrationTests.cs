@@ -3,6 +3,8 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using SimpleECommerceBackend.Api.DTOs.Auth;
 using SimpleECommerceBackend.Api.Tests.Fixtures;
+using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Api.Tests.Integration.Auth;
 
@@ -32,7 +34,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = "Test@123",
             FirstName = "Test",
             LastName = "User",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         };
 
         // Act
@@ -58,7 +60,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = "Test@123",
             FirstName = "Test",
             LastName = "User",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         };
 
         // Register first time
@@ -72,19 +74,19 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
     }
 
     [Theory]
-    [InlineData("customer")]
-    [InlineData("seller")]
-    [InlineData("admin")]
-    public async Task Register_Should_AcceptValidRoles(string role)
+    [InlineData(Role.Customer)]
+    [InlineData(Role.Seller)]
+    [InlineData(Role.Admin)]
+    public async Task Register_Should_AcceptValidRoles(Role role)
     {
         // Arrange
         var request = new RegisterRequest
         {
-            Email = $"test_{role}_{Guid.NewGuid()}@example.com",
+            Email = $"test_{RoleUtils.ToKeycloakRoleName(role)}_{Guid.NewGuid()}@example.com",
             Password = "Test@123",
             FirstName = "Test",
             LastName = "User",
-            Role = role
+            Role = RoleUtils.ToKeycloakRoleName(role)
         };
 
         // Act
@@ -129,7 +131,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = password,
             FirstName = "Test",
             LastName = "User",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         });
 
         // Small delay to ensure Keycloak processes the registration
@@ -168,7 +170,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = correctPassword,
             FirstName = "Test",
             LastName = "User",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         });
 
         await Task.Delay(500);
@@ -216,7 +218,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = password,
             FirstName = "Seller",
             LastName = "User",
-            Role = "seller"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Seller)
         });
 
         await Task.Delay(500);
@@ -235,7 +237,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
 
         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
         result.Should().NotBeNull();
-        result!.Role.Should().Be("seller");
+        result!.Role.Should().Be(RoleUtils.ToKeycloakRoleName(Role.Seller));
     }
 
     // ---------- Refresh Token Endpoint Tests ----------
@@ -253,7 +255,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = password,
             FirstName = "Test",
             LastName = "User",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         });
 
         await Task.Delay(500);
@@ -336,7 +338,7 @@ public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationF
             Password = password,
             FirstName = "Full",
             LastName = "Flow",
-            Role = "customer"
+            Role = RoleUtils.ToKeycloakRoleName(Role.Customer)
         });
 
         registerResponse.StatusCode.Should().Be(HttpStatusCode.OK);

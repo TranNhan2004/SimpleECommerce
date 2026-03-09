@@ -2,14 +2,15 @@ using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Events.Email;
-using SimpleECommerceBackend.Application.Models.Auth.Register;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Application.Models.Keycloak;
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
-namespace SimpleECommerceBackend.Application.UseCases.Auth.Register;
+
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 
 [AutoConstructor]
 public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
@@ -31,9 +32,7 @@ public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, R
                 "User with this email already exists"
             );
 
-        var validRoles = new[] { "customer", "seller", "admin" };
-        if (!validRoles.Contains(request.Role.ToLower()))
-            throw new BusinessException($"Invalid role. Must be one of: {string.Join(", ", validRoles)}");
+        var role = RoleUtils.Parse(request.Role);
 
         var keycloakUser = await _keycloakAdminService.CreateUserAsync(new CreateKeycloakUserRequest
         {
@@ -41,7 +40,7 @@ public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, R
             Password = request.Password,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Role = request.Role.ToLower()
+            Role = role
         }, cancellationToken);
 
         var verificationToken = TokenUtils.CreateVerificationToken();

@@ -4,11 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleECommerceBackend.Api.DTOs.Auth;
 using SimpleECommerceBackend.Api.DTOs.Errors;
-using SimpleECommerceBackend.Application.Models.Users.Update;
-using SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
-using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
-using SimpleECommerceBackend.Application.Models.Auth.Register;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Application.Models.Auth;
 
 namespace SimpleECommerceBackend.Api.Controllers;
 

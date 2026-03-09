@@ -4,14 +4,15 @@ using Moq;
 using SimpleECommerceBackend.Application.Events.Email;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.Register;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Application.Models.Keycloak;
-using SimpleECommerceBackend.Application.UseCases.Auth.Register;
+using SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth;
+namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth.Commands;
 
 public class RegisterCommandHandlerTests
 {
@@ -103,7 +104,7 @@ public class RegisterCommandHandlerTests
                     r.Password == command.Password &&
                     r.FirstName == command.FirstName &&
                     r.LastName == command.LastName &&
-                    r.Role == "customer"
+                    r.Role == Role.Customer
                 ),
                 It.IsAny<CancellationToken>()
             ),
@@ -147,10 +148,10 @@ public class RegisterCommandHandlerTests
     }
 
     [Theory]
-    [InlineData("customer")]
-    [InlineData("seller")]
-    [InlineData("admin")]
-    public async Task Handle_ShouldAcceptValidRoles(string role)
+    [InlineData(Role.Customer)]
+    [InlineData(Role.Seller)]
+    [InlineData(Role.Admin)]
+    public async Task Handle_ShouldAcceptValidRoles(Role role)
     {
         // Arrange
         var command = new RegisterCommand(
@@ -158,7 +159,7 @@ public class RegisterCommandHandlerTests
             Password: "Test@123",
             FirstName: "John",
             LastName: "Doe",
-            Role: role
+            Role: role.ToString()
         );
 
         var keycloakUserResponse = new CreateKeycloakUserResponse
@@ -200,7 +201,7 @@ public class RegisterCommandHandlerTests
 
         _keycloakAdminServiceMock.Verify(
             x => x.CreateUserAsync(
-                It.Is<CreateKeycloakUserRequest>(r => r.Role == role.ToLower()),
+                It.Is<CreateKeycloakUserRequest>(r => r.Role == role),
                 It.IsAny<CancellationToken>()
             ),
             Times.Once
@@ -326,7 +327,7 @@ public class RegisterCommandHandlerTests
 
         _keycloakAdminServiceMock.Verify(
             x => x.CreateUserAsync(
-                It.Is<CreateKeycloakUserRequest>(r => r.Role == "customer"),
+                It.Is<CreateKeycloakUserRequest>(r => r.Role == Role.Customer),
                 It.IsAny<CancellationToken>()
             ),
             Times.Once

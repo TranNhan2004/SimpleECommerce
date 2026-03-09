@@ -1,6 +1,6 @@
 using SimpleECommerceBackend.Domain.Enums;
 
-namespace SimpleECommerceBackend.Application.Models.Users.Update;
+namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
 public class UpdateResult
 {

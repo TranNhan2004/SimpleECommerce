@@ -7,7 +7,9 @@ using System.Text.Json.Nodes;
 using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Keycloak;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Keycloak;
 
@@ -147,11 +149,13 @@ public class KeycloakAdminService : IKeycloakAdminService
 
     public async Task AssignRoleToUserAsync(
         string userId,
-        string roleName,
+        Role role,
         CancellationToken cancellationToken = default
     )
     {
         await EnsureAdminTokenAsync(cancellationToken);
+
+        var roleName = RoleUtils.ToKeycloakRoleName(role);
 
         var rolesUrl = $"{_settings.AdminUrl}/roles/{roleName}";
         var getRoleRequest = new HttpRequestMessage(HttpMethod.Get, rolesUrl);
@@ -162,7 +166,7 @@ public class KeycloakAdminService : IKeycloakAdminService
             throw new BusinessException($"Role '{roleName}' not found in Keycloak");
 
         var roleContent = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
-        var role = JsonSerializer.Deserialize<KeycloakRoleDto>(roleContent, new JsonSerializerOptions
+        var roleDto = JsonSerializer.Deserialize<KeycloakRoleDto>(roleContent, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         }) ?? throw new BusinessException($"Failed to deserialize role \"{roleName}\"");
@@ -171,7 +175,7 @@ public class KeycloakAdminService : IKeycloakAdminService
         var assignRequest = new HttpRequestMessage(HttpMethod.Post, assignRoleUrl);
         assignRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
 
-        var roleArray = new[] { new { id = role.Id, name = role.Name } };
+        var roleArray = new[] { new { id = roleDto.Id, name = roleDto.Name } };
         var json = JsonSerializer.Serialize(roleArray);
         assignRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 

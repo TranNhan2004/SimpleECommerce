@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace SimpleECommerceBackend.Application.Models.Auth.Login;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public record LoginCommand(
     string Email,

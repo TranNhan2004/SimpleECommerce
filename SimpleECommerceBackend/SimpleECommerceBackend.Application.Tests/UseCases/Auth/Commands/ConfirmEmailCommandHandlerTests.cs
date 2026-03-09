@@ -4,12 +4,12 @@ using FluentAssertions;
 using Moq;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
-using SimpleECommerceBackend.Application.UseCases.Auth.ConfirmEmail;
+using SimpleECommerceBackend.Application.Models.Auth;
+using SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth;
+namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth.Commands;
 
 public class ConfirmEmailCommandHandlerTests
 {

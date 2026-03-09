@@ -1,8 +1,8 @@
 using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
+using SimpleECommerceBackend.Application.Models.Auth;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.RefreshToken;
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 
 [AutoConstructor]
 public partial class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>

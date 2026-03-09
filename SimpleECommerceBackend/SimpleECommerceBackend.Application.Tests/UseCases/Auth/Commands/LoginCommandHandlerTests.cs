@@ -3,12 +3,13 @@ using Moq;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Keycloak;
-using SimpleECommerceBackend.Application.UseCases.Auth.Login;
+using SimpleECommerceBackend.Application.UseCases.Auth.Commands;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth;
+namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth.Commands;
 
 public class LoginCommandHandlerTests
 {
@@ -95,7 +96,7 @@ public class LoginCommandHandlerTests
         result.Email.Should().Be(command.Email);
         result.FirstName.Should().Be("John");
         result.LastName.Should().Be("Doe");
-        result.Role.Should().Be("customer");
+        result.Role.Should().Be(Role.Customer);
         result.AccessToken.Should().Be(tokenResponse.AccessToken);
         result.RefreshToken.Should().Be(tokenResponse.RefreshToken);
         result.ExpiresIn.Should().Be(tokenResponse.ExpiresIn);
@@ -182,7 +183,7 @@ public class LoginCommandHandlerTests
         result.Email.Should().Be(command.Email);
         result.FirstName.Should().Be("Jane");
         result.LastName.Should().Be("Smith");
-        result.Role.Should().Be("seller");
+        result.Role.Should().Be(Role.Seller);
         result.AccessToken.Should().Be(tokenResponse.AccessToken);
 
         _userProfileRepositoryMock.Verify(
@@ -229,7 +230,7 @@ public class LoginCommandHandlerTests
             PreferredUsername = command.Email,
             GivenName = "John",
             FamilyName = "Doe",
-            Roles = new List<string>() // Empty roles
+            Roles = [] // Empty roles
         };
 
         var existingUserProfile = UserProfile.Create(
@@ -260,7 +261,7 @@ public class LoginCommandHandlerTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Role.Should().Be("customer");
+        result.Role.Should().Be(Role.Customer);
     }
 
     [Fact]
@@ -337,18 +338,18 @@ public class LoginCommandHandlerTests
         // Arrange
         var command = new LoginCommand(
             Email: "test@example.com",
-            Password: "WrongPassword"
+            Password: "Test@123"
         );
 
         _keycloakTokenServiceMock
             .Setup(x => x.GetTokenAsync(command.Email, command.Password, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new UnauthorizedAccessException("Invalid credentials"));
+            .ThrowsAsync(new UnauthorizedException("Invalid credentials"));
 
         // Act
         var act = async () => await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<UnauthorizedAccessException>()
+        await act.Should().ThrowAsync<UnauthorizedException>()
             .WithMessage("Invalid credentials");
 
         _keycloakTokenServiceMock.Verify(

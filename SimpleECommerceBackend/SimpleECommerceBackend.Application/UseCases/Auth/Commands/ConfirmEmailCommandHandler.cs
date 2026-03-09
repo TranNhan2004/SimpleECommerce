@@ -1,13 +1,11 @@
-using System.Security.Cryptography;
-using System.Text;
 using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.ConfirmEmail;
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 
 [AutoConstructor]
 public partial class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, ConfirmEmailResult>
@@ -57,5 +55,5 @@ public partial class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCo
         };
     }
 
-    
+
 }

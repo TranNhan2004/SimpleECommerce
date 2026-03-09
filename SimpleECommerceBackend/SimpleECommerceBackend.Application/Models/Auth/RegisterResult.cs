@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Models.Auth.Register;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public class RegisterResult
 {

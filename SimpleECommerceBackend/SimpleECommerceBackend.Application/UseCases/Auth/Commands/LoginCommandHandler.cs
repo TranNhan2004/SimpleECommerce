@@ -1,14 +1,13 @@
 using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Application.Models.Auth;
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.UseCases.Auth.Login;
+namespace SimpleECommerceBackend.Application.UseCases.Auth.Commands;
 
 [AutoConstructor]
 public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResult>
@@ -52,7 +51,7 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        var role = userInfo.Roles.FirstOrDefault() ?? "customer";
+        var role = RoleUtils.ResolvePrimaryRole(userInfo.Roles);
 
         return new LoginResult
         {

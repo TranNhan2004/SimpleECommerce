@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public class RefreshTokenResult
 {

@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace SimpleECommerceBackend.Application.Models.Auth.Register;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public record RegisterCommand(
     string Email,

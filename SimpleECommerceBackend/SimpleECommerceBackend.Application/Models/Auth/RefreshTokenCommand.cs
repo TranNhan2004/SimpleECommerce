@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
+namespace SimpleECommerceBackend.Application.Models.Auth;
 
 public record RefreshTokenCommand(
     string RefreshToken

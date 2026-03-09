@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace SimpleECommerceBackend.Application.Models.Users.Update;
+namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
 public record UpdateCommand(
     string Email,

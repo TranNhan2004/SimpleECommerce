@@ -6,6 +6,7 @@ public interface IKeycloakAdminService
 {
     Task<CreateKeycloakUserResponse> CreateUserAsync(CreateKeycloakUserRequest request, CancellationToken cancellationToken = default);
     Task AssignRoleToUserAsync(string userId, string roleName, CancellationToken cancellationToken = default);
+    Task MarkEmailAsVerifiedAsync(string userId, CancellationToken cancellationToken = default);
     Task DeleteUserAsync(string userId, CancellationToken cancellationToken = default);
     Task<bool> UserExistsAsync(string email, CancellationToken cancellationToken = default);
 }

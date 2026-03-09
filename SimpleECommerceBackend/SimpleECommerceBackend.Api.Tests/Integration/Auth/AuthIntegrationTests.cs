@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using SimpleECommerceBackend.Api.DTOs.Auth;
+using SimpleECommerceBackend.Api.Tests.Fixtures;
 
 namespace SimpleECommerceBackend.Api.Tests.Integration.Auth;
 
@@ -11,11 +11,11 @@ namespace SimpleECommerceBackend.Api.Tests.Integration.Auth;
 /// NOTE: These tests require a running Keycloak instance at http://localhost:8080
 /// Run docker-compose up before executing these tests.
 /// </summary>
-public class AuthIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class AuthIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public AuthIntegrationTests(WebApplicationFactory<Program> factory)
+    public AuthIntegrationTests(IntegrationTestWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
@@ -64,7 +64,7 @@ public class AuthIntegrationTests : IClassFixture<WebApplicationFactory<Program>
         // Register first time
         await _client.PostAsJsonAsync("/api/v1/auth/register", request1);
 
-        // Act - Try to register again with same email
+        // Act 
         var response = await _client.PostAsJsonAsync("/api/v1/auth/register", request1);
 
         // Assert
@@ -158,7 +158,7 @@ public class AuthIntegrationTests : IClassFixture<WebApplicationFactory<Program>
     [Fact]
     public async Task Login_Should_Return401_WithInvalidPassword()
     {
-        // Arrange - First register a user
+        // Arrange 
         var email = $"logintest_{Guid.NewGuid()}@example.com";
         var correctPassword = "Test@123";
 
@@ -173,7 +173,7 @@ public class AuthIntegrationTests : IClassFixture<WebApplicationFactory<Program>
 
         await Task.Delay(500);
 
-        // Act - Try to login with wrong password
+        // Act 
         var loginRequest = new LoginRequest
         {
             Email = email,

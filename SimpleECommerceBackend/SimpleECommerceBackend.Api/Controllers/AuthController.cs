@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleECommerceBackend.Api.DTOs.Auth;
 using SimpleECommerceBackend.Api.DTOs.Errors;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
+using SimpleECommerceBackend.Application.Models.Users.Update;
+using SimpleECommerceBackend.Application.Models.Auth.ConfirmEmail;
 using SimpleECommerceBackend.Application.Models.Auth.RefreshToken;
 using SimpleECommerceBackend.Application.Models.Auth.Register;
+using SimpleECommerceBackend.Application.Models.Auth.Login;
 
 namespace SimpleECommerceBackend.Api.Controllers;
 
@@ -30,6 +32,19 @@ public partial class AuthController : ControllerBase
         var command = _mapper.Map<RegisterCommand>(request);
         var result = await _sender.Send(command);
         var response = _mapper.Map<RegisterResponse>(result);
+        return Ok(response);
+    }
+
+    [HttpGet("confirm-email")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ConfirmEmailResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
+    {
+        var command = _mapper.Map<ConfirmEmailCommand>(request);
+        var result = await _sender.Send(command);
+        var response = _mapper.Map<ConfirmEmailResponse>(result);
         return Ok(response);
     }
 

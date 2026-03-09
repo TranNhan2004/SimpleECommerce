@@ -5,6 +5,7 @@ using SimpleECommerceBackend.Application.Models.Auth.Login;
 using SimpleECommerceBackend.Domain.Constants;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.Auth.Login;
@@ -16,11 +17,14 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
     private readonly IUserProfileRepository _userProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken = default)
+    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
+        var validatedEmail = CredentialUtils.ValidateEmail(request.Email);
+        var validatedPassword = CredentialUtils.ValidatePassword(request.Password);
+
         var tokenResponse = await _keycloakTokenService.GetTokenAsync(
-            request.Email,
-            request.Password,
+            validatedEmail,
+            validatedPassword,
             cancellationToken
         );
 
@@ -32,7 +36,7 @@ public partial class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRe
         var keycloakUserId = Guid.Parse(userInfo.Sub);
         var userProfile = await _userProfileRepository.FindByIdAsync(keycloakUserId);
 
-        if (userProfile == null)
+        if (userProfile is null)
         {
             userProfile = UserProfile.Create(
                 keycloakUserId,

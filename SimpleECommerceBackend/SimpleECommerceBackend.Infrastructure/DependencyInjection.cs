@@ -18,9 +18,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpContextAccessor();
+
         // Email Services
         services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
+        services.Configure<EmailVerificationOptions>(configuration.GetSection("EmailVerification"));
         services.AddScoped<IEmailProvider, EmailProvider>();
+        services.AddScoped<IEmailVerificationLinkBuilder, EmailVerificationLinkBuilder>();
         services.AddSingleton<BackgroundEmailQueue>();
         services.AddSingleton<IEmailService, SmtpEmailService>();
         services.AddSingleton<IEmailSender, SmtpEmailSender>();
@@ -63,6 +67,7 @@ public static class DependencyInjection
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICustomerShippingAddressRepository, CustomerShippingAddressRepository>();
+        services.AddScoped<IEmailVerificationRepository, EmailVerificationRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IOrderItemRepository, OrderItemRepository>();

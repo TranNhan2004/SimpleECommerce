@@ -6,7 +6,7 @@
 - **Date**: 2026-03-03
 - **Target**: Migrate from Custom JWT Authentication to Keycloak
 - **Strategy**: Full Keycloak Integration (Option 1)
-- **Status**: Not Started
+- **Status**: ✅ Completed (Development Scope)
 
 ---
 
@@ -22,7 +22,6 @@
    - [Phase 5: Use Case Layer Updates](#phase-5-use-case-layer-updates)
    - [Phase 6: Domain & Infrastructure Updates](#phase-6-domain--infrastructure-updates)
    - [Phase 7: Testing & Validation](#phase-7-testing--validation)
-   - [Phase 8: Deployment & Migration](#phase-8-deployment--migration)
 4. [Notifications & Alerts](#notifications--alerts)
 5. [Rollback Plan](#rollback-plan)
 
@@ -46,8 +45,7 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 | Phase 3-5 | 5-7 days       | ✅ Complete (Jan 2025 + Mar 2026 refactor) | Core implementation              |
 | Phase 6   | 3-4 days       | ✅ Complete (Mar 6, 2026)                  | Domain updates and cleanup       |
 | Phase 7   | 3-5 days       | ✅ Complete (Mar 8, 2026)                  | Testing & Validation             |
-| Phase 8   | 2-3 days       | ⬜ Not Started                             | Deployment                       |
-| **Total** | **15-22 days** | **~95% Complete**                          | Complete migration               |
+| **Total** | **13-19 days** | **✅ Complete**                            | Complete development migration   |
 
 ### Key Benefits
 
@@ -120,7 +118,7 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 ### Notifications
 
 - ⚠️ **Important**: Save client secret immediately after creation
-- ⚠️ **Warning**: Enable service accounts for admin operations
+- ⚠️ **Warning**: Enable service accounts for admin operations and assign `realm-management` roles to the backend service account
 - ✅ **Success**: Validate JWT tokens contain role claims before proceeding
 
 ---
@@ -354,45 +352,6 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 
 ---
 
-## Phase 8: Deployment & Migration
-
-**Status**: ⬜ Not Started  
-**Duration**: 2-3 days  
-**Detailed Implementation**: [KEYCLOAK_IMPLEMENTATION_PHASE_8.md](./KEYCLOAK_IMPLEMENTATION_PHASE_8.md)
-
-### Objectives
-
-- Deploy production Keycloak instance
-- Configure production settings with SSL
-- Migrate existing users to Keycloak (if applicable)
-- Deploy updated backend application
-- Update frontend authentication
-- Monitor and validate production deployment
-
-### Techniques & Approaches
-
-1. **Production Keycloak**: Use managed service or self-host with HA configuration
-2. **SSL/TLS**: Configure HTTPS for all Keycloak communication
-3. **User Migration**: Create migration scripts for existing users
-4. **Deployment Strategy**: Blue-green or canary deployment
-5. **Frontend Updates**: Update Angular app to use new token format
-6. **Monitoring**: Set up logging, alerts, and dashboards
-
-### Key Files & Components
-
-- Keycloak production configuration
-- User migration scripts
-- Deployment manifests (Docker/Kubernetes)
-- Frontend authentication service updates
-
-### Notifications
-
-- ⚠️ **Downtime**: Plan maintenance window for migration
-- 🔥 **Rollback Ready**: Have rollback plan prepared
-- ✅ **Monitoring**: Watch metrics closely post-deployment
-
----
-
 ## Notifications & Alerts
 
 ### Critical Warnings
@@ -406,6 +365,7 @@ Replace the current custom JWT authentication system with Keycloak to leverage e
 - 🟡 **Dependencies**: Backend depends on Keycloak availability
 - 🟡 **Token Expiration**: Default 5-minute token lifetime (configure as needed)
 - 🟡 **Testing Required**: Each phase requires validation before proceeding
+- 🟡 **Keycloak Admin Roles**: Backend registration flows require `realm-management` roles on the service account
 
 ### Information
 
@@ -451,7 +411,7 @@ Support both authentication methods temporarily:
 - **Phase 1-2**: Simple - just stop using Keycloak, no code changes yet
 - **Phase 3-5**: Revert code changes via Git, services not yet integrated
 - **Phase 6**: Git rollback to previous commit, recreate database
-- **Phase 7-8**: Full rollback required via Git, redeploy old version
+- **Phase 7**: Full rollback required via Git, redeploy old version
 
 ---
 
@@ -462,8 +422,7 @@ Support both authentication methods temporarily:
 - ✅ All users can authenticate via Keycloak
 - ✅ Token-based authorization working correctly
 - ✅ All roles and permissions properly configured
-- ✅ Frontend successfully integrated
-- ✅ Production deployment stable
+- ✅ Local backend and API integration tests stable
 - ✅ No security vulnerabilities introduced
 - Performance meets or exceeds previous system
 
@@ -496,6 +455,6 @@ Each phase considered complete when:
 
 ---
 
-_Document Version: 2.0_  
-_Last Updated: 2026-03-03_  
+_Document Version: 2.1_  
+_Last Updated: 2026-03-09_  
 _Author: Development Team_

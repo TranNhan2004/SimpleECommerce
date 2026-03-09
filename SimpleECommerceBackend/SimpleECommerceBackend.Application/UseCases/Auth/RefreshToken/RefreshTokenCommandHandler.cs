@@ -9,7 +9,7 @@ public partial class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCo
 {
     private readonly IKeycloakTokenService _keycloakTokenService;
 
-    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
+    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var tokenResponse = await _keycloakTokenService.RefreshTokenAsync(
             request.RefreshToken,

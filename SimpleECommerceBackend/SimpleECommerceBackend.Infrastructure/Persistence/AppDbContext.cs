@@ -16,6 +16,7 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<EmailVerification> EmailVerifications => Set<EmailVerification>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
@@ -28,7 +29,6 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
-
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

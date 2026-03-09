@@ -2,11 +2,11 @@ using FluentAssertions;
 using Moq;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
-using SimpleECommerceBackend.Application.Models.Auth.Login;
 using SimpleECommerceBackend.Application.Models.Keycloak;
 using SimpleECommerceBackend.Application.UseCases.Auth.Login;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Application.Models.Auth.Login;
 
 namespace SimpleECommerceBackend.Application.Tests.UseCases.Auth;
 

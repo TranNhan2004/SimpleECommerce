@@ -1,6 +1,7 @@
 using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
+using SimpleECommerceBackend.Application.Events.Email;
 using SimpleECommerceBackend.Application.Models.Auth.Register;
 using SimpleECommerceBackend.Application.Models.Keycloak;
 using SimpleECommerceBackend.Domain.Constants;
@@ -8,29 +9,32 @@ using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
-
 namespace SimpleECommerceBackend.Application.UseCases.Auth.Register;
 
 [AutoConstructor]
 public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
+    private readonly IEmailVerificationRepository _emailVerificationRepository;
     private readonly IKeycloakAdminService _keycloakAdminService;
+    private readonly IPublisher _publisher;
     private readonly IUserProfileRepository _userProfileRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken = default)
+    public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        // Check if user already exists in Keycloak
         var userExists = await _keycloakAdminService.UserExistsAsync(request.Email, cancellationToken);
         if (userExists)
-            throw new BusinessException("User with this email already exists");
+            throw new ConflictException(
+                "UserProfile",
+                "email",
+                request.Email,
+                "User with this email already exists"
+            );
 
-        // Validate role
         var validRoles = new[] { "customer", "seller", "admin" };
         if (!validRoles.Contains(request.Role.ToLower()))
             throw new BusinessException($"Invalid role. Must be one of: {string.Join(", ", validRoles)}");
 
-        // Create user in Keycloak
         var keycloakUser = await _keycloakAdminService.CreateUserAsync(new CreateKeycloakUserRequest
         {
             Email = request.Email,
@@ -40,20 +44,33 @@ public partial class RegisterCommandHandler : IRequestHandler<RegisterCommand, R
             Role = request.Role.ToLower()
         }, cancellationToken);
 
-        // Create local UserProfile with Keycloak user ID
+        var verificationToken = TokenUtils.CreateVerificationToken();
+        var emailVerification = EmailVerification.Create(
+            Guid.Parse(keycloakUser.KeycloakUserId),
+            request.Email,
+            TokenUtils.HashToken(verificationToken),
+            DateTimeOffset.UtcNow.AddHours(EmailVerificationConstants.TokenLifetimeHours)
+        );
+
         var userProfile = UserProfile.Create(
             Guid.Parse(keycloakUser.KeycloakUserId),
             request.Email,
             request.FirstName,
             request.LastName,
-            null, // nickname
+            null,
             Sex.Other,
             AgeUtils.CreateRandomBirthDate(UserProfileConstants.MinAge, UserProfileConstants.MaxAge),
-            null // avatar URL
+            null
         );
 
+        _emailVerificationRepository.Add(emailVerification);
         _userProfileRepository.Add(userProfile);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _publisher.Publish(
+            new SendEmailVerificationEvent(request.Email, verificationToken),
+            cancellationToken
+        );
 
         return new RegisterResult
         {

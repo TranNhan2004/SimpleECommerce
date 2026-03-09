@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Api.Tests.Fixtures;
@@ -18,11 +17,11 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
         // Set environment to Development to load appsettings.Development.json
         builder.UseEnvironment("Development");
 
-        // Set content root to the API project directory to find appsettings files
-        // Navigate from the test assembly location (bin/Debug/net10.0) to the API project
-        var testProjectPath = Directory.GetCurrentDirectory();
-        var solutionPath = Path.GetFullPath(Path.Combine(testProjectPath, "..", "..", "..", ".."));
-        var apiProjectPath = Path.Combine(solutionPath, "SimpleECommerceBackend.Api");
+        // Resolve the API project from the compiled test assembly so the factory works
+        // regardless of which directory dotnet test is launched from.
+        var apiProjectPath = Path.GetFullPath(
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "SimpleECommerceBackend.Api")
+        );
 
         builder.UseContentRoot(apiProjectPath);
 

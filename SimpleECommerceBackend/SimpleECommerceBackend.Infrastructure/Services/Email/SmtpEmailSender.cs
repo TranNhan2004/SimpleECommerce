@@ -1,10 +1,7 @@
+using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-
-using Microsoft.Extensions.Configuration;
-
-using MimeKit;
-
+using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;
@@ -13,9 +10,9 @@ public class SmtpEmailSender : IEmailSender
 {
     private readonly SmtpOptions _smtpOptions;
 
-    public SmtpEmailSender(IConfiguration configuration)
+    public SmtpEmailSender(IOptions<SmtpOptions> smtpOptions)
     {
-        _smtpOptions = configuration.GetSection("SmtpOptions").Get<SmtpOptions>()!;
+        _smtpOptions = smtpOptions.Value;
     }
 
     public async Task SendEmailAsync(string to, string subject, string body, CancellationToken stoppingToken)

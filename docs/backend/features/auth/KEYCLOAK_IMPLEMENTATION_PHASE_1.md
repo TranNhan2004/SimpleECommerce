@@ -278,8 +278,22 @@ Configure URLs for both development and production environments:
 #### Retrieve Client Secret
 
 1. After saving, navigate to the **Credentials** tab
-2. Copy the **Client Secret** value
-3. **⚠️ IMPORTANT**: Save this secret securely - you'll need it for backend configuration
+
+#### Assign Service Account Admin Roles
+
+1. Navigate to: **Clients** → `simple-e-commerce-backend`
+2. Open the **Service accounts roles** tab
+3. Click **Assign role**
+4. Change the filter to **Filter by clients**
+5. Select the `realm-management` client
+6. Assign these roles:
+
+- `view-users`
+- `manage-users`
+- `query-users`
+- `view-realm`
+
+**⚠️ IMPORTANT**: These `realm-management` roles are required for backend admin operations such as checking whether a user exists, creating users, and assigning roles during registration. Without them, API integration tests and register/login flows will fail with `401` or `422` responses. 2. Copy the **Client Secret** value 3. **⚠️ IMPORTANT**: Save this secret securely - you'll need it for backend configuration
 
 **✅ Checkpoint**: Client created with secret retrieved
 
@@ -681,6 +695,7 @@ Complete this checklist before proceeding to Phase 2:
 - [x] Client `simple-e-commerce-backend` created
 - [x] Client secret retrieved and stored securely
 - [x] Service accounts enabled for client
+- [x] `realm-management` roles assigned to the backend service account (`view-users`, `manage-users`, `query-users`, `view-realm`)
 - [x] `simple-e-commerce-roles` client scope created with realm role mapper
 - [x] `simple-e-commerce-roles` scope assigned to client as default
 - [x] Three realm roles created: `customer`, `seller`, `admin`

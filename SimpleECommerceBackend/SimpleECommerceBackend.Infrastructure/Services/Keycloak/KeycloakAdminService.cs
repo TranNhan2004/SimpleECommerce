@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Application.Interfaces.Services.Keycloak;
 using SimpleECommerceBackend.Application.Models.Keycloak;
@@ -40,7 +42,7 @@ public class KeycloakAdminService : IKeycloakAdminService
             firstName = request.FirstName,
             lastName = request.LastName,
             enabled = true,
-            emailVerified = true,
+            emailVerified = false,
             credentials = new[]
             {
                 new
@@ -64,7 +66,7 @@ public class KeycloakAdminService : IKeycloakAdminService
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
                 if (response.StatusCode == HttpStatusCode.Conflict)
-                    throw new BusinessException("User with this email already exists");
+                    throw new ConflictException("UserProfile", "email", request.Email, "User with this email already exists");
 
                 throw new BusinessException($"Failed to create user in Keycloak: {errorContent}");
             }
@@ -88,6 +90,61 @@ public class KeycloakAdminService : IKeycloakAdminService
         }
     }
 
+    public async Task MarkEmailAsVerifiedAsync(
+        string userId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await EnsureAdminTokenAsync(cancellationToken);
+
+        var userUrl = $"{_settings.AdminUrl}/users/{userId}";
+        var getRequest = new HttpRequestMessage(HttpMethod.Get, userUrl);
+        getRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
+
+        var getResponse = await _httpClient.SendAsync(getRequest, cancellationToken);
+        if (getResponse.StatusCode == HttpStatusCode.NotFound)
+            throw new NotFoundException("User not found in Keycloak");
+
+        if (!getResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await getResponse.Content.ReadAsStringAsync(cancellationToken);
+            throw new BusinessException($"Failed to retrieve Keycloak user before email verification: {errorContent}");
+        }
+
+        var userContent = await getResponse.Content.ReadAsStringAsync(cancellationToken);
+        var userRepresentation = JsonNode.Parse(userContent)?.AsObject()
+            ?? throw new BusinessException("Failed to deserialize Keycloak user representation");
+
+        if (userRepresentation["emailVerified"]?.GetValue<bool>() == true)
+            return;
+
+        userRepresentation["emailVerified"] = true;
+
+        if (userRepresentation["requiredActions"] is JsonArray requiredActions)
+        {
+            for (var index = requiredActions.Count - 1; index >= 0; index--)
+            {
+                if (string.Equals(requiredActions[index]?.GetValue<string>(), "VERIFY_EMAIL", StringComparison.Ordinal))
+                    requiredActions.RemoveAt(index);
+            }
+        }
+
+        var updateRequest = new HttpRequestMessage(HttpMethod.Put, userUrl);
+        updateRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _adminToken);
+        updateRequest.Content = new StringContent(
+            userRepresentation.ToJsonString(),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var updateResponse = await _httpClient.SendAsync(updateRequest, cancellationToken);
+        if (!updateResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await updateResponse.Content.ReadAsStringAsync(cancellationToken);
+            throw new BusinessException($"Failed to mark Keycloak email as verified: {errorContent}");
+        }
+    }
+
     public async Task AssignRoleToUserAsync(
         string userId,
         string roleName,
@@ -108,10 +165,7 @@ public class KeycloakAdminService : IKeycloakAdminService
         var role = JsonSerializer.Deserialize<KeycloakRoleDto>(roleContent, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
-        });
-
-        if (role is null)
-            throw new BusinessException($"Failed to deserialize role '{roleName}'");
+        }) ?? throw new BusinessException($"Failed to deserialize role \"{roleName}\"");
 
         var assignRoleUrl = $"{_settings.AdminUrl}/users/{userId}/role-mappings/realm";
         var assignRequest = new HttpRequestMessage(HttpMethod.Post, assignRoleUrl);
@@ -198,13 +252,19 @@ public class KeycloakAdminService : IKeycloakAdminService
         if (tokenResponse == null)
             throw new BusinessException("Invalid admin token response");
 
+        if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
+            throw new BusinessException("Admin token response did not include an access token");
+
         _adminToken = tokenResponse.AccessToken;
         _tokenExpiration = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn - 60); // Refresh 1 min before expiry
     }
 
     private class AdminTokenResponse
     {
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; } = null!;
+
+        [JsonPropertyName("expires_in")]
         public int ExpiresIn { get; set; }
     }
 

@@ -27,7 +27,7 @@ public sealed partial class SendEmailEventHandler : INotificationHandler<SendEma
         );
 
         _logger.LogInformation(
-            "[Events::SendEmailHandler]: Welcome email queued for {Email}",
+            "[Events::SendEmailEventHandler]: Welcome email queued for {Email}",
             notification.Email
         );
     }

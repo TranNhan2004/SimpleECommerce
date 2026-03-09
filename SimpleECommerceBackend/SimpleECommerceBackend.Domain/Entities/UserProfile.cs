@@ -50,14 +50,8 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
     public void SetEmail(string email)
     {
-        if (string.IsNullOrEmpty(email))
-            throw new BusinessException("Email is required");
-
-        var trimmedEmail = email.Trim();
-
-        Email = trimmedEmail;
+        Email = CredentialUtils.ValidateEmail(email);
     }
-
 
     public void SetFirstName(string firstName)
     {
@@ -67,8 +61,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         var trimmedFirstName = firstName.Trim();
 
         if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
-            throw new BusinessException(
-                $"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
+            throw new BusinessException($"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
 
         FirstName = trimmedFirstName;
     }

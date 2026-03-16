@@ -1,0 +1,29 @@
+{
+  "brand": {
+    "tagline": "Modern Commerce"
+  },
+  "search": {
+    "placeholder": "Search products, brands, and collections",
+    "action": "Search"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "newArrivals": "New arrivals",
+    "bestSellers": "Best sellers",
+    "flashDeals": "Flash deals",
+    "support": "Support",
+    "login": "Login",
+    "account": "Account",
+    "cart": "Cart"
+  },
+  "meta": {
+    "freeShipping": "Free shipping",
+    "returns": "30-day returns",
+    "secureCheckout": "Secure checkout"
+  },
+  "language": {
+    "switchToEnglish": "Switch language to English",
+    "switchToVietnamese": "Switch language to Vietnamese"
+  }
+}

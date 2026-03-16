@@ -63,6 +63,8 @@ services:
     restart: unless-stopped
     networks:
       - default
+    profiles:
+      - tunnel
 
 volumes:
   sqlserver_data:

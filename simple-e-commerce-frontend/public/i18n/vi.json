@@ -1,0 +1,29 @@
+{
+  "brand": {
+    "tagline": "Thương mại hiện đại"
+  },
+  "search": {
+    "placeholder": "Tìm sản phẩm, thương hiệu và bộ sưu tập",
+    "action": "Tìm kiếm"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "categories": "Danh mục",
+    "newArrivals": "Hàng mới về",
+    "bestSellers": "Bán chạy",
+    "flashDeals": "Giá sốc",
+    "support": "Hỗ trợ",
+    "login": "Đăng nhập",
+    "account": "Tài khoản",
+    "cart": "Giỏ hàng"
+  },
+  "meta": {
+    "freeShipping": "Miễn phí vận chuyển",
+    "returns": "Đổi trả trong 30 ngày",
+    "secureCheckout": "Thanh toán an toàn"
+  },
+  "language": {
+    "switchToEnglish": "Chuyển ngôn ngữ sang tiếng Anh",
+    "switchToVietnamese": "Chuyển ngôn ngữ sang tiếng Việt"
+  }
+}

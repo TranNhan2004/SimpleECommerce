@@ -8,7 +8,7 @@ namespace SimpleECommerceBackend.Api.Tests.Fixtures;
 
 /// <summary>
 /// Custom WebApplicationFactory for integration tests that properly configures
-/// the test environment with database and Keycloak settings.
+/// the test environment with the database and bearer-token authentication settings.
 /// </summary>
 public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Program>
 {

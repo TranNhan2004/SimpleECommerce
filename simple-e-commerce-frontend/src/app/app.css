@@ -1,3 +1,4 @@
 :host {
-	@apply block min-h-screen;
+	display: block;
+	min-height: 100vh;
 }

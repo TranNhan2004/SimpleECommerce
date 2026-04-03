@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
-using SimpleECommerceBackend.Infrastructure.Persistence.DbExceptions;
+using SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 
@@ -16,7 +16,6 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
-    public DbSet<EmailVerification> EmailVerifications => Set<EmailVerification>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();

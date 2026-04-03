@@ -2,19 +2,83 @@
   "brand": {
     "tagline": "Modern Commerce"
   },
+  "home": {
+    "chip": "Secure sign-in",
+    "title": "Sign in to your storefront",
+    "description": "The browser now owns login, logout, route protection, token refresh, and API bearer token flow.",
+    "oauthSummary": "The identity provider handles login and logout redirects.",
+    "routeSummary": "Signed-in routes are protected on the frontend.",
+    "apiSummary": "API calls send the access token automatically.",
+    "sessionLabel": "Session",
+    "guest": "Guest",
+    "signedIn": "Signed in",
+    "signedOut": "Signed out",
+    "realmRoleCount": "Realm roles",
+    "resourceRoleCount": "Resource roles",
+    "loading": "Loading",
+    "ready": "Ready",
+    "public": "Public",
+    "stateLabel": "Auth state"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Sign out",
+    "account": "Account",
+    "returnHome": "Back home",
+    "accessToken": "Access token",
+    "realmRoles": "Realm roles",
+    "resourceRoles": "Resource roles"
+  },
+  "account": {
+    "chip": "Protected area",
+    "title": "Your account",
+    "description": "This page reads the authenticated user state and exposes the active roles and token preview.",
+    "username": "Username",
+    "roles": "Roles",
+    "unknown": "Unknown",
+    "noRoles": "No roles",
+    "tokenLabel": "Short preview of the current bearer token"
+  },
+  "seller": {
+    "chip": "Role protected",
+    "title": "Seller workspace",
+    "description": "Only users with the seller role can keep moving through this route.",
+    "requiredRoles": "Required role",
+    "accessSummary": "This screen is guarded before rendering.",
+    "session": "Signed in as",
+    "roles": "Active roles",
+    "none": "None"
+  },
+  "admin": {
+    "chip": "Role protected",
+    "title": "Admin workspace",
+    "description": "Only users with the admin role can open this area.",
+    "requiredRoles": "Required role",
+    "accessSummary": "Guarded with the same frontend flow.",
+    "session": "Signed in as",
+    "roles": "Active roles",
+    "none": "None"
+  },
+  "forbidden": {
+    "chip": "Access denied",
+    "title": "You do not have access",
+    "description": "Your session is valid, but the current user does not have the role required for this page.",
+    "homeAction": "Return home",
+    "tipLabel": "What happened",
+    "tip": "Check the assigned roles in the identity provider and try again."
+  },
   "search": {
     "placeholder": "Search products, brands, and collections",
     "action": "Search"
   },
   "nav": {
     "home": "Home",
-    "categories": "Categories",
-    "newArrivals": "New arrivals",
-    "bestSellers": "Best sellers",
-    "flashDeals": "Flash deals",
+    "account": "Account",
+    "seller": "Seller",
+    "admin": "Admin",
     "support": "Support",
     "login": "Login",
-    "account": "Account",
     "cart": "Cart"
   },
   "meta": {

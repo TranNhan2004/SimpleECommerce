@@ -2,16 +2,80 @@
   "brand": {
     "tagline": "Thương mại hiện đại"
   },
+  "home": {
+    "chip": "Đăng nhập an toàn",
+    "title": "Đăng nhập vào cửa hàng của bạn",
+    "description": "Trình duyệt hiện chịu trách nhiệm cho đăng nhập, đăng xuất, bảo vệ route, làm mới token và tự gắn bearer token vào API.",
+    "oauthSummary": "Nhà cung cấp định danh xử lý chuyển hướng đăng nhập và đăng xuất.",
+    "routeSummary": "Các route đã đăng nhập được bảo vệ ở frontend.",
+    "apiSummary": "Lời gọi API tự động gửi access token.",
+    "sessionLabel": "Phiên",
+    "guest": "Khách",
+    "signedIn": "Đã đăng nhập",
+    "signedOut": "Chưa đăng nhập",
+    "realmRoleCount": "Vai trò realm",
+    "resourceRoleCount": "Vai trò resource",
+    "loading": "Đang tải",
+    "ready": "Sẵn sàng",
+    "public": "Công khai",
+    "stateLabel": "Trạng thái xác thực"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Tạo tài khoản",
+    "logout": "Đăng xuất",
+    "account": "Tài khoản",
+    "returnHome": "Về trang chủ",
+    "accessToken": "Access token",
+    "realmRoles": "Vai trò realm",
+    "resourceRoles": "Vai trò resource"
+  },
+  "account": {
+    "chip": "Khu vực bảo vệ",
+    "title": "Tài khoản của bạn",
+    "description": "Trang này đọc trạng thái người dùng đã xác thực và hiển thị vai trò cùng bản xem trước token.",
+    "username": "Tên đăng nhập",
+    "roles": "Vai trò",
+    "unknown": "Không rõ",
+    "noRoles": "Không có vai trò",
+    "tokenLabel": "Bản xem trước ngắn của bearer token hiện tại"
+  },
+  "seller": {
+    "chip": "Bảo vệ theo vai trò",
+    "title": "Khu vực người bán",
+    "description": "Chỉ người dùng có vai trò seller mới có thể đi tiếp ở route này.",
+    "requiredRoles": "Vai trò bắt buộc",
+    "accessSummary": "Màn hình này được chặn trước khi render.",
+    "session": "Đang đăng nhập dưới tên",
+    "roles": "Vai trò đang có",
+    "none": "Không có"
+  },
+  "admin": {
+    "chip": "Bảo vệ theo vai trò",
+    "title": "Khu vực quản trị",
+    "description": "Chỉ người dùng có vai trò admin mới mở được khu vực này.",
+    "requiredRoles": "Vai trò bắt buộc",
+    "accessSummary": "Được bảo vệ bằng cùng luồng frontend.",
+    "session": "Đang đăng nhập dưới tên",
+    "roles": "Vai trò đang có",
+    "none": "Không có"
+  },
+  "forbidden": {
+    "chip": "Không có quyền",
+    "title": "Bạn không có quyền truy cập",
+    "description": "Phiên của bạn hợp lệ, nhưng người dùng hiện tại không có vai trò cần thiết cho trang này.",
+    "homeAction": "Về trang chủ",
+    "tipLabel": "Điều gì đã xảy ra",
+    "tip": "Hãy kiểm tra các vai trò đã gán trong nhà cung cấp định danh rồi thử lại."
+  },
   "search": {
     "placeholder": "Tìm sản phẩm, thương hiệu và bộ sưu tập",
     "action": "Tìm kiếm"
   },
   "nav": {
     "home": "Trang chủ",
-    "categories": "Danh mục",
-    "newArrivals": "Hàng mới về",
-    "bestSellers": "Bán chạy",
-    "flashDeals": "Giá sốc",
+    "seller": "Người bán",
+    "admin": "Quản trị",
     "support": "Hỗ trợ",
     "login": "Đăng nhập",
     "account": "Tài khoản",

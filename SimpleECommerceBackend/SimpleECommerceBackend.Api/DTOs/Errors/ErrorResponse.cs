@@ -23,7 +23,7 @@ public sealed class ErrorResponse
     /// <summary>
     ///     Human-readable explanation specific to this occurrence
     /// </summary>
-    public string? Detail { get; set; }
+    public string Message { get; set; }
 
     /// <summary>
     ///     URI reference that identifies the specific occurrence

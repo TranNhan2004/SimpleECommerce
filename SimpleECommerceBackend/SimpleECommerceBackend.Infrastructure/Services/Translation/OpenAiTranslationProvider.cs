@@ -7,19 +7,11 @@ using SimpleECommerceBackend.Application.Models.Translations;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-public sealed class OpenAiTranslationProvider : ITranslationProvider
+[AutoConstructor]
+public partial class OpenAiTranslationProvider : ITranslationProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly OpenAiTranslationOptions _options;
-
-    public OpenAiTranslationProvider(
-        HttpClient httpClient,
-        IOptions<OpenAiTranslationOptions> options
-    )
-    {
-        _httpClient = httpClient;
-        _options = options.Value;
-    }
+    private readonly IOptions<OpenAiTranslationOptions> _options;
 
     public string Name => "openai";
 
@@ -28,20 +20,18 @@ public sealed class OpenAiTranslationProvider : ITranslationProvider
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrWhiteSpace(_options.ApiKey))
-        {
+        if (string.IsNullOrWhiteSpace(_options.Value.ApiKey))
             throw new InvalidOperationException("Translation:OpenAI:ApiKey is not configured.");
-        }
 
         using var message = new HttpRequestMessage(
             HttpMethod.Post,
-            $"{_options.BaseUrl.TrimEnd('/')}/responses"
+            $"{_options.Value.BaseUrl.TrimEnd('/')}/responses"
         );
-        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.Value.ApiKey);
         message.Content = new StringContent(
             JsonSerializer.Serialize(new
             {
-                model = _options.Model,
+                model = _options.Value.Model,
                 input = new object[]
                 {
                     new
@@ -80,9 +70,7 @@ public sealed class OpenAiTranslationProvider : ITranslationProvider
 
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         if (document.RootElement.TryGetProperty("output_text", out var outputText))
-        {
             return outputText.GetString() ?? request.SourceText;
-        }
 
         return request.SourceText;
     }

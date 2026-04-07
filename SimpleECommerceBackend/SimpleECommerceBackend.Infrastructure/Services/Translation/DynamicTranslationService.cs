@@ -1,52 +1,32 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
-using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Entities.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-public class DynamicTranslationService : IDynamicTranslationService
+[AutoConstructor]
+public partial class DynamicTranslationService : IDynamicTranslationService
 {
     private readonly ITranslationCache _cache;
     private readonly ILogger<DynamicTranslationService> _logger;
-    private readonly TranslationOptions _options;
+    private readonly IOptions<TranslationOptions> _options;
     private readonly IEnumerable<ITranslationProvider> _providers;
-    private readonly ITranslationRepository _repository;
-
-    public DynamicTranslationService(
-        ITranslationRepository repository,
-        ITranslationCache cache,
-        IEnumerable<ITranslationProvider> providers,
-        IOptions<TranslationOptions> options,
-        ILogger<DynamicTranslationService> logger
-    )
-    {
-        _repository = repository;
-        _cache = cache;
-        _providers = providers;
-        _logger = logger;
-        _options = options.Value;
-    }
+    private readonly ITranslationEntryRepository _repository;
 
     public async Task<string> TranslateAsync(
         DynamicTranslationRequest request,
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrWhiteSpace(request.SourceText))
-        {
-            return request.SourceText;
-        }
+        if (string.IsNullOrWhiteSpace(request.SourceText)) return request.SourceText;
 
         var normalizedSourceLocale = NormalizeLocale(request.SourceLocale);
         var normalizedTargetLocale = NormalizeLocale(request.TargetLocale);
 
-        if (normalizedSourceLocale == normalizedTargetLocale)
-        {
-            return request.SourceText;
-        }
+        if (normalizedSourceLocale == normalizedTargetLocale) return request.SourceText;
 
         var cacheKey = BuildCacheKey(
             request.EntityName,
@@ -56,10 +36,7 @@ public class DynamicTranslationService : IDynamicTranslationService
         );
 
         var cachedValue = await _cache.GetAsync(cacheKey, cancellationToken);
-        if (!string.IsNullOrWhiteSpace(cachedValue))
-        {
-            return cachedValue;
-        }
+        if (!string.IsNullOrWhiteSpace(cachedValue)) return cachedValue;
 
         var existing = await _repository.FindAsync(
             request.EntityName,
@@ -89,10 +66,7 @@ public class DynamicTranslationService : IDynamicTranslationService
                 cancellationToken
             );
 
-            if (string.IsNullOrWhiteSpace(translatedValue))
-            {
-                return request.SourceText;
-            }
+            if (string.IsNullOrWhiteSpace(translatedValue)) return request.SourceText;
 
             var entry = new TranslationEntry(
                 Guid.NewGuid(),
@@ -108,7 +82,7 @@ public class DynamicTranslationService : IDynamicTranslationService
 
             return translatedValue;
         }
-        catch (Exception ex) when (_options.UseSourceTextWhenProviderUnavailable)
+        catch (Exception ex) when (_options.Value.UseSourceTextWhenProviderUnavailable)
         {
             _logger.LogWarning(
                 ex,
@@ -126,14 +100,14 @@ public class DynamicTranslationService : IDynamicTranslationService
     private ITranslationProvider ResolveProvider()
     {
         return _providers.FirstOrDefault(provider =>
-                   string.Equals(provider.Name, _options.Provider, StringComparison.OrdinalIgnoreCase))
+                   string.Equals(provider.Name, _options.Value.Provider, StringComparison.OrdinalIgnoreCase))
                ?? _providers.First(provider =>
                    string.Equals(provider.Name, "none", StringComparison.OrdinalIgnoreCase));
     }
 
     private TimeSpan GetCacheDuration()
     {
-        return TimeSpan.FromHours(Math.Max(_options.CacheDurationHours, 0.25));
+        return TimeSpan.FromHours(Math.Max(_options.Value.CacheDurationHours, 0.25));
     }
 
     private static string BuildCacheKey(string entityName, string fieldName, Guid rowId, string locale)

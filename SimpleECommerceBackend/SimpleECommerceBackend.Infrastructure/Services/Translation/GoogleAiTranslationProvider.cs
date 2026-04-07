@@ -6,19 +6,11 @@ using SimpleECommerceBackend.Application.Models.Translations;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-public sealed class GoogleAiTranslationProvider : ITranslationProvider
+[AutoConstructor]
+public partial class GoogleAiTranslationProvider : ITranslationProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly GoogleAiTranslationOptions _options;
-
-    public GoogleAiTranslationProvider(
-        HttpClient httpClient,
-        IOptions<GoogleAiTranslationOptions> options
-    )
-    {
-        _httpClient = httpClient;
-        _options = options.Value;
-    }
+    private readonly IOptions<GoogleAiTranslationOptions> _options;
 
     public string Name => "googleai";
 
@@ -27,17 +19,15 @@ public sealed class GoogleAiTranslationProvider : ITranslationProvider
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrWhiteSpace(_options.ApiKey))
-        {
+        if (string.IsNullOrWhiteSpace(_options.Value.ApiKey))
             throw new InvalidOperationException("Translation:GoogleAI:ApiKey is not configured.");
-        }
 
         var prompt =
             $"Translate {request.EntityName}.{request.FieldName} from {request.SourceLocale} to {request.TargetLocale}. Preserve product meaning and return plain text only.\n\nText:\n{request.SourceText}";
 
         using var message = new HttpRequestMessage(
             HttpMethod.Post,
-            $"{_options.BaseUrl.TrimEnd('/')}/models/{_options.Model}:generateContent?key={Uri.EscapeDataString(_options.ApiKey)}"
+            $"{_options.Value.BaseUrl.TrimEnd('/')}/models/{_options.Value.Model}:generateContent?key={Uri.EscapeDataString(_options.Value.ApiKey)}"
         );
         message.Content = new StringContent(
             JsonSerializer.Serialize(new
@@ -75,9 +65,7 @@ public sealed class GoogleAiTranslationProvider : ITranslationProvider
                 && parts.ValueKind == JsonValueKind.Array
                 && parts.GetArrayLength() > 0
                 && parts[0].TryGetProperty("text", out var text))
-            {
                 return text.GetString() ?? request.SourceText;
-            }
         }
 
         return request.SourceText;

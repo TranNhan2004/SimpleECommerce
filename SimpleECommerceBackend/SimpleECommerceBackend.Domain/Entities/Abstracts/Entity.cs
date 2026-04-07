@@ -5,12 +5,11 @@ namespace SimpleECommerceBackend.Domain.Entities.Abstracts;
 
 public class Entity : IEntity
 {
-    public Guid Id { get; protected set; }
+    public Guid Id { get; private set; }
 
     protected virtual void SetId(Guid id)
     {
         if (id == Guid.Empty)
-        {
             throw new ValidationException(
                 EntityErrorCode.EmptyId,
                 "Id cannot be empty.",
@@ -19,7 +18,6 @@ public class Entity : IEntity
                     ["field"] = "Id"
                 }
             );
-        }
 
         Id = id;
     }

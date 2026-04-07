@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 

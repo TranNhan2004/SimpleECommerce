@@ -7,16 +7,18 @@ using SimpleECommerceBackend.Application.Models.Translations;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
+public class JsonStaticTextLocalizer : IStaticTextLocalizer
 {
     private readonly string _contentRootPath;
-    private readonly TranslationOptions _options;
+    private readonly IOptions<TranslationOptions> _options;
+    private readonly Dictionary<string, TranslationResource> _resources = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly JsonSerializerOptions _serializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
+
     private readonly Lock _sync = new();
-    private Dictionary<string, TranslationResource> _resources = new(StringComparer.OrdinalIgnoreCase);
 
     public JsonStaticTextLocalizer(
         IHostEnvironment hostEnvironment,
@@ -24,16 +26,13 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
     )
     {
         _contentRootPath = hostEnvironment.ContentRootPath;
-        _options = options.Value;
+        _options = options;
     }
 
     public string LocalizeProblemTitle(string key, string locale)
     {
         var resource = GetResource(locale);
-        if (resource.ProblemTitles.TryGetValue(key, out var title))
-        {
-            return title;
-        }
+        if (resource.ProblemTitles.TryGetValue(key, out var title)) return title;
 
         return GetFallbackResource().ProblemTitles.TryGetValue(key, out var fallbackTitle)
             ? fallbackTitle
@@ -66,25 +65,16 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
     public string LocalizeFieldName(string fieldName, string locale)
     {
         var resource = GetResource(locale);
-        if (resource.Fields.TryGetValue(fieldName, out var localizedField))
-        {
-            return localizedField;
-        }
+        if (resource.Fields.TryGetValue(fieldName, out var localizedField)) return localizedField;
 
         var normalizedFieldName = NormalizeFieldLookupKey(fieldName);
 
         var localizedByAlias = resource.Fields.FirstOrDefault(pair =>
             NormalizeFieldLookupKey(pair.Key) == normalizedFieldName);
-        if (!string.IsNullOrWhiteSpace(localizedByAlias.Value))
-        {
-            return localizedByAlias.Value;
-        }
+        if (!string.IsNullOrWhiteSpace(localizedByAlias.Value)) return localizedByAlias.Value;
 
         var fallbackResource = GetFallbackResource();
-        if (fallbackResource.Fields.TryGetValue(fieldName, out var fallbackField))
-        {
-            return fallbackField;
-        }
+        if (fallbackResource.Fields.TryGetValue(fieldName, out var fallbackField)) return fallbackField;
 
         var fallbackByAlias = fallbackResource.Fields.FirstOrDefault(pair =>
             NormalizeFieldLookupKey(pair.Key) == normalizedFieldName);
@@ -99,10 +89,7 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
 
         lock (_sync)
         {
-            if (_resources.TryGetValue(normalizedLocale, out var resource))
-            {
-                return resource;
-            }
+            if (_resources.TryGetValue(normalizedLocale, out var resource)) return resource;
 
             resource = LoadResource(normalizedLocale);
             _resources[normalizedLocale] = resource;
@@ -112,16 +99,13 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
 
     private TranslationResource GetFallbackResource()
     {
-        return GetResource(_options.DefaultLocale);
+        return GetResource(_options.Value.DefaultLocale);
     }
 
     private TranslationResource LoadResource(string locale)
     {
-        var path = Path.Combine(_contentRootPath, _options.StaticResourcesPath, $"errormessages.{locale}.json");
-        if (!File.Exists(path))
-        {
-            return new TranslationResource();
-        }
+        var path = Path.Combine(_contentRootPath, _options.Value.StaticResourcesPath, $"errormessages.{locale}.json");
+        if (!File.Exists(path)) return new TranslationResource();
 
         var document = JsonSerializer.Deserialize<TranslationResourceDocument>(
             File.ReadAllText(path),
@@ -133,25 +117,17 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
 
     private static string? GetFieldKey(IReadOnlyDictionary<string, object?>? details)
     {
-        if (details is null)
-        {
-            return null;
-        }
+        if (details is null) return null;
 
         if (details.TryGetValue("field", out var fieldValue) && fieldValue is not null)
-        {
             return GetFieldKey(fieldValue.ToString());
-        }
 
         return null;
     }
 
     private static string? GetFieldKey(string? rawField)
     {
-        if (string.IsNullOrWhiteSpace(rawField))
-        {
-            return null;
-        }
+        if (string.IsNullOrWhiteSpace(rawField)) return null;
 
         return rawField.Trim()
             .Replace(" ", string.Empty, StringComparison.Ordinal)
@@ -167,17 +143,10 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         if (details is not null)
-        {
             foreach (var pair in details)
-            {
                 values[pair.Key] = pair.Value?.ToString() ?? string.Empty;
-            }
-        }
 
-        if (!string.IsNullOrWhiteSpace(fieldKey))
-        {
-            values["fieldKey"] = fieldKey;
-        }
+        if (!string.IsNullOrWhiteSpace(fieldKey)) values["fieldKey"] = fieldKey;
 
         if (!string.IsNullOrWhiteSpace(fieldDisplayName))
         {
@@ -197,9 +166,7 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
     {
         var result = template;
         foreach (var pair in values)
-        {
             result = result.Replace($"{{{pair.Key}}}", pair.Value, StringComparison.OrdinalIgnoreCase);
-        }
 
         return result;
     }
@@ -234,10 +201,7 @@ public sealed class JsonStaticTextLocalizer : IStaticTextLocalizer
 
         public static TranslationResource FromDocument(TranslationResourceDocument? document)
         {
-            if (document is null)
-            {
-                return new TranslationResource();
-            }
+            if (document is null) return new TranslationResource();
 
             return new TranslationResource
             {

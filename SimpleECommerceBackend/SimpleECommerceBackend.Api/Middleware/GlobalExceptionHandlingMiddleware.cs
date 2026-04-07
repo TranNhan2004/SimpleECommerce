@@ -58,9 +58,9 @@ public sealed class GlobalExceptionHandlerMiddleware
             case ConflictException:
             case UnauthorizedException:
             case ForbiddenException:
-                _logger.LogWarning(
+                _logger.LogError(
                     exception,
-                    "Handled domain exception occurred: {ExceptionType} - {Message}",
+                    "Handled exception occurred: {ExceptionType} - {Message}",
                     exception.GetType().Name,
                     exception.Message
                 );
@@ -152,9 +152,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
                     Title = _staticTextLocalizer.LocalizeProblemTitle("Problem.Unexpected", locale),
                     Status = StatusCodes.Status500InternalServerError,
-                    Detail = _environment.IsDevelopment()
-                        ? exception.Message
-                        : _staticTextLocalizer.LocalizeProblemTitle("Message.Unexpected", locale),
+                    Message = exception.Message,
                     Instance = context.Request.Path,
                     TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
                     Extensions = new Dictionary<string, object>
@@ -183,31 +181,23 @@ public sealed class GlobalExceptionHandlerMiddleware
         };
 
         if (exception.Details is not null)
-        {
             extensions["details"] = exception.Details;
-        }
 
         if (!string.IsNullOrWhiteSpace(localizedError.FieldKey))
-        {
             extensions["field"] = localizedError.FieldKey;
-        }
 
         if (!string.IsNullOrWhiteSpace(localizedError.FieldDisplayName))
-        {
             extensions["fieldDisplayName"] = localizedError.FieldDisplayName;
-        }
 
         if (_environment.IsDevelopment() && !string.IsNullOrWhiteSpace(exception.InternalMessage))
-        {
             extensions["internalMessage"] = exception.InternalMessage;
-        }
 
         return new ErrorResponse
         {
             Type = type,
             Title = _staticTextLocalizer.LocalizeProblemTitle(titleKey, locale),
             Status = statusCode,
-            Detail = localizedError.Message,
+            Message = localizedError.Message,
             Instance = context.Request.Path,
             TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
             Errors = string.IsNullOrWhiteSpace(localizedError.FieldKey)
@@ -224,9 +214,7 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         var header = context.Request.Headers.AcceptLanguage.ToString();
         if (string.IsNullOrWhiteSpace(header))
-        {
             return "en";
-        }
 
         return header.Split(',', ';')[0].Trim().ToLowerInvariant();
     }

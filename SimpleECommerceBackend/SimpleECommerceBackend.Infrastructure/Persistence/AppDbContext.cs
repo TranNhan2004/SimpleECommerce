@@ -1,18 +1,19 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext, IUnitOfWork
+public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
+    // Business entities
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
@@ -25,10 +26,12 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
-    public DbSet<TranslationEntry> TranslationEntries => Set<TranslationEntry>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
+
+    // Translation
+    public DbSet<TranslationEntry> TranslationEntries => Set<TranslationEntry>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

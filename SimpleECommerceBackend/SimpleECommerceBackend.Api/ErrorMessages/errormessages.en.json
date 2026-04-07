@@ -5,8 +5,7 @@
     "Problem.Conflict": "Resource conflict",
     "Problem.Unauthorized": "Unauthorized",
     "Problem.Forbidden": "Forbidden",
-    "Problem.Unexpected": "An error occurred while processing your request",
-    "Message.Unexpected": "An unexpected error occurred. Please try again later."
+    "Problem.Unexpected": "An error occurred while processing your request"
   },
   "fields": {
     "Address": "Address",
@@ -25,10 +24,10 @@
     "Description": "Description",
     "DisplayOrder": "Display order",
     "Email": "Email",
-    "ExternalTransactionId": "External transaction",
+    "ExternalTransactionId": "External transaction ID",
     "Field": "Field",
     "FirstName": "First name",
-    "Id": "Id",
+    "Id": "ID",
     "Image": "Image",
     "ImageUrl": "Image URL",
     "LastName": "Last name",

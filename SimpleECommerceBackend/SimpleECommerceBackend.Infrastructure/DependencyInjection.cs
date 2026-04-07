@@ -1,14 +1,16 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
-using SimpleECommerceBackend.Infrastructure.Repositories;
+using SimpleECommerceBackend.Infrastructure.Repositories.Business;
+using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
@@ -33,27 +35,24 @@ public static class DependencyInjection
         // Translation Services
         services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
         services.Configure<OpenAiTranslationOptions>(configuration.GetSection(OpenAiTranslationOptions.SectionName));
-        services.Configure<GoogleAiTranslationOptions>(configuration.GetSection(GoogleAiTranslationOptions.SectionName));
+        services.Configure<GoogleAiTranslationOptions>(
+            configuration.GetSection(GoogleAiTranslationOptions.SectionName));
 
         var redisConnectionString = configuration["Translation:Redis:ConnectionString"];
         var redisInstanceName = configuration["Translation:Redis:InstanceName"];
         if (!string.IsNullOrWhiteSpace(redisConnectionString))
-        {
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = redisConnectionString;
                 options.InstanceName = redisInstanceName;
             });
-        }
         else
-        {
             services.AddDistributedMemoryCache();
-        }
 
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
         services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
         services.AddScoped<ITranslationCache, DistributedTranslationCache>();
-        services.AddScoped<ITranslationRepository, TranslationRepository>();
+        services.AddScoped<ITranslationEntryRepository, TranslationEntryRepository>();
 
         services.AddSingleton<NullTranslationProvider>();
         services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());

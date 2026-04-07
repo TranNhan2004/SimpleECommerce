@@ -1,24 +1,20 @@
-using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;
 
-public class SmtpEmailSender : IEmailSender
+[AutoConstructor]
+public partial class SmtpEmailSender : IEmailSender
 {
-    private readonly SmtpOptions _smtpOptions;
-
-    public SmtpEmailSender(IOptions<SmtpOptions> smtpOptions)
-    {
-        _smtpOptions = smtpOptions.Value;
-    }
+    private readonly IOptions<SmtpOptions> _smtpOptions;
 
     public async Task SendEmailAsync(string to, string subject, string body, CancellationToken stoppingToken)
     {
         var message = new MimeMessage();
-        message.From.Add(MailboxAddress.Parse(_smtpOptions.From));
+        message.From.Add(MailboxAddress.Parse(_smtpOptions.Value.From));
         message.To.Add(MailboxAddress.Parse(to));
         message.Subject = subject;
         message.Body = new TextPart("html") { Text = body };
@@ -26,15 +22,15 @@ public class SmtpEmailSender : IEmailSender
         using var client = new SmtpClient();
 
         await client.ConnectAsync(
-            _smtpOptions.Host,
-            _smtpOptions.Port,
+            _smtpOptions.Value.Host,
+            _smtpOptions.Value.Port,
             SecureSocketOptions.StartTls,
             stoppingToken
         );
 
         await client.AuthenticateAsync(
-            _smtpOptions.Username,
-            _smtpOptions.Password,
+            _smtpOptions.Value.Username,
+            _smtpOptions.Value.Password,
             stoppingToken
         );
 

@@ -4,21 +4,10 @@ namespace SimpleECommerceBackend.Domain.Exceptions;
 ///     Exception for resource conflicts (duplicates, concurrent updates).
 ///     Maps to HTTP 409 Conflict.
 /// </summary>
-public class ConflictException : Exception
+public class ConflictException : ExceptionBase
 {
-    public ConflictException(string message) : base(message)
+    public ConflictException(string errorCode, string? internalMessage = null, IReadOnlyDictionary<string, object?>? details = null)
+        : base(errorCode, internalMessage, details)
     {
     }
-
-    public ConflictException(string entityName, string conflictingField, object conflictingValue, string message)
-        : base(message)
-    {
-        EntityName = entityName;
-        ConflictingField = conflictingField;
-        ConflictingValue = conflictingValue;
-    }
-
-    public string? EntityName { get; }
-    public string? ConflictingField { get; }
-    public object? ConflictingValue { get; }
 }

@@ -32,4 +32,10 @@
         <ProjectReference Include="..\SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Update="ErrorMessages\*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>

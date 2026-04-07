@@ -8,7 +8,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
-        builder.ToTable("OrderItems");
+        builder.ToTable("OrderItems", DbSchemas.Business);
 
         builder.Property(oi => oi.Quantity)
             .IsRequired();

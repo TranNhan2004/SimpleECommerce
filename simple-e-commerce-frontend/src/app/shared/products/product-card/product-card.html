@@ -1,0 +1,49 @@
+<article class="se-product-card">
+	<div class="se-product-media">
+		@if (primaryImage(); as image) {
+			<img
+				class="se-product-image"
+				[src]="image.imageUrl"
+				[alt]="image.description ?? product().name"
+				loading="lazy"
+			/>
+		} @else {
+			<div class="se-product-placeholder">
+				<span class="material-icons-outlined se-product-placeholder-icon" aria-hidden="true">image</span>
+				<span>No image</span>
+			</div>
+		}
+	</div>
+
+	<div class="se-product-body">
+		<div class="se-product-name">{{ product().name }}</div>
+
+		<div class="se-product-meta">
+			<div class="se-product-price">{{ formatMoney(product().currentPrice) }}</div>
+
+			<div class="se-product-star" aria-label="Product rating">
+				<span class="material-icons-outlined se-product-star-icon" aria-hidden="true">star</span>
+				<span>{{ product().rating ?? 0 }} star</span>
+			</div>
+		</div>
+
+		<div class="se-product-actions" aria-label="Product actions">
+			<button class="se-product-action se-product-action-add" type="button">
+				<span class="material-icons-outlined se-product-action-icon" aria-hidden="true">add_shopping_cart</span>
+				<span>Add cart</span>
+			</button>
+			<button class="se-product-action se-product-action-buy" type="button">
+				<span class="material-icons-outlined se-product-action-icon" aria-hidden="true">bolt</span>
+				<span>Buy</span>
+			</button>
+			<button class="se-product-action se-product-action-edit" type="button">
+				<span class="material-icons-outlined se-product-action-icon" aria-hidden="true">edit</span>
+				<span>Edit</span>
+			</button>
+			<button class="se-product-action se-product-action-delete" type="button">
+				<span class="material-icons-outlined se-product-action-icon" aria-hidden="true">delete</span>
+				<span>Delete</span>
+			</button>
+		</div>
+	</div>
+</article>

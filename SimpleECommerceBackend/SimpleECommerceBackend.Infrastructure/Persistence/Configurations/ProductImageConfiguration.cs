@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
@@ -9,7 +9,7 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
 {
     public void Configure(EntityTypeBuilder<ProductImage> builder)
     {
-        builder.ToTable("ProductImages");
+        builder.ToTable("ProductImages", DbSchemas.Business);
 
         builder.Property(pi => pi.ImageUrl)
             .IsRequired();

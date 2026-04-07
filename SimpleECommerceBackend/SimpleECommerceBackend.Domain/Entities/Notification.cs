@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -33,7 +34,14 @@ public class Notification : Entity, ICreatedTrackable
     private void SetUserId(Guid userId)
     {
         if (userId == Guid.Empty)
-            throw new BusinessException("User ID is required");
+            throw new ValidationException(
+                NotificationErrorCode.UserIdRequired,
+                "User ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "UserId"
+                }
+            );
 
         UserId = userId;
     }
@@ -41,12 +49,27 @@ public class Notification : Entity, ICreatedTrackable
     private void SetMessage(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
-            throw new BusinessException("Message is required");
+            throw new ValidationException(
+                NotificationErrorCode.MessageRequired,
+                "Message is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Message"
+                }
+            );
 
         var trimmedMessage = message.Trim();
 
         if (trimmedMessage.Length > NotificationConstants.MessageMaxLength)
-            throw new BusinessException($"Message cannot exceed {NotificationConstants.MessageMaxLength} characters");
+            throw new ValidationException(
+                NotificationErrorCode.MessageMaxLengthExceeded,
+                $"Message cannot exceed {NotificationConstants.MessageMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Message",
+                    ["max"] = NotificationConstants.MessageMaxLength
+                }
+            );
 
         Message = trimmedMessage;
     }
@@ -54,7 +77,15 @@ public class Notification : Entity, ICreatedTrackable
     public void MarkAsRead()
     {
         if (IsRead)
-            throw new BusinessException("Notification is already marked as read");
+            throw new ValidationException(
+                NotificationErrorCode.AlreadyMarkedAsRead,
+                "Notification is already marked as read",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Notification",
+                    ["state"] = "marked as read"
+                }
+            );
 
         IsRead = true;
     }

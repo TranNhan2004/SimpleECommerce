@@ -8,7 +8,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
     public void Configure(EntityTypeBuilder<Cart> builder)
     {
-        builder.ToTable("Carts");
+        builder.ToTable("Carts", DbSchemas.Business);
 
         builder.HasOne(c => c.Customer)
             .WithOne()

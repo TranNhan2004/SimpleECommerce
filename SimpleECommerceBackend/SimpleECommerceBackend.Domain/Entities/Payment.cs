@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -52,7 +53,14 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetOrderId(Guid orderId)
     {
         if (orderId == Guid.Empty)
-            throw new BusinessException("Order ID is required");
+            throw new ValidationException(
+                PaymentErrorCode.OrderIdRequired,
+                "Order ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "OrderId"
+                }
+            );
 
         OrderId = orderId;
     }
@@ -78,7 +86,15 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
         var trimmedProvider = provider.Trim();
 
         if (trimmedProvider.Length > PaymentConstants.ProviderMaxLength)
-            throw new BusinessException($"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters");
+            throw new ValidationException(
+                PaymentErrorCode.ProviderMaxLengthExceeded,
+                $"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Provider",
+                    ["max"] = PaymentConstants.ProviderMaxLength
+                }
+            );
 
         Provider = string.IsNullOrWhiteSpace(trimmedProvider) ? null : trimmedProvider;
     }
@@ -99,8 +115,15 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
         var trimmedId = externalTransactionId.Trim();
 
         if (trimmedId.Length > PaymentConstants.ExternalTransactionIdMaxLength)
-            throw new BusinessException(
-                $"External transaction ID cannot exceed {PaymentConstants.ExternalTransactionIdMaxLength} characters");
+            throw new ValidationException(
+                PaymentErrorCode.ExternalTransactionIdMaxLengthExceeded,
+                $"External transaction ID cannot exceed {PaymentConstants.ExternalTransactionIdMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ExternalTransactionId",
+                    ["max"] = PaymentConstants.ExternalTransactionIdMaxLength
+                }
+            );
 
         ExternalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
     }
@@ -108,7 +131,16 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Complete(string? externalTransactionId = null)
     {
         if (Status != PaymentStatus.Pending)
-            throw new BusinessException("Only pending payments can be marked as completed");
+            throw new ValidationException(
+                PaymentErrorCode.CompleteNotAllowed,
+                "Only pending payments can be marked as completed",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Complete",
+                    ["allowedStates"] = "pending"
+                }
+            );
 
         if (externalTransactionId != null)
             SetExternalTransactionId(externalTransactionId);
@@ -119,7 +151,16 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Fail()
     {
         if (Status != PaymentStatus.Pending)
-            throw new BusinessException("Only pending payments can be marked as failed");
+            throw new ValidationException(
+                PaymentErrorCode.FailNotAllowed,
+                "Only pending payments can be marked as failed",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Fail",
+                    ["allowedStates"] = "pending"
+                }
+            );
 
         SetStatus(PaymentStatus.Failed);
     }
@@ -127,7 +168,16 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Refund()
     {
         if (Status != PaymentStatus.Completed)
-            throw new BusinessException("Only completed payments can be refunded");
+            throw new ValidationException(
+                PaymentErrorCode.RefundNotAllowed,
+                "Only completed payments can be refunded",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Refund",
+                    ["allowedStates"] = "completed"
+                }
+            );
 
         SetStatus(PaymentStatus.Refunded);
     }

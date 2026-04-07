@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
@@ -9,7 +9,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable("Products");
+        builder.ToTable("Products", DbSchemas.Business);
 
         builder.Property(p => p.Name)
             .IsRequired()

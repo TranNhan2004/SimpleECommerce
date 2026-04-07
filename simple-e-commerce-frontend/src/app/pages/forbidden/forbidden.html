@@ -1,21 +1,8 @@
-<section class="se-page">
-  <div class="se-shell">
-    <div class="se-card se-hero se-grid">
-      <div class="se-copy">
-        <span class="se-chip">{{ t('forbidden.chip') }}</span>
-        <h1 class="se-title">{{ t('forbidden.title') }}</h1>
-        <p class="se-text">{{ t('forbidden.description') }}</p>
-
-        <div class="se-actions">
-          <a class="se-btn se-btn-pri" routerLink="/">{{ t('forbidden.homeAction') }}</a>
-        </div>
-      </div>
-
-      <aside class="se-side">
-        <div class="se-label">{{ t('forbidden.tipLabel') }}</div>
-        <div class="se-stat-value">403</div>
-        <div class="se-stat-label">{{ t('forbidden.tip') }}</div>
-      </aside>
-    </div>
+<section class="se-status-page">
+  <div class="se-status-content">
+    <span class="se-status-icon material-icons-outlined" aria-hidden="true">lock</span>
+    <div class="se-status-code">{{ t('forbidden.code') }}</div>
+    <h1 class="se-status-title">{{ t('forbidden.title') }}</h1>
+    <p class="se-status-message">{{ t('forbidden.message') }}</p>
   </div>
 </section>

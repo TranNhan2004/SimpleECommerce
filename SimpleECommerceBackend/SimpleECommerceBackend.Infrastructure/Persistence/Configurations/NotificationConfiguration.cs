@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
@@ -9,7 +9,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 {
     public void Configure(EntityTypeBuilder<Notification> builder)
     {
-        builder.ToTable("Notifications");
+        builder.ToTable("Notifications", DbSchemas.Business);
 
         builder.Property(n => n.Message)
             .IsRequired()

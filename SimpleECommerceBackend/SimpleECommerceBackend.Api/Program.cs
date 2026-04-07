@@ -6,11 +6,12 @@ using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddOptions();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddKeycloakPolicies();
+builder.Services.AddCustomRateLimiter(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>
@@ -90,6 +91,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseGlobalExceptionHandler();
-app.MapControllers();
 
+app.UseForwardedHeaders();
+app.UseRateLimiter();
+
+app.MapControllers().RequireRateLimiting("ip-route");
 app.Run();

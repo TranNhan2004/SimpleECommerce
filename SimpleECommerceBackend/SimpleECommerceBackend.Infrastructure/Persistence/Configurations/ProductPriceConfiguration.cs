@@ -8,7 +8,7 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
 {
     public void Configure(EntityTypeBuilder<ProductPrice> builder)
     {
-        builder.ToTable("ProductPrices");
+        builder.ToTable("ProductPrices", DbSchemas.Business);
 
         builder.Property(pp => pp.EffectiveFrom)
             .IsRequired();

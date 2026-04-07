@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
@@ -33,7 +34,14 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     public void SoftDelete()
     {
         if (IsDeleted)
-            throw new BusinessException("Warehouse is already deleted");
+            throw new ValidationException(
+                SellerWarehouseErrorCode.AlreadyDeleted,
+                "Warehouse is already deleted",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Warehouse"
+                }
+            );
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
@@ -60,7 +68,14 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     private void SetSellerShopId(Guid sellerShopId)
     {
         if (sellerShopId == Guid.Empty)
-            throw new BusinessException("Seller shop is required");
+            throw new ValidationException(
+                SellerWarehouseErrorCode.SellerShopRequired,
+                "Seller shop is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "SellerShop"
+                }
+            );
 
         SellerShopId = sellerShopId;
     }

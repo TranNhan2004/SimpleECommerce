@@ -1,14 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
+using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
+using SimpleECommerceBackend.Infrastructure.Services.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -26,6 +29,38 @@ public static class DependencyInjection
 
         // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
+
+        // Translation Services
+        services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
+        services.Configure<OpenAiTranslationOptions>(configuration.GetSection(OpenAiTranslationOptions.SectionName));
+        services.Configure<GoogleAiTranslationOptions>(configuration.GetSection(GoogleAiTranslationOptions.SectionName));
+
+        var redisConnectionString = configuration["Translation:Redis:ConnectionString"];
+        var redisInstanceName = configuration["Translation:Redis:InstanceName"];
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnectionString;
+                options.InstanceName = redisInstanceName;
+            });
+        }
+        else
+        {
+            services.AddDistributedMemoryCache();
+        }
+
+        services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
+        services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
+        services.AddScoped<ITranslationCache, DistributedTranslationCache>();
+        services.AddScoped<ITranslationRepository, TranslationRepository>();
+
+        services.AddSingleton<NullTranslationProvider>();
+        services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());
+        services.AddHttpClient<OpenAiTranslationProvider>();
+        services.AddHttpClient<GoogleAiTranslationProvider>();
+        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<OpenAiTranslationProvider>());
+        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<GoogleAiTranslationProvider>());
 
         // Database
         services.AddScoped<AuditSaveChangesInterceptor>();

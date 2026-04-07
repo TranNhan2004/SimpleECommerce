@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -51,7 +52,14 @@ public class ProductImage : Entity, ICreatedTrackable
     public void SetImageUrl(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new BusinessException("Image URL is required");
+            throw new ValidationException(
+                ProductImageErrorCode.ImageUrlRequired,
+                "Image URL is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ImageUrl"
+                }
+            );
 
         ImageUrl = imageUrl.Trim();
     }
@@ -59,7 +67,14 @@ public class ProductImage : Entity, ICreatedTrackable
     public void SetDisplayOrder(int displayOrder)
     {
         if (displayOrder < 0)
-            throw new BusinessException("Display order cannot be negative");
+            throw new ValidationException(
+                ProductImageErrorCode.DisplayOrderCannotBeNegative,
+                "Display order cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "DisplayOrder"
+                }
+            );
 
         DisplayOrder = displayOrder;
     }
@@ -78,13 +93,27 @@ public class ProductImage : Entity, ICreatedTrackable
         }
 
         if (string.IsNullOrWhiteSpace(description))
-            throw new BusinessException("Description is not blank");
+            throw new ValidationException(
+                ProductImageErrorCode.DescriptionMustNotBeBlank,
+                "Description is not blank",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description"
+                }
+            );
 
         var trimmedDescription = description.Trim();
 
         if (trimmedDescription.Length > ProductImageConstants.DescriptionMaxLength)
-            throw new BusinessException(
-                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
+            throw new ValidationException(
+                ProductImageErrorCode.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description",
+                    ["max"] = ProductImageConstants.DescriptionMaxLength
+                }
+            );
 
         Description = trimmedDescription;
     }

@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -55,11 +56,26 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new BusinessException("Name is required");
+            throw new ValidationException(
+                ProductErrorCode.NameRequired,
+                "Name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Name"
+                }
+            );
 
         var trimmedName = name.Trim();
         if (trimmedName.Length > ProductConstants.NameMaxLength)
-            throw new BusinessException($"Name cannot exceed {ProductConstants.NameMaxLength} characters");
+            throw new ValidationException(
+                ProductErrorCode.NameMaxLengthExceeded,
+                $"Name cannot exceed {ProductConstants.NameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Name",
+                    ["max"] = ProductConstants.NameMaxLength
+                }
+            );
 
         Name = trimmedName;
     }
@@ -67,12 +83,26 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
-            throw new BusinessException("Description is required");
+            throw new ValidationException(
+                ProductErrorCode.DescriptionRequired,
+                "Description is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description"
+                }
+            );
 
         var trimmedDescription = description.Trim();
         if (trimmedDescription.Length > ProductConstants.DescriptionMaxLength)
-            throw new BusinessException(
-                $"Description cannot exceed {ProductConstants.DescriptionMaxLength} characters");
+            throw new ValidationException(
+                ProductErrorCode.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {ProductConstants.DescriptionMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description",
+                    ["max"] = ProductConstants.DescriptionMaxLength
+                }
+            );
 
         Description = trimmedDescription;
     }
@@ -90,7 +120,16 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Activate()
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Hidden)
-            throw new BusinessException("Only draft or hidden product can be activated");
+            throw new ValidationException(
+                ProductErrorCode.ActivateNotAllowed,
+                "Only draft or hidden product can be activated",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Activate",
+                    ["allowedStates"] = "draft, hidden"
+                }
+            );
 
         Status = ProductStatus.Active;
     }
@@ -98,7 +137,16 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Hide()
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Active)
-            throw new BusinessException("Only draft or active product can be hidden");
+            throw new ValidationException(
+                ProductErrorCode.HideNotAllowed,
+                "Only draft or active product can be hidden",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Hide",
+                    ["allowedStates"] = "draft, active"
+                }
+            );
 
         Status = ProductStatus.Hidden;
     }
@@ -106,7 +154,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetCategoryId(Guid categoryId)
     {
         if (categoryId == Guid.Empty)
-            throw new BusinessException("Category is required");
+            throw new ValidationException(
+                ProductErrorCode.CategoryRequired,
+                "Category is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Category"
+                }
+            );
 
         CategoryId = categoryId;
     }
@@ -114,7 +169,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new BusinessException("Seller is required");
+            throw new ValidationException(
+                ProductErrorCode.SellerRequired,
+                "Seller is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Seller"
+                }
+            );
 
         SellerId = sellerId;
     }
@@ -128,7 +190,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == image.Id);
         if (existingImage is null)
-            throw new BusinessException("Image not found");
+            throw new ValidationException(
+                ProductErrorCode.ImageNotFound,
+                "Image not found",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Image"
+                }
+            );
 
         existingImage.SetDescription(image.Description);
         existingImage.SetDisplayOrder(image.DisplayOrder);
@@ -139,7 +208,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == imageId);
         if (existingImage is null)
-            throw new BusinessException("Image not found");
+            throw new ValidationException(
+                ProductErrorCode.ImageNotFound,
+                "Image not found",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Image"
+                }
+            );
 
         _productImages.Remove(existingImage);
     }

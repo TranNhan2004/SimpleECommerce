@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -33,12 +34,27 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new BusinessException("Name is required");
+            throw new ValidationException(
+                CategoryErrorCode.NameRequired,
+                "Name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Name"
+                }
+            );
 
         var trimmedName = name.Trim();
 
         if (trimmedName.Length > CategoryConstants.NameMaxLength)
-            throw new BusinessException($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
+            throw new ValidationException(
+                CategoryErrorCode.NameMaxLengthExceeded,
+                $"Name cannot exceed {CategoryConstants.NameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Name",
+                    ["max"] = CategoryConstants.NameMaxLength
+                }
+            );
 
         Name = trimmedName;
     }
@@ -52,13 +68,27 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
         }
 
         if (string.IsNullOrWhiteSpace(description))
-            throw new BusinessException("Description is not blank");
+            throw new ValidationException(
+                CategoryErrorCode.DescriptionMustNotBeBlank,
+                "Description is not blank",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description"
+                }
+            );
 
         var trimmedDescription = description.Trim();
 
         if (trimmedDescription.Length > CategoryConstants.DescriptionMaxLength)
-            throw new BusinessException(
-                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
+            throw new ValidationException(
+                CategoryErrorCode.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Description",
+                    ["max"] = CategoryConstants.DescriptionMaxLength
+                }
+            );
 
         Description = trimmedDescription;
     }
@@ -71,7 +101,16 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Activate()
     {
         if (Status == CategoryStatus.Archived)
-            throw new BusinessException("Archived category cannot be activated");
+            throw new ValidationException(
+                CategoryErrorCode.ActivateNotAllowed,
+                "Archived category cannot be activated",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Activate",
+                    ["allowedStates"] = "not archived"
+                }
+            );
 
         if (Status != CategoryStatus.Active)
             SetStatus(CategoryStatus.Active);
@@ -80,7 +119,16 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Deactivate()
     {
         if (Status == CategoryStatus.Archived)
-            throw new BusinessException("Archived category cannot be deactivated");
+            throw new ValidationException(
+                CategoryErrorCode.DeactivateNotAllowed,
+                "Archived category cannot be deactivated",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Deactivate",
+                    ["allowedStates"] = "not archived"
+                }
+            );
 
         if (Status != CategoryStatus.Inactive)
             SetStatus(CategoryStatus.Inactive);
@@ -89,7 +137,14 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Archive()
     {
         if (Status == CategoryStatus.Archived)
-            throw new BusinessException("Category already archived");
+            throw new ValidationException(
+                CategoryErrorCode.AlreadyArchived,
+                "Category already archived",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Category"
+                }
+            );
 
         SetStatus(CategoryStatus.Archived);
     }
@@ -97,7 +152,14 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetAdminId(Guid adminId)
     {
         if (adminId == Guid.Empty)
-            throw new BusinessException("Admin is required");
+            throw new ValidationException(
+                CategoryErrorCode.AdminRequired,
+                "Admin is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Admin"
+                }
+            );
 
         AdminId = adminId;
     }

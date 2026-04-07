@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
@@ -22,7 +23,7 @@ public static class DbUpdateConflictExceptionExtensions
     {
         var entry = ex.Entries.FirstOrDefault();
         if (entry is null)
-            return new ConflictException("Unknown", "", "", "");
+            return new ConflictException(UniqueErrorCode.UnknownError);
 
         var entityName = entry.Metadata.ClrType.Name;
 
@@ -31,16 +32,20 @@ public static class DbUpdateConflictExceptionExtensions
             .FirstOrDefault(i => i.IsUnique);
 
         if (uniqueIndex is null)
-            return new ConflictException(entityName, "", "", "");
+            return new ConflictException(UniqueErrorCode.HasNoIndex);
 
         var property = uniqueIndex.Properties.First();
         var value = entry.CurrentValues[property.Name]!;
 
         return new ConflictException(
-            entityName,
-            property.Name,
-            value,
-            $"{property.Name} already exists."
+            UniqueErrorCode.DuplicateValue,
+            $"Duplicate value for unique constraint",
+            new Dictionary<string, object?>
+            {
+                { "entity", entityName },
+                { "field", property.Name },
+                { "value", value }
+            }
         );
     }
 }

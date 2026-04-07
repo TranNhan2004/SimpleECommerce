@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -34,7 +35,15 @@ public static class RoleUtils
         if (TryParse(input, out var role))
             return role;
 
-        throw new BusinessException($"Invalid role. Must be one of: {GetSupportedRolesDisplay()}");
+        throw new ValidationException(
+            RoleErrorCode.InvalidRole,
+            $"Invalid role. Must be one of: {GetSupportedRolesDisplay()}",
+            new Dictionary<string, object?>
+            {
+                ["field"] = "Role",
+                ["allowedValues"] = GetSupportedRolesDisplay()
+            }
+        );
     }
 
     public static bool TryParse(string? input, out Role role)
@@ -75,7 +84,15 @@ public static class RoleUtils
             Role.Customer => "customer",
             Role.Seller => "seller",
             Role.Admin => "admin",
-            _ => throw new BusinessException($"Unsupported role value: {role}")
+            _ => throw new ValidationException(
+                RoleErrorCode.UnsupportedRole,
+                $"Unsupported role value: {role}",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Role",
+                    ["value"] = role
+                }
+            )
         };
     }
 

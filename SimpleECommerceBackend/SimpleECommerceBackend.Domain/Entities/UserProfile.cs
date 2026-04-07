@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -56,12 +57,27 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetFirstName(string firstName)
     {
         if (string.IsNullOrEmpty(firstName))
-            throw new BusinessException("First name is required");
+            throw new ValidationException(
+                UserProfileErrorCode.FirstNameRequired,
+                "First name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "FirstName"
+                }
+            );
 
         var trimmedFirstName = firstName.Trim();
 
         if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
-            throw new BusinessException($"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters");
+            throw new ValidationException(
+                UserProfileErrorCode.FirstNameMaxLengthExceeded,
+                $"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "FirstName",
+                    ["max"] = UserProfileConstants.FirstNameMaxLength
+                }
+            );
 
         FirstName = trimmedFirstName;
     }
@@ -69,13 +85,27 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetLastName(string lastName)
     {
         if (string.IsNullOrEmpty(lastName))
-            throw new BusinessException("Last name is required");
+            throw new ValidationException(
+                UserProfileErrorCode.LastNameRequired,
+                "Last name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "LastName"
+                }
+            );
 
         var trimmedLastName = lastName.Trim();
 
         if (trimmedLastName.Length > UserProfileConstants.LastNameMaxLength)
-            throw new BusinessException(
-                $"Last name cannot exceed {UserProfileConstants.LastNameMaxLength} characters");
+            throw new ValidationException(
+                UserProfileErrorCode.LastNameMaxLengthExceeded,
+                $"Last name cannot exceed {UserProfileConstants.LastNameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "LastName",
+                    ["max"] = UserProfileConstants.LastNameMaxLength
+                }
+            );
 
         LastName = trimmedLastName;
     }
@@ -89,12 +119,27 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         }
 
         if (string.IsNullOrWhiteSpace(nickName))
-            throw new BusinessException("Nick name is not blank");
+            throw new ValidationException(
+                UserProfileErrorCode.NickNameMustNotBeBlank,
+                "Nick name is not blank",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "NickName"
+                }
+            );
 
         var trimmedNickName = nickName.Trim();
 
         if (trimmedNickName.Length > UserProfileConstants.NickNameMaxLength)
-            throw new BusinessException($"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters");
+            throw new ValidationException(
+                UserProfileErrorCode.NickNameMaxLengthExceeded,
+                $"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "NickName",
+                    ["max"] = UserProfileConstants.NickNameMaxLength
+                }
+            );
 
         NickName = trimmedNickName;
     }
@@ -109,13 +154,36 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
 
         if (birthDate > today)
-            throw new BusinessException("Birth date cannot be in the future");
+            throw new ValidationException(
+                UserProfileErrorCode.BirthDateCannotBeFuture,
+                "Birth date cannot be in the future",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "BirthDate"
+                }
+            );
 
         if (AgeUtils.Calculate(birthDate, today) < UserProfileConstants.MinAge)
-            throw new BusinessException($"Age cannot be less than {UserProfileConstants.MinAge} years");
+            throw new ValidationException(
+                UserProfileErrorCode.AgeCannotBeLessThan,
+                $"Age cannot be less than {UserProfileConstants.MinAge} years",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Age",
+                    ["min"] = UserProfileConstants.MinAge
+                }
+            );
 
         if (AgeUtils.Calculate(birthDate, today) > UserProfileConstants.MaxAge)
-            throw new BusinessException($"Age cannot exceed than {UserProfileConstants.MaxAge} years");
+            throw new ValidationException(
+                UserProfileErrorCode.AgeCannotExceed,
+                $"Age cannot exceed than {UserProfileConstants.MaxAge} years",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Age",
+                    ["max"] = UserProfileConstants.MaxAge
+                }
+            );
 
         BirthDate = birthDate;
     }

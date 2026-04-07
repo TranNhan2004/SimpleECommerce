@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -43,7 +44,14 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetProductId(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new BusinessException("Product is required");
+            throw new ValidationException(
+                InventoryErrorCode.ProductRequired,
+                "Product is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Product"
+                }
+            );
 
         ProductId = productId;
     }
@@ -51,7 +59,14 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetSellerWarehouseId(Guid sellerWarehouseId)
     {
         if (sellerWarehouseId == Guid.Empty)
-            throw new BusinessException("Seller warehouse is required");
+            throw new ValidationException(
+                InventoryErrorCode.SellerWarehouseRequired,
+                "Seller warehouse is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "SellerWarehouse"
+                }
+            );
 
         SellerWarehouseId = sellerWarehouseId;
     }
@@ -60,10 +75,25 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetQuantityOnHand(int quantityOnHand)
     {
         if (quantityOnHand < 0)
-            throw new BusinessException("Quantity on hand cannot be negative");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityOnHandCannotBeNegative,
+                "Quantity on hand cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityOnHand"
+                }
+            );
 
         if (quantityOnHand > InventoryConstants.MaxQuantity)
-            throw new BusinessException($"Quantity on hand cannot exceed {InventoryConstants.MaxQuantity}");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityOnHandCannotExceed,
+                $"Quantity on hand cannot exceed {InventoryConstants.MaxQuantity}",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityOnHand",
+                    ["max"] = InventoryConstants.MaxQuantity
+                }
+            );
 
         QuantityInStock = quantityOnHand;
     }
@@ -71,10 +101,25 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetQuantityReserved(int quantityReserved)
     {
         if (quantityReserved < 0)
-            throw new BusinessException("Quantity reserved cannot be negative");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityReservedCannotBeNegative,
+                "Quantity reserved cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityReserved"
+                }
+            );
 
         if (quantityReserved > QuantityInStock)
-            throw new BusinessException("Quantity reserved cannot exceed quantity on hand");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityReservedCannotExceedQuantityOnHand,
+                "Quantity reserved cannot exceed quantity on hand",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityReserved",
+                    ["max"] = "quantity on hand"
+                }
+            );
 
         QuantityReserved = quantityReserved;
     }
@@ -92,7 +137,14 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     public void AddStock(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Quantity to add must be positive");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityToAddMustBePositive,
+                "Quantity to add must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityToAdd"
+                }
+            );
 
         SetQuantityOnHand(QuantityInStock + quantity);
     }
@@ -100,10 +152,24 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     public void ReserveStock(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Quantity to reserve must be positive");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityToReserveMustBePositive,
+                "Quantity to reserve must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityToReserve"
+                }
+            );
 
         if (AvailableQuantity < quantity)
-            throw new BusinessException("Insufficient available stock");
+            throw new ValidationException(
+                InventoryErrorCode.InsufficientStock,
+                "Insufficient available stock",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Quantity"
+                }
+            );
 
         SetQuantityReserved(QuantityReserved + quantity);
     }
@@ -111,10 +177,25 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     public void ReleaseStock(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Quantity to release must be positive");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityToReleaseMustBePositive,
+                "Quantity to release must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityToRelease"
+                }
+            );
 
         if (QuantityReserved < quantity)
-            throw new BusinessException("Cannot release more than reserved quantity");
+            throw new ValidationException(
+                InventoryErrorCode.QuantityToReleaseCannotExceedReserved,
+                "Cannot release more than reserved quantity",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "QuantityToRelease",
+                    ["max"] = "reserved quantity"
+                }
+            );
 
         SetQuantityReserved(QuantityReserved - quantity);
     }

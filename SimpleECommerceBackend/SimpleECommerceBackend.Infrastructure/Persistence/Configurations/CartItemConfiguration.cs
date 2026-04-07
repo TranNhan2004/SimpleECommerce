@@ -8,7 +8,7 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
 {
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
-        builder.ToTable("CartItems");
+        builder.ToTable("CartItems", DbSchemas.Business);
 
         builder.Property(ci => ci.Quantity)
             .IsRequired();

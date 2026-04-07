@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Enums;
 
@@ -10,7 +10,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 {
     public void Configure(EntityTypeBuilder<UserProfile> builder)
     {
-        builder.ToTable("UserProfiles");
+        builder.ToTable("UserProfiles", DbSchemas.Business);
 
         builder.Property(u => u.Email)
             .IsRequired();

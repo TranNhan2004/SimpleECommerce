@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
@@ -9,7 +9,7 @@ public class CustomerShippingAddressConfiguration : IEntityTypeConfiguration<Cus
 {
     public void Configure(EntityTypeBuilder<CustomerShippingAddress> builder)
     {
-        builder.ToTable("CustomerShippingAddresses");
+        builder.ToTable("CustomerShippingAddresses", DbSchemas.Business);
 
         builder.Property(csa => csa.RecipientName)
             .IsRequired()

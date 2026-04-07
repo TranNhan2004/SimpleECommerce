@@ -3,22 +3,20 @@
     "tagline": "Thương mại hiện đại"
   },
   "home": {
-    "chip": "Đăng nhập an toàn",
-    "title": "Đăng nhập vào cửa hàng của bạn",
-    "description": "Trình duyệt hiện chịu trách nhiệm cho đăng nhập, đăng xuất, bảo vệ route, làm mới token và tự gắn bearer token vào API.",
-    "oauthSummary": "Nhà cung cấp định danh xử lý chuyển hướng đăng nhập và đăng xuất.",
-    "routeSummary": "Các route đã đăng nhập được bảo vệ ở frontend.",
-    "apiSummary": "Lời gọi API tự động gửi access token.",
-    "sessionLabel": "Phiên",
-    "guest": "Khách",
-    "signedIn": "Đã đăng nhập",
-    "signedOut": "Chưa đăng nhập",
-    "realmRoleCount": "Vai trò realm",
-    "resourceRoleCount": "Vai trò resource",
-    "loading": "Đang tải",
-    "ready": "Sẵn sàng",
-    "public": "Công khai",
-    "stateLabel": "Trạng thái xác thực"
+    "chip": "Quyền truy cập khách",
+    "title": "Chào mừng đến với SimpleECommerce",
+    "description": "Đây là trang giới thiệu công khai trước khi đăng nhập. Bạn có thể xem tổng quan về ứng dụng rồi chọn cách tiếp tục.",
+    "loginAction": "Đăng nhập",
+    "registerAction": "Tạo tài khoản",
+    "panelLabel": "Bạn nhận được gì",
+    "panelTitle": "Giao diện thân thiện",
+    "panelMessage": "Bố cục được thiết kế để tạo ấn tượng nhanh và dẫn đến bước tiếp theo dễ dàng.",
+    "featureCatalogTitle": "Danh mục linh hoạt",
+    "featureCatalogDescription": "Các khu vực sản phẩm tự thích ứng theo kích thước màn hình.",
+    "featureSecurityTitle": "Truy cập an toàn",
+    "featureSecurityDescription": "Dùng chức năng đăng nhập hoặc tạo tài khoản khi bạn sẵn sàng tiếp tục.",
+    "featureResponsiveTitle": "Tối ưu cho mọi màn hình",
+    "featureResponsiveDescription": "Bố cục dễ đọc trên cả desktop, tablet và mobile."
   },
   "auth": {
     "login": "Đăng nhập",
@@ -61,12 +59,14 @@
     "none": "Không có"
   },
   "forbidden": {
-    "chip": "Không có quyền",
-    "title": "Bạn không có quyền truy cập",
-    "description": "Phiên của bạn hợp lệ, nhưng người dùng hiện tại không có vai trò cần thiết cho trang này.",
-    "homeAction": "Về trang chủ",
-    "tipLabel": "Điều gì đã xảy ra",
-    "tip": "Hãy kiểm tra các vai trò đã gán trong nhà cung cấp định danh rồi thử lại."
+    "code": "403",
+    "title": "Không có quyền truy cập",
+    "message": "Bạn không có quyền truy cập trang này."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Không tìm thấy",
+    "message": "Không tìm thấy trang bạn yêu cầu."
   },
   "search": {
     "placeholder": "Tìm sản phẩm, thương hiệu và bộ sưu tập",

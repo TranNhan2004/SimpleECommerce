@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
@@ -31,7 +32,14 @@ public class ProductPrice : Entity, ICreatedTrackable
     private void SetMoney(Money money)
     {
         if (money.Amount <= 0)
-            throw new BusinessException("Price amount must be positive");
+            throw new ValidationException(
+                ProductPriceErrorCode.PriceMustBePositive,
+                "Price amount must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Price"
+                }
+            );
 
         Money = money;
     }

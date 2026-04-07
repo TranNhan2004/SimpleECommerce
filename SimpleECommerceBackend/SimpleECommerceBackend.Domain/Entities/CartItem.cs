@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -37,7 +38,14 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetProductId(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new BusinessException("Product ID is required");
+            throw new ValidationException(
+                CartItemErrorCode.ProductIdRequired,
+                "Product ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ProductId"
+                }
+            );
 
         ProductId = productId;
     }
@@ -45,7 +53,14 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetCartId(Guid cartId)
     {
         if (cartId == Guid.Empty)
-            throw new BusinessException("Cart ID is required");
+            throw new ValidationException(
+                CartItemErrorCode.CartIdRequired,
+                "Cart ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "CartId"
+                }
+            );
 
         CartId = cartId;
     }
@@ -53,10 +68,25 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetQuantity(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Quantity must be greater than zero");
+            throw new ValidationException(
+                CartItemErrorCode.QuantityMustBeGreaterThanZero,
+                "Quantity must be greater than zero",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Quantity"
+                }
+            );
 
         if (quantity > CartConstants.MaxQuantityPerItem)
-            throw new BusinessException($"Quantity cannot exceed {CartConstants.MaxQuantityPerItem}");
+            throw new ValidationException(
+                CartItemErrorCode.QuantityCannotExceed,
+                $"Quantity cannot exceed {CartConstants.MaxQuantityPerItem}",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Quantity",
+                    ["max"] = CartConstants.MaxQuantityPerItem
+                }
+            );
 
         Quantity = quantity;
     }
@@ -64,7 +94,14 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     public void IncreaseQuantity(int amount)
     {
         if (amount <= 0)
-            throw new BusinessException("Amount must be positive");
+            throw new ValidationException(
+                CartItemErrorCode.AmountMustBePositive,
+                "Amount must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Amount"
+                }
+            );
 
         SetQuantity(Quantity + amount);
     }
@@ -72,7 +109,14 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     public void DecreaseQuantity(int amount)
     {
         if (amount <= 0)
-            throw new BusinessException("Amount must be positive");
+            throw new ValidationException(
+                CartItemErrorCode.AmountMustBePositive,
+                "Amount must be positive",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Amount"
+                }
+            );
 
         SetQuantity(Quantity - amount);
     }

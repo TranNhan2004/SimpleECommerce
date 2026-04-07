@@ -1,0 +1,13 @@
+@reference '../../../styles.css';
+
+:host {
+	@apply block min-h-screen;
+}
+
+main.se-page {
+	@apply flex min-h-screen flex-col;
+}
+
+.se-route {
+	@apply flex-1;
+}

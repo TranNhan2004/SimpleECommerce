@@ -25,6 +25,7 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
+    public DbSet<TranslationEntry> TranslationEntries => Set<TranslationEntry>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
@@ -43,6 +44,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema(DbSchemas.Business);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         ApplyCommonConventions(modelBuilder);

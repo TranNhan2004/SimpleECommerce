@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
@@ -39,7 +40,14 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetProductId(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new BusinessException("Product ID is required");
+            throw new ValidationException(
+                OrderItemErrorCode.ProductIdRequired,
+                "Product ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ProductId"
+                }
+            );
 
         ProductId = productId;
     }
@@ -47,7 +55,14 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     private void SetOrderId(Guid orderId)
     {
         if (orderId == Guid.Empty)
-            throw new BusinessException("Order ID is required");
+            throw new ValidationException(
+                OrderItemErrorCode.OrderIdRequired,
+                "Order ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "OrderId"
+                }
+            );
 
         OrderId = orderId;
     }
@@ -55,7 +70,14 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetQuantity(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Quantity must be greater than zero");
+            throw new ValidationException(
+                OrderItemErrorCode.QuantityMustBeGreaterThanZero,
+                "Quantity must be greater than zero",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Quantity"
+                }
+            );
 
         Quantity = quantity;
     }
@@ -63,7 +85,14 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetCurrentPrice(Money currentPrice)
     {
         if (currentPrice.Amount < 0)
-            throw new BusinessException("Amount cannot be negative");
+            throw new ValidationException(
+                OrderItemErrorCode.AmountCannotBeNegative,
+                "Amount cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Amount"
+                }
+            );
 
         CurrentPrice = currentPrice;
     }

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CustomerNavbar } from './pages/customer/customer-navbar/customer-navbar';
 import { environment } from '../environments/environment';
+import { Navbar } from "./shared/navbar/navbar";
 
 @Component({
   selector: 'app-root',
-  imports: [CustomerNavbar],
+  imports: [Navbar],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

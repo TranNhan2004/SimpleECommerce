@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
@@ -41,7 +42,14 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     public void SoftDelete()
     {
         if (IsDeleted)
-            throw new BusinessException("Address has beed deleted");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.AlreadyDeleted,
+                "Address has beed deleted",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Address"
+                }
+            );
 
         IsDeleted = true;
         DeletedAt = DateTimeOffset.UtcNow;
@@ -52,13 +60,27 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     public void SetRecipientName(string recipientName)
     {
         if (string.IsNullOrWhiteSpace(recipientName))
-            throw new BusinessException("Recipient name is required");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.RecipientNameRequired,
+                "Recipient name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientName"
+                }
+            );
 
         var trimmedName = recipientName.Trim();
 
         if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
-            throw new BusinessException(
-                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.RecipientNameMaxLengthExceeded,
+                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientName",
+                    ["max"] = ShippingAddressConstants.RecipientNameMaxLength
+                }
+            );
 
         RecipientName = trimmedName;
     }
@@ -66,13 +88,27 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     public void SetRecipientPhoneNumber(string recipientPhoneNumber)
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new BusinessException("Recipient phone number is required");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.RecipientPhoneNumberRequired,
+                "Recipient phone number is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientPhoneNumber"
+                }
+            );
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
         if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new BusinessException(
-                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.RecipientPhoneNumberMaxLengthExceeded,
+                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientPhoneNumber",
+                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                }
+            );
 
         RecipientPhoneNumber = trimmedRecipientPhoneNumber;
     }
@@ -90,7 +126,14 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     public void MarkAsDefault()
     {
         if (IsDefault)
-            throw new BusinessException("Address is default");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.AlreadyDefault,
+                "Address is default",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Address"
+                }
+            );
 
         SetIsDefault(true);
     }
@@ -98,7 +141,14 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     public void RemoveDefault()
     {
         if (!IsDefault)
-            throw new BusinessException("Address is not default");
+            throw new ValidationException(
+                CustomerShippingAddressErrorCode.NotDefault,
+                "Address is not default",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Address"
+                }
+            );
 
         SetIsDefault(false);
     }

@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -31,7 +32,14 @@ public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetCustomerId(Guid customerId)
     {
         if (customerId == Guid.Empty)
-            throw new BusinessException("Customer ID is required");
+            throw new ValidationException(
+                CartErrorCode.CustomerIdRequired,
+                "Customer ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "CustomerId"
+                }
+            );
 
         CustomerId = customerId;
     }

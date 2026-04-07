@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -42,13 +43,27 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new BusinessException("Seller shop name is required");
+            throw new ValidationException(
+                SellerShopErrorCode.NameRequired,
+                "Seller shop name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "SellerShop"
+                }
+            );
 
         var trimmedName = name.Trim();
 
         if (trimmedName.Length > SellerShopConstants.NameMaxLength)
-            throw new BusinessException(
-                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters");
+            throw new ValidationException(
+                SellerShopErrorCode.NameMaxLengthExceeded,
+                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "SellerShop",
+                    ["max"] = SellerShopConstants.NameMaxLength
+                }
+            );
 
         Name = trimmedName;
     }
@@ -56,13 +71,27 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetPhoneNumber(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
-            throw new BusinessException("Phone number is required");
+            throw new ValidationException(
+                SellerShopErrorCode.PhoneNumberRequired,
+                "Phone number is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "PhoneNumber"
+                }
+            );
 
         var trimmedPhoneNumber = phoneNumber.Trim();
 
         if (trimmedPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new BusinessException(
-                $"Phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
+            throw new ValidationException(
+                SellerShopErrorCode.PhoneNumberMaxLengthExceeded,
+                $"Phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "PhoneNumber",
+                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                }
+            );
 
         PhoneNumber = trimmedPhoneNumber;
     }
@@ -75,7 +104,14 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new BusinessException("Seller is required");
+            throw new ValidationException(
+                SellerShopErrorCode.SellerRequired,
+                "Seller is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Seller"
+                }
+            );
 
         SellerId = sellerId;
     }
@@ -89,7 +125,14 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == sellerWarehouse.Id);
         if (existing is null)
-            throw new BusinessException("Warehouse not found");
+            throw new ValidationException(
+                SellerShopErrorCode.WarehouseNotFound,
+                "Warehouse not found",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Warehouse"
+                }
+            );
 
         existing.SetFullAddress(sellerWarehouse.FullAddress);
     }
@@ -98,7 +141,14 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == id);
         if (existing is null)
-            throw new BusinessException("Warehouse not found");
+            throw new ValidationException(
+                SellerShopErrorCode.WarehouseNotFound,
+                "Warehouse not found",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Warehouse"
+                }
+            );
 
         existing.SoftDelete();
     }

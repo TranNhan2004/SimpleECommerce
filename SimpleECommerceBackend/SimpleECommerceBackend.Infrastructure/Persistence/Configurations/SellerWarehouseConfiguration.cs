@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations;
@@ -9,7 +9,7 @@ public class SellerWarehouseConfiguration : IEntityTypeConfiguration<SellerWareh
 {
     public void Configure(EntityTypeBuilder<SellerWarehouse> builder)
     {
-        builder.ToTable("SellerWarehouses");
+        builder.ToTable("SellerWarehouses", DbSchemas.Business);
 
         builder.ComplexProperty(sw => sw.FullAddress, address =>
         {

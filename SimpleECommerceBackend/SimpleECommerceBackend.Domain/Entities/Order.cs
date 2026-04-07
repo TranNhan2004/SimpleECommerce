@@ -1,4 +1,5 @@
-using SimpleECommerceBackend.Domain.Constants;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -100,12 +101,27 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetCode(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
-            throw new BusinessException("Order code is required");
+            throw new ValidationException(
+                OrderErrorCode.CodeRequired,
+                "Order code is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "OrderCode"
+                }
+            );
 
         var trimmedCode = code.Trim();
 
         if (trimmedCode.Length > OrderConstants.CodeMaxLength)
-            throw new BusinessException($"Order code cannot exceed {OrderConstants.CodeMaxLength} characters");
+            throw new ValidationException(
+                OrderErrorCode.CodeMaxLengthExceeded,
+                $"Order code cannot exceed {OrderConstants.CodeMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "OrderCode",
+                    ["max"] = OrderConstants.CodeMaxLength
+                }
+            );
 
         Code = trimmedCode;
     }
@@ -119,12 +135,27 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
         }
 
         if (string.IsNullOrWhiteSpace(note))
-            throw new BusinessException("Note is not blank");
+            throw new ValidationException(
+                OrderErrorCode.NoteMustNotBeBlank,
+                "Note is not blank",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Note"
+                }
+            );
 
         var trimmedNote = note.Trim();
 
         if (trimmedNote.Length > OrderConstants.NoteMaxLength)
-            throw new BusinessException($"Note cannot exceed {OrderConstants.NoteMaxLength} characters");
+            throw new ValidationException(
+                OrderErrorCode.NoteMaxLengthExceeded,
+                $"Note cannot exceed {OrderConstants.NoteMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Note",
+                    ["max"] = OrderConstants.NoteMaxLength
+                }
+            );
 
         Note = trimmedNote;
     }
@@ -147,7 +178,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Pickup()
     {
         if (Status != OrderStatus.PendingPayment)
-            throw new BusinessException("Only pending payment orders can be picked up");
+            throw new ValidationException(
+                OrderErrorCode.PickupNotAllowed,
+                "Only pending payment orders can be picked up",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Pickup",
+                    ["allowedStates"] = "pending payment"
+                }
+            );
 
         SetStatus(OrderStatus.ReadyToPickup);
     }
@@ -155,7 +195,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Ship()
     {
         if (Status != OrderStatus.ReadyToPickup)
-            throw new BusinessException("Only picked up orders can be shipped");
+            throw new ValidationException(
+                OrderErrorCode.ShipNotAllowed,
+                "Only picked up orders can be shipped",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Ship",
+                    ["allowedStates"] = "ready to pickup"
+                }
+            );
 
         SetStatus(OrderStatus.Shipped);
     }
@@ -163,7 +212,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void AwaitConfirmation()
     {
         if (Status != OrderStatus.Shipped)
-            throw new BusinessException("Only shipped orders can be awaited confirmation");
+            throw new ValidationException(
+                OrderErrorCode.AwaitConfirmationNotAllowed,
+                "Only shipped orders can be awaited confirmation",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Await confirmation",
+                    ["allowedStates"] = "shipped"
+                }
+            );
 
         SetStatus(OrderStatus.AwaitingConfirmation);
     }
@@ -171,7 +229,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Deliver()
     {
         if (Status != OrderStatus.AwaitingConfirmation)
-            throw new BusinessException("Only awaiting confirmation orders can be delivered");
+            throw new ValidationException(
+                OrderErrorCode.DeliverNotAllowed,
+                "Only awaiting confirmation orders can be delivered",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Deliver",
+                    ["allowedStates"] = "awaiting confirmation"
+                }
+            );
 
         SetStatus(OrderStatus.Delivered);
     }
@@ -179,7 +246,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Cancel()
     {
         if (Status != OrderStatus.PendingPayment && Status != OrderStatus.ReadyToPickup)
-            throw new BusinessException("Only pending payment or picked up orders can be cancelled");
+            throw new ValidationException(
+                OrderErrorCode.CancelNotAllowed,
+                "Only pending payment or picked up orders can be cancelled",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Cancel",
+                    ["allowedStates"] = "pending payment, ready to pickup"
+                }
+            );
 
         SetStatus(OrderStatus.Cancelled);
     }
@@ -187,7 +263,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Return()
     {
         if (Status != OrderStatus.AwaitingConfirmation)
-            throw new BusinessException("Only awaiting confirmation orders can be returned");
+            throw new ValidationException(
+                OrderErrorCode.ReturnNotAllowed,
+                "Only awaiting confirmation orders can be returned",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Return",
+                    ["allowedStates"] = "awaiting confirmation"
+                }
+            );
 
         SetStatus(OrderStatus.Returned);
     }
@@ -195,7 +280,16 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void Expire()
     {
         if (Status != OrderStatus.PendingPayment)
-            throw new BusinessException("Only pending payment orders can be expired");
+            throw new ValidationException(
+                OrderErrorCode.ExpireNotAllowed,
+                "Only pending payment orders can be expired",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                    ["operation"] = "Expire",
+                    ["allowedStates"] = "pending payment"
+                }
+            );
 
         SetStatus(OrderStatus.Expired);
         ExpiredAt = DateTimeOffset.UtcNow.AddDays(1);
@@ -204,13 +298,27 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetShopName(string shopName)
     {
         if (string.IsNullOrWhiteSpace(shopName))
-            throw new BusinessException("Shop name is required");
+            throw new ValidationException(
+                OrderErrorCode.ShopNameRequired,
+                "Shop name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ShopName"
+                }
+            );
 
         var trimmedName = shopName.Trim();
 
         if (trimmedName.Length > SellerShopConstants.NameMaxLength)
-            throw new BusinessException(
-                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters");
+            throw new ValidationException(
+                OrderErrorCode.ShopNameMaxLengthExceeded,
+                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ShopName",
+                    ["max"] = SellerShopConstants.NameMaxLength
+                }
+            );
 
         ShopName = shopName;
     }
@@ -223,13 +331,27 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetRecipientName(string recipientName)
     {
         if (string.IsNullOrWhiteSpace(recipientName))
-            throw new BusinessException("Recipient name is required");
+            throw new ValidationException(
+                OrderErrorCode.RecipientNameRequired,
+                "Recipient name is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientName"
+                }
+            );
 
         var trimmedName = recipientName.Trim();
 
         if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
-            throw new BusinessException(
-                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters");
+            throw new ValidationException(
+                OrderErrorCode.RecipientNameMaxLengthExceeded,
+                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientName",
+                    ["max"] = ShippingAddressConstants.RecipientNameMaxLength
+                }
+            );
 
         RecipientName = trimmedName;
     }
@@ -237,13 +359,27 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetRecipientPhoneNumber(string recipientPhoneNumber)
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new BusinessException("Recipient phone number is required");
+            throw new ValidationException(
+                OrderErrorCode.RecipientPhoneNumberRequired,
+                "Recipient phone number is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientPhoneNumber"
+                }
+            );
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
         if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
-            throw new BusinessException(
-                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters");
+            throw new ValidationException(
+                OrderErrorCode.RecipientPhoneNumberMaxLengthExceeded,
+                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "RecipientPhoneNumber",
+                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                }
+            );
 
         RecipientPhoneNumber = trimmedRecipientPhoneNumber;
     }
@@ -256,7 +392,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetCustomerId(Guid customerId)
     {
         if (customerId == Guid.Empty)
-            throw new BusinessException("Customer is required");
+            throw new ValidationException(
+                OrderErrorCode.CustomerRequired,
+                "Customer is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Customer"
+                }
+            );
 
         CustomerId = customerId;
     }
@@ -264,7 +407,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetSellerId(Guid sellerId)
     {
         if (sellerId == Guid.Empty)
-            throw new BusinessException("Seller is required");
+            throw new ValidationException(
+                OrderErrorCode.SellerRequired,
+                "Seller is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Seller"
+                }
+            );
 
         SellerId = sellerId;
     }

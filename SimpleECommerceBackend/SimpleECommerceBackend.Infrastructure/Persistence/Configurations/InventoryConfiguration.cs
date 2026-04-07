@@ -8,7 +8,7 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
 {
     public void Configure(EntityTypeBuilder<Inventory> builder)
     {
-        builder.ToTable("Inventories");
+        builder.ToTable("Inventories", DbSchemas.Business);
 
         builder.Property(i => i.QuantityInStock)
             .IsRequired();

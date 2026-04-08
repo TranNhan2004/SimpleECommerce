@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Moq;
+using SimpleECommerceBackend.Infrastructure.Options.Translation;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Tests.Services.Translation;
@@ -126,7 +126,7 @@ public class JsonStaticTextLocalizerTests
         var hostEnvironment = new Mock<IHostEnvironment>();
         hostEnvironment.SetupGet(environment => environment.ContentRootPath).Returns(contentRootPath);
 
-        var options = Options.Create(new TranslationOptions
+        var options = Microsoft.Extensions.Options.Options.Create(new TranslationOptions
         {
             DefaultLocale = "en",
             StaticResourcesPath = "ErrorMessages"

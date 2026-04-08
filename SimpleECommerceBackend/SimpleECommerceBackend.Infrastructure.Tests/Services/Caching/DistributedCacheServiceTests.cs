@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 
 namespace SimpleECommerceBackend.Infrastructure.Tests.Services.Caching;
@@ -45,7 +44,9 @@ public class DistributedCacheServiceTests
 
     private static DistributedCacheService CreateSut()
     {
-        IDistributedCache cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+        IDistributedCache cache =
+            new MemoryDistributedCache(
+                Microsoft.Extensions.Options.Options.Create(new MemoryDistributedCacheOptions()));
         return new DistributedCacheService(cache);
     }
 

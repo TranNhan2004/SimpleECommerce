@@ -34,6 +34,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         SetLastName(lastName);
         SetNickName(nickName);
         SetSex(sex);
+        SetStatus(UserStatus.Active);
         SetBirthDate(birthDate);
         SetAvatarUrl(avatarUrl);
     }
@@ -56,7 +57,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
     public void SetFirstName(string firstName)
     {
-        if (string.IsNullOrEmpty(firstName))
+        if (string.IsNullOrWhiteSpace(firstName))
             throw new ValidationException(
                 UserProfileErrorCode.FirstNameRequired,
                 "First name is required",
@@ -84,7 +85,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
     public void SetLastName(string lastName)
     {
-        if (string.IsNullOrEmpty(lastName))
+        if (string.IsNullOrWhiteSpace(lastName))
             throw new ValidationException(
                 UserProfileErrorCode.LastNameRequired,
                 "Last name is required",
@@ -147,6 +148,11 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
     public void SetSex(Sex sex)
     {
         Sex = sex;
+    }
+
+    private void SetStatus(UserStatus status)
+    {
+        Status = status;
     }
 
     public void SetBirthDate(DateOnly birthDate)

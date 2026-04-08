@@ -9,6 +9,7 @@ using SimpleECommerceBackend.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOptions();
+builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);

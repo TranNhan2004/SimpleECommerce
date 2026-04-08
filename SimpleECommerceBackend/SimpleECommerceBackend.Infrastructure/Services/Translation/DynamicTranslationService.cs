@@ -6,6 +6,7 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
 using SimpleECommerceBackend.Domain.Entities.Translation;
+using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 

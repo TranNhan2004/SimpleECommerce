@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Models.Pagination;
 
-namespace SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
+namespace SimpleECommerceBackend.Infrastructure.Extensions;
 
 public static class PaginationExtension
 {
@@ -11,10 +11,10 @@ public static class PaginationExtension
         CancellationToken cancellationToken = default
     ) where T : class
     {
-        int currentPage = paginationRequestModel.CurrentPage;
-        int rowsPerPage = paginationRequestModel.RowsPerPage;
+        var currentPage = paginationRequestModel.CurrentPage;
+        var rowsPerPage = paginationRequestModel.RowsPerPage;
 
-        int totalItems = await query.CountAsync(cancellationToken);
+        var totalItems = await query.CountAsync(cancellationToken);
 
         var items = await query
             .Skip((currentPage - 1) * rowsPerPage)

@@ -8,7 +8,7 @@ using SimpleECommerceBackend.Domain.Utils;
 namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 [AutoConstructor]
-public partial class UpdateCommandHandler : IRequestHandler<UpdateUserProfileCommand, UpdateUserProfileResult>
+public partial class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, UpdateUserProfileResult>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContextHolder _userContextHolder;
@@ -29,6 +29,16 @@ public partial class UpdateCommandHandler : IRequestHandler<UpdateUserProfileCom
         userProfile.SetBirthDate(request.BirthDate);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new UpdateUserProfileResult();
+        return new UpdateUserProfileResult
+        {
+            Id = userProfile.Id,
+            Email = userProfile.Email,
+            FirstName = userProfile.FirstName,
+            LastName = userProfile.LastName,
+            NickName = userProfile.NickName,
+            Sex = SexUtils.ToName(userProfile.Sex),
+            Status = UserStatusUtils.ToName(userProfile.Status),
+            BirthDate = userProfile.BirthDate
+        };
     }
 }

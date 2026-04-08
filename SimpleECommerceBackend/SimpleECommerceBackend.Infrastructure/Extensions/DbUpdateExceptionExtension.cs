@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
+namespace SimpleECommerceBackend.Infrastructure.Extensions;
 
 public static class DbUpdateConflictExceptionExtensions
 {
@@ -39,7 +39,7 @@ public static class DbUpdateConflictExceptionExtensions
 
         return new ConflictException(
             UniqueErrorCode.DuplicateValue,
-            $"Duplicate value for unique constraint",
+            "Duplicate value for unique constraint",
             new Dictionary<string, object?>
             {
                 { "entity", entityName },

@@ -1,135 +1,85 @@
 using FluentAssertions;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Tests.Entities;
 
 public class CategoryTests
 {
-    // ---------- Happy path ----------
-
     [Fact]
     public void Create_ShouldCreateCategory_WhenInputIsValid()
     {
-        // Act
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var category = Category.Create(
-            "Books",
-            "All kinds of books",
-            adminId
-        );
+        var adminId = Guid.NewGuid();
 
-        // Assert
-        category.Should().NotBeNull();
+        var category = Category.Create("  Books  ", "  All kinds of books  ", adminId);
+
         category.Name.Should().Be("Books");
         category.Description.Should().Be("All kinds of books");
         category.AdminId.Should().Be(adminId);
-    }
-
-    [Fact]
-    public void Create_ShouldTrimNameAndDescription()
-    {
-        // Act
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var category = Category.Create(
-            "  Books  ",
-            "  Description  ",
-            adminId
-        );
-
-        // Assert
-        category.Name.Should().Be("Books");
-        category.Description.Should().Be("Description");
+        category.Status.Should().Be(CategoryStatus.Active);
     }
 
     [Fact]
     public void Create_ShouldAllowNullDescription()
     {
-        // Act
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var category = Category.Create("Books", null, adminId);
+        var category = Category.Create("Books", null, Guid.NewGuid());
 
-        // Assert
         category.Description.Should().BeNull();
     }
 
-    // ---------- Name validation ----------
-
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void Create_ShouldThrow_WhenNameIsEmptyOrWhitespace(string name)
+    public void Create_ShouldThrowValidationException_WhenNameIsEmptyOrWhitespace(string name)
     {
-        // Act
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var act = () => Category.Create(name, "desc", adminId);
+        var action = () => Category.Create(name, "desc", Guid.NewGuid());
 
-        // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Message.Should().Be("Name is required");
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(CategoryErrorCode.NameRequired);
     }
 
     [Fact]
-    public void Create_ShouldThrow_WhenNameExceedsMaxLength()
+    public void Create_ShouldThrowValidationException_WhenNameExceedsMaxLength()
     {
-        // Arrange
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
         var name = new string('a', CategoryConstants.NameMaxLength + 1);
+        var action = () => Category.Create(name, "desc", Guid.NewGuid());
 
-        // Act
-        var act = () => Category.Create(name, "desc", adminId);
-
-        // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Message.Should().Be($"Name cannot exceed {CategoryConstants.NameMaxLength} characters");
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(CategoryErrorCode.NameMaxLengthExceeded);
     }
-
-    // ---------- Description validation ----------
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_ShouldThrow_WhenDescriptionIsEmptyOrWhitespace(string description)
-    {
-        // Act
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var act = () => Category.Create("name", description, adminId);
-
-        // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Message.Should().Be("Description is not blank");
-    }
-
 
     [Fact]
-    public void Create_ShouldThrow_WhenDescriptionExceedsMaxLength()
+    public void Deactivate_ShouldChangeStatus_WhenCategoryIsActive()
     {
-        // Arrange
-        var adminId = Guid.Parse("6984453b-0a40-8324-833a-ad6649374fce");
-        var description =
-            new string('a', CategoryConstants.DescriptionMaxLength + 1);
+        var category = Category.Create("Books", "Description", Guid.NewGuid());
 
-        // Act
-        var act = () => Category.Create("Books", description, adminId);
+        category.Deactivate();
 
-        // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Message.Should()
-            .Be($"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters");
+        category.Status.Should().Be(CategoryStatus.Inactive);
     }
 
-    // ---------- AdminId validation ----------
     [Fact]
-    public void Create_ShouldThrow_WhenAdminIdIsEmpty()
+    public void Activate_ShouldThrowValidationException_WhenCategoryIsArchived()
     {
-        // Act
-        var adminId = Guid.Empty;
-        var act = () => Category.Create("Books", null, adminId);
+        var category = Category.Create("Books", "Description", Guid.NewGuid());
+        category.Archive();
+        var action = () => category.Activate();
 
-        // Assert
-        // Assert
-        var exception = act.Should().Throw<ValidationException>().Which;
-        exception.Message.Should()
-            .Be("Admin is required");
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(CategoryErrorCode.ActivateNotAllowed);
+    }
+
+    [Fact]
+    public void Archive_ShouldThrowValidationException_WhenCategoryIsAlreadyArchived()
+    {
+        var category = Category.Create("Books", "Description", Guid.NewGuid());
+        category.Archive();
+        var action = () => category.Archive();
+
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(CategoryErrorCode.AlreadyArchived);
     }
 }

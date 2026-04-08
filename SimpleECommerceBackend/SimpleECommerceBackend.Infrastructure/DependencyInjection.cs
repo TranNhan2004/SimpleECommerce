@@ -10,6 +10,12 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Infrastructure.Contexts;
+using SimpleECommerceBackend.Infrastructure.Extensions;
+using SimpleECommerceBackend.Infrastructure.Options.Authentication;
+using SimpleECommerceBackend.Infrastructure.Options.Caching;
+using SimpleECommerceBackend.Infrastructure.Options.Email;
+using SimpleECommerceBackend.Infrastructure.Options.RateLimiter;
+using SimpleECommerceBackend.Infrastructure.Options.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories;
@@ -24,10 +30,32 @@ namespace SimpleECommerceBackend.Infrastructure;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddAppOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Authentication
+        services.Configure<KeycloakOptions>(configuration.GetSection(KeycloakOptions.SectionName));
+
+        // Caching
+        services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
+
+        // Email
+        services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
+
+        // Rate Limiter
+        services.Configure<GlobalRateLimiterOptions>(configuration.GetSection(GlobalRateLimiterOptions.SectionName));
+        services.Configure<IpRateLimiterOptions>(configuration.GetSection(IpRateLimiterOptions.SectionName));
+
+        // Translation
+        services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
+        services.Configure<OpenAITranslationOptions>(configuration.GetSection(OpenAITranslationOptions.SectionName));
+        services.Configure<GoogleAITranslationOptions>(configuration.GetSection(GoogleAITranslationOptions.SectionName));
+
+        return services;
+    }
+
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Email Services
-        services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
         services.AddScoped<IEmailBodyProvider, EmailBodyProvider>();
         services.AddSingleton<BackgroundEmailQueue>();
         services.AddSingleton<IEmailService, SmtpEmailService>();
@@ -42,26 +70,15 @@ public static class DependencyInjection
         services.AddScoped<IUserContextHolder, UserContextHolder>();
 
         // Cache Services
-        services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
-        var redisConnectionString = configuration[$"{RedisOptions.SectionName}:ConnectionString"];
-        var redisInstanceName = configuration[$"{RedisOptions.SectionName}:InstanceName"];
-        if (!string.IsNullOrWhiteSpace(redisConnectionString))
-            services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = redisConnectionString;
-                options.InstanceName = redisInstanceName;
-            });
-        else
-            services.AddDistributedMemoryCache();
-
+        var redisOptions = configuration.GetRequiredOptions<RedisOptions>(RedisOptions.SectionName);
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisOptions.ConnectionString;
+            options.InstanceName = redisOptions.InstanceName;
+        });
         services.AddScoped<ICacheService, DistributedCacheService>();
 
         // Translation Services
-        services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
-        services.Configure<OpenAITranslationOptions>(configuration.GetSection(OpenAITranslationOptions.SectionName));
-        services.Configure<GoogleAITranslationOptions>(
-            configuration.GetSection(GoogleAITranslationOptions.SectionName));
-
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
         services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
         services.AddScoped<ITranslationEntryRepository, TranslationEntryRepository>();

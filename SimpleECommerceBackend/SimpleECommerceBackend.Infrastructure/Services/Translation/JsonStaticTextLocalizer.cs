@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
+using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 

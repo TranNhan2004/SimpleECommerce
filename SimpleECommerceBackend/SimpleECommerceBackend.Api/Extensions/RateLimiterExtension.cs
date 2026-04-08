@@ -1,16 +1,21 @@
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Options;
-using SimpleECommerceBackend.Infrastructure.Services.RateLimiter;
+using SimpleECommerceBackend.Infrastructure.Extensions;
+using SimpleECommerceBackend.Infrastructure.Options.RateLimiter;
 
 namespace SimpleECommerceBackend.Api.Extensions;
 
 public static class IpRateLimitExtension
 {
-    public static IServiceCollection AddCustomRateLimiter(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCustomRateLimiter(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.Configure<GlobalRateLimiterOptions>(configuration.GetSection("GlobalRateLimiterOptions"));
-        services.Configure<IpRateLimiterOptions>(configuration.GetSection("IpRateLimiterOptions"));
+        var globalOptions =
+            configuration.GetRequiredOptions<GlobalRateLimiterOptions>(GlobalRateLimiterOptions.SectionName);
+        var ipOptions = configuration.GetRequiredOptions<IpRateLimiterOptions>(IpRateLimiterOptions.SectionName);
+
         services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -21,24 +26,20 @@ public static class IpRateLimitExtension
         services.AddRateLimiter(options =>
         {
             // Global limiter
-            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-            {
-                var globalOptions = context.RequestServices.GetRequiredService<IOptions<GlobalRateLimiterOptions>>().Value;
-
-                return RateLimitPartition.GetTokenBucketLimiter("global", _ =>
-                    new TokenBucketRateLimiterOptions
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(_ =>
+                RateLimitPartition.GetTokenBucketLimiter(
+                    "global",
+                    _ => new TokenBucketRateLimiterOptions
                     {
                         TokenLimit = globalOptions.TokenLimit,
                         TokensPerPeriod = globalOptions.TokensPerPeriod,
                         ReplenishmentPeriod = TimeSpan.FromSeconds(globalOptions.ReplenishmentPeriodSeconds),
                         AutoReplenishment = globalOptions.AutoReplenishment
-                    });
-            });
+                    }));
 
             // Per-IP-Route limiter
             options.AddPolicy("ip-route", context =>
             {
-                var ipOptions = context.RequestServices.GetRequiredService<IOptions<IpRateLimiterOptions>>().Value;
                 var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                 var route = context.Request.RouteValues["controller"] + ":" +
                             context.Request.RouteValues["action"];

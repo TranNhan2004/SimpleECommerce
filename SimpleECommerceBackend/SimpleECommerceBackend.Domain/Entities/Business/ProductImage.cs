@@ -107,7 +107,7 @@ public class ProductImage : Entity, ICreatedTrackable
         if (trimmedDescription.Length > ProductImageConstants.DescriptionMaxLength)
             throw new ValidationException(
                 ProductImageErrorCode.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters",
+                $"Description cannot exceed {ProductImageConstants.DescriptionMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Description",

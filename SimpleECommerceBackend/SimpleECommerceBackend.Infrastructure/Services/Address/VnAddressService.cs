@@ -1,12 +1,11 @@
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
-
 using VN.Address;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Address;
 
-public sealed class VnAddressService : IAddressService
+public class VnAddressService : IAddressService
 {
     public bool IsValidAddress(string address)
     {

@@ -320,7 +320,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        ShopName = shopName;
+        ShopName = trimmedName;
     }
 
     public void SetWarehouseAddress(Address warehouseAddress)

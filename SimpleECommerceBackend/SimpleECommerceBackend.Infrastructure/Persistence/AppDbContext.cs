@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Entities.Translation;
-using SimpleECommerceBackend.Infrastructure.Persistence.Extensions;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 

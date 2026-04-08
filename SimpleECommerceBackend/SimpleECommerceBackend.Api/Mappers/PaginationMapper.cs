@@ -2,7 +2,7 @@ using Mapster;
 using SimpleECommerceBackend.Api.DTOs.Pagination;
 using SimpleECommerceBackend.Application.Models.Pagination;
 
-namespace SimpleECommerceBackend.Api.Mapping;
+namespace SimpleECommerceBackend.Api.Mappers;
 
 public class PaginationMapper : IRegister
 {

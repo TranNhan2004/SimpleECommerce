@@ -2,13 +2,19 @@ using Microsoft.Extensions.Options;
 using OpenAI.Chat;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
+using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
 [AutoConstructor]
 public partial class OpenAITranslationProvider : ITranslationProvider
 {
-    private readonly IOptions<OpenAITranslationOptions> _options;
+    private readonly OpenAITranslationOptions _options;
+
+    public OpenAITranslationProvider(IOptions<OpenAITranslationOptions> options)
+    {
+        _options = options.Value;
+    }
 
     public string Name => "openai";
 
@@ -17,17 +23,21 @@ public partial class OpenAITranslationProvider : ITranslationProvider
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrWhiteSpace(_options.Value.ApiKey))
+        if (string.IsNullOrWhiteSpace(_options.ApiKey))
             throw new InvalidOperationException("Translation:OpenAI:ApiKey is not configured.");
 
-        var client = new ChatClient(_options.Value.Model, _options.Value.ApiKey);
+        var client = new ChatClient(_options.Model, _options.ApiKey);
         var options = new ChatCompletionOptions();
 
-        if (_options.Value.MaxOutputTokenCount is > 0)
-            options.MaxOutputTokenCount = _options.Value.MaxOutputTokenCount;
+        if (_options.MaxOutputTokenCount is > 0)
+            options.MaxOutputTokenCount = _options.MaxOutputTokenCount;
 
-        ChatMessage[] messages = [
-            new SystemChatMessage(_options.Value.Instructions),
+        if (_options.Temperature is >= 0)
+            options.Temperature = _options.Temperature;
+
+        ChatMessage[] messages =
+        [
+            new SystemChatMessage(_options.Instructions),
             new UserChatMessage(CreatePrompt(request))
         ];
 
@@ -38,6 +48,7 @@ public partial class OpenAITranslationProvider : ITranslationProvider
     private static string CreatePrompt(DynamicTranslationRequest request)
     {
         return
-            $"Translate {request.EntityName}.{request.FieldName} from {request.SourceLocale} to {request.TargetLocale}.\nReturn plain text only.\n\nText:\n{request.SourceText}";
+            $"Translate {request.EntityName}.{request.FieldName} from {request.SourceLocale} " +
+            $"to {request.TargetLocale}.\nReturn plain text only.\n\nText:\n{request.SourceText}";
     }
 }

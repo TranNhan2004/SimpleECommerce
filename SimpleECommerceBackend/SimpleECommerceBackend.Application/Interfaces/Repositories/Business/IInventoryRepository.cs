@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
 public interface IInventoryRepository : IGenericRepository<Inventory>
 {
-    Task<Inventory?> FindByProductIdAsync(Guid productId);
+    Task<Inventory?> FindByProductIdAsync(Guid productId, bool trackChanges = false);
 }

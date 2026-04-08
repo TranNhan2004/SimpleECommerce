@@ -47,9 +47,10 @@ public class JsonStaticTextLocalizer : IStaticTextLocalizer
     {
         var resource = GetResource(locale);
         var fieldKey = GetFieldKey(details);
+        var errorEntityName = GetErrorEntityName(errorCode);
         var fieldDisplayName = fieldKey is null
             ? null
-            : LocalizeFieldName(fieldKey, locale);
+            : LocalizeFieldName(fieldKey, locale, errorEntityName);
 
         var exactTemplate = GetTemplate(resource.ErrorTemplates, errorCode)
                             ?? GetTemplate(GetFallbackResource().ErrorTemplates, errorCode);
@@ -64,22 +65,18 @@ public class JsonStaticTextLocalizer : IStaticTextLocalizer
 
     public string LocalizeFieldName(string fieldName, string locale)
     {
+        return LocalizeFieldName(fieldName, locale, null);
+    }
+
+    private string LocalizeFieldName(string fieldName, string locale, string? entityName)
+    {
         var resource = GetResource(locale);
-        if (resource.Fields.TryGetValue(fieldName, out var localizedField)) return localizedField;
-
-        var normalizedFieldName = NormalizeFieldLookupKey(fieldName);
-
-        var localizedByAlias = resource.Fields.FirstOrDefault(pair =>
-            NormalizeFieldLookupKey(pair.Key) == normalizedFieldName);
-        if (!string.IsNullOrWhiteSpace(localizedByAlias.Value)) return localizedByAlias.Value;
+        if (TryGetLocalizedField(resource.Fields, fieldName, entityName, out var localizedField))
+            return localizedField;
 
         var fallbackResource = GetFallbackResource();
-        if (fallbackResource.Fields.TryGetValue(fieldName, out var fallbackField)) return fallbackField;
-
-        var fallbackByAlias = fallbackResource.Fields.FirstOrDefault(pair =>
-            NormalizeFieldLookupKey(pair.Key) == normalizedFieldName);
-        return !string.IsNullOrWhiteSpace(fallbackByAlias.Value)
-            ? fallbackByAlias.Value
+        return TryGetLocalizedField(fallbackResource.Fields, fieldName, entityName, out var fallbackField)
+            ? fallbackField
             : Humanize(fieldName);
     }
 
@@ -162,6 +159,60 @@ public class JsonStaticTextLocalizer : IStaticTextLocalizer
         return templates.TryGetValue(errorCode, out var template) ? template : null;
     }
 
+    private static bool TryGetLocalizedField(
+        IReadOnlyDictionary<string, string> fields,
+        string fieldName,
+        string? entityName,
+        out string localizedField
+    )
+    {
+        if (!string.IsNullOrWhiteSpace(entityName))
+        {
+            var compositeKey = $"{entityName}_{fieldName}";
+            if (fields.TryGetValue(compositeKey, out var localizedCompositeKey))
+            {
+                localizedField = localizedCompositeKey;
+                return true;
+            }
+
+            var normalizedCompositeKey = NormalizeFieldLookupKey(compositeKey);
+            var localizedCompositeField = fields.FirstOrDefault(pair =>
+                NormalizeFieldLookupKey(pair.Key) == normalizedCompositeKey);
+            if (!string.IsNullOrWhiteSpace(localizedCompositeField.Value))
+            {
+                localizedField = localizedCompositeField.Value;
+                return true;
+            }
+        }
+
+        if (fields.TryGetValue(fieldName, out var exactLocalizedField))
+        {
+            localizedField = exactLocalizedField;
+            return true;
+        }
+
+        var normalizedFieldName = NormalizeFieldLookupKey(fieldName);
+
+        var localizedByAlias = fields.FirstOrDefault(pair =>
+            NormalizeFieldLookupKey(pair.Key) == normalizedFieldName);
+        if (!string.IsNullOrWhiteSpace(localizedByAlias.Value))
+        {
+            localizedField = localizedByAlias.Value;
+            return true;
+        }
+
+        var localizedByNestedField = fields.FirstOrDefault(pair =>
+            NormalizeFieldLookupKey(GetNestedFieldName(pair.Key)) == normalizedFieldName);
+        if (!string.IsNullOrWhiteSpace(localizedByNestedField.Value))
+        {
+            localizedField = localizedByNestedField.Value;
+            return true;
+        }
+
+        localizedField = string.Empty;
+        return false;
+    }
+
     private static string Format(string template, IReadOnlyDictionary<string, string> values)
     {
         var result = template;
@@ -193,6 +244,20 @@ public class JsonStaticTextLocalizer : IStaticTextLocalizer
             .ToLowerInvariant();
     }
 
+    private static string GetNestedFieldName(string value)
+    {
+        var separatorIndex = value.IndexOf('_');
+        return separatorIndex >= 0 ? value[(separatorIndex + 1)..] : value;
+    }
+
+    private static string? GetErrorEntityName(string errorCode)
+    {
+        if (string.IsNullOrWhiteSpace(errorCode)) return null;
+
+        var separatorIndex = errorCode.IndexOf('_');
+        return separatorIndex > 0 ? errorCode[..separatorIndex] : null;
+    }
+
     private sealed class TranslationResource
     {
         public Dictionary<string, string> ProblemTitles { get; init; } = new(StringComparer.OrdinalIgnoreCase);
@@ -209,22 +274,61 @@ public class JsonStaticTextLocalizer : IStaticTextLocalizer
                     document.ProblemTitles ?? new Dictionary<string, string>(),
                     StringComparer.OrdinalIgnoreCase
                 ),
-                Fields = new Dictionary<string, string>(
-                    document.Fields ?? new Dictionary<string, string>(),
-                    StringComparer.OrdinalIgnoreCase
-                ),
-                ErrorTemplates = new Dictionary<string, string>(
-                    document.Errors ?? new Dictionary<string, string>(),
-                    StringComparer.OrdinalIgnoreCase
-                )
+                Fields = FlattenLocalizedEntries(document.Fields),
+                ErrorTemplates = FlattenLocalizedEntries(document.Errors)
             };
+        }
+
+        private static Dictionary<string, string> FlattenLocalizedEntries(JsonElement? entries)
+        {
+            var templates = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (entries is null) return templates;
+
+            var rootElement = entries.Value;
+            if (rootElement.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null) return templates;
+            if (rootElement.ValueKind != JsonValueKind.Object) return templates;
+
+            foreach (var property in rootElement.EnumerateObject())
+                AddLocalizedEntry(templates, property, null);
+
+            return templates;
+        }
+
+        private static void AddLocalizedEntry(
+            Dictionary<string, string> templates,
+            JsonProperty property,
+            string? prefix
+        )
+        {
+            switch (property.Value.ValueKind)
+            {
+                case JsonValueKind.String:
+                {
+                    var key = string.IsNullOrWhiteSpace(prefix)
+                        ? property.Name
+                        : $"{prefix}_{property.Name}";
+                    templates[key] = property.Value.GetString() ?? string.Empty;
+                    break;
+                }
+                case JsonValueKind.Object:
+                {
+                    var nextPrefix = string.IsNullOrWhiteSpace(prefix)
+                        ? property.Name
+                        : $"{prefix}_{property.Name}";
+
+                    foreach (var childProperty in property.Value.EnumerateObject())
+                        AddLocalizedEntry(templates, childProperty, nextPrefix);
+
+                    break;
+                }
+            }
         }
     }
 
     private sealed class TranslationResourceDocument
     {
         public Dictionary<string, string>? ProblemTitles { get; init; }
-        public Dictionary<string, string>? Fields { get; init; }
-        public Dictionary<string, string>? Errors { get; init; }
+        public JsonElement? Fields { get; init; }
+        public JsonElement? Errors { get; init; }
     }
 }

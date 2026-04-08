@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
 public interface IPaymentRepository : IGenericRepository<Payment>
 {
-    Task<Payment?> FindByOrderIdAsync(Guid orderId);
+    Task<Payment?> FindByOrderIdAsync(Guid orderId, bool trackChanges = false);
 }

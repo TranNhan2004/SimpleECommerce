@@ -5,43 +5,22 @@ using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-[AutoConstructor]
-public partial class ProductRepository : IProductRepository
+
+public class ProductRepository : GenericRepository<Product>, IProductRepository
 {
-    private readonly AppDbContext _db;
-
-    public async Task<Product?> FindByIdAsync(Guid id)
+    public ProductRepository(AppDbContext appDbContext) : base(appDbContext)
     {
-        return await _db.Products
-            .Include(p => p.Category)
-            .Include(p => p.Seller)
-            .Include(p => p.ProductImages)
-            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IReadOnlyList<Product>> FindAllAsync()
+    public override async Task<Product?> FindByIdAsync(Guid id, bool trackChanges = false)
     {
-        return await _db.Products
-            .Include(p => p.Category)
-            .OrderByDescending(p => p.CreatedAt)
-            .ToListAsync();
-    }
-
-    public Product Add(Product product)
-    {
-        _db.Products.Add(product);
-        return product;
-    }
-
-    public Product Update(Product product)
-    {
-        _db.Products.Update(product);
-        return product;
-    }
-
-    public Product Delete(Product product)
-    {
-        _db.Products.Remove(product);
-        return product;
+        return await base.FindFirstByConditionAsync(
+            q => q
+                .Include(p => p.Category)
+                .Include(p => p.Seller)
+                .Include(p => p.ProductImages)
+                .Where(p => p.Id == id),
+            trackChanges
+        );
     }
 }

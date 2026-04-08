@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
@@ -18,54 +17,72 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
     {
         IQueryable<T> query = DbContext.Set<T>();
 
-        if (trackChanges)
-            query.AsNoTracking();
+        if (!trackChanges)
+            query = query.AsNoTracking();
 
         return await query.FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public virtual async Task<T?> FindFirstByConditionAsync(
-        Expression<Func<T, bool>> expression,
-        Func<IQueryable<T>, IQueryable<T>>? include = null,
+        Func<IQueryable<T>, IQueryable<T>> condition,
         bool trackChanges = false
     )
     {
         IQueryable<T> query = DbContext.Set<T>();
 
-        if (trackChanges)
-            query.AsNoTracking();
+        if (!trackChanges)
+            query = query.AsNoTracking();
 
-        if (include is not null)
-            query = include(query);
-
-        return await query.FirstOrDefaultAsync(expression);
+        query = condition(query);
+        return await query.FirstOrDefaultAsync();
     }
 
     public virtual async Task<IReadOnlyList<T>> FindAllAsync(bool trackChanges = false)
     {
         IQueryable<T> query = DbContext.Set<T>();
 
-        if (trackChanges)
-            query.AsNoTracking();
+        if (!trackChanges)
+            query = query.AsNoTracking();
 
         return await query.ToListAsync();
     }
 
     public virtual async Task<IReadOnlyList<T>> FindAllByConditionAsync(
-        Expression<Func<T, bool>> expression,
-        Func<IQueryable<T>, IQueryable<T>>? include = null,
+        Func<IQueryable<T>, IQueryable<T>> condition,
         bool trackChanges = false
     )
     {
         IQueryable<T> query = DbContext.Set<T>();
 
-        if (trackChanges)
-            query.AsNoTracking();
+        if (!trackChanges)
+            query = query.AsNoTracking();
 
-        if (include is not null)
-            query = include(query);
+        query = condition(query);
+        return await query.ToListAsync();
+    }
 
-        return await query.Where(expression).ToListAsync();
+    public IQueryable<T> QueryAll(bool trackChanges = false)
+    {
+        IQueryable<T> query = DbContext.Set<T>();
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        return query;
+    }
+
+    public IQueryable<T> QueryAllByCondition(
+        Func<IQueryable<T>, IQueryable<T>> condition,
+        bool trackChanges = false
+    )
+    {
+        IQueryable<T> query = DbContext.Set<T>();
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        query = condition(query);
+        return query;
     }
 
     public virtual T Add(T entity)

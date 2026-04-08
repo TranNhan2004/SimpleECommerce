@@ -51,29 +51,23 @@ public sealed class GlobalExceptionHandlerMiddleware
 
     private void LogException(Exception exception)
     {
-        switch (exception)
+        if (exception is ExceptionBase ex)
         {
-            case ValidationException:
-            case ResourceNotFoundException:
-            case ConflictException:
-            case UnauthorizedException:
-            case ForbiddenException:
-                _logger.LogError(
-                    exception,
-                    "Handled exception occurred: {ExceptionType} - {Message}",
-                    exception.GetType().Name,
-                    exception.Message
-                );
-                break;
-
-            default:
-                _logger.LogError(
-                    exception,
-                    "Unhandled exception occurred: {ExceptionType} - {Message}",
-                    exception.GetType().Name,
-                    exception.Message
-                );
-                break;
+            _logger.LogError(
+                ex,
+                "Handled exception occurred: {ExceptionType} - {Message}",
+                ex.GetType().Name,
+                ex.InternalMessage
+            );
+        }
+        else
+        {
+            _logger.LogError(
+                exception,
+                "Unhandled exception occurred: {ExceptionType} - {Message}",
+                exception.GetType().Name,
+                exception.Message
+            );
         }
     }
 

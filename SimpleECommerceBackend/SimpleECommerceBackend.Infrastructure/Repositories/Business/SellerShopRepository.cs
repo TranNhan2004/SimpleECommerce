@@ -5,43 +5,30 @@ using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-[AutoConstructor]
-public partial class SellerShopRepository : ISellerShopRepository
+
+public class SellerShopRepository : GenericRepository<SellerShop>, ISellerShopRepository
 {
-    private readonly AppDbContext _db;
-
-    public async Task<IReadOnlyList<SellerShop>> FindAllAsync()
+    public SellerShopRepository(AppDbContext appDbContext) : base(appDbContext)
     {
-        return await _db.SellerShops.ToListAsync();
     }
 
-    public async Task<SellerShop?> FindByIdAsync(Guid id)
+    public override async Task<SellerShop?> FindByIdAsync(Guid id, bool trackChanges = false)
     {
-        return await _db.SellerShops.Include(ss => ss.SellerWarehouses)
-            .FirstOrDefaultAsync(ss => ss.Id == id);
+        return await base.FindFirstByConditionAsync(
+            q => q
+                .Include(ss => ss.SellerWarehouses)
+                .Where(ss => ss.Id == id),
+            trackChanges
+        );
     }
 
-    public async Task<SellerShop?> FindBySellerIdAsync(Guid sellerId)
+    public async Task<SellerShop?> FindBySellerIdAsync(Guid sellerId, bool trackChanges = false)
     {
-        return await _db.SellerShops.Include(ss => ss.SellerWarehouses)
-            .FirstOrDefaultAsync(ss => ss.SellerId == sellerId);
-    }
-
-    public SellerShop Add(SellerShop sellerShop)
-    {
-        _db.SellerShops.Add(sellerShop);
-        return sellerShop;
-    }
-
-    public SellerShop Update(SellerShop sellerShop)
-    {
-        _db.SellerShops.Update(sellerShop);
-        return sellerShop;
-    }
-
-    public SellerShop Delete(SellerShop sellerShop)
-    {
-        _db.SellerShops.Remove(sellerShop);
-        return sellerShop;
+        return await base.FindFirstByConditionAsync(
+            q => q
+                .Include(ss => ss.SellerWarehouses)
+                .Where(ss => ss.SellerId == sellerId),
+            trackChanges
+        );
     }
 }

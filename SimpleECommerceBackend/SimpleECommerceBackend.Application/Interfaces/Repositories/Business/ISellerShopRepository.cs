@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
 public interface ISellerShopRepository : IGenericRepository<SellerShop>
 {
-    Task<SellerShop?> FindBySellerIdAsync(Guid sellerId);
+    Task<SellerShop?> FindBySellerIdAsync(Guid sellerId, bool trackChanges = false);
 }

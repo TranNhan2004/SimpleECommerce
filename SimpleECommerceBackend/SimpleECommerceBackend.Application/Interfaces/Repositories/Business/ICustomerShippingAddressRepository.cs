@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
 public interface ICustomerShippingAddressRepository : IGenericRepository<CustomerShippingAddress>
 {
-    Task<IReadOnlyList<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId);
+    Task<IReadOnlyList<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId, bool trackChanges = false);
 }

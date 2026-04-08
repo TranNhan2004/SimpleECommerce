@@ -8,199 +8,340 @@
     "Problem.Unexpected": "An error occurred while processing your request"
   },
   "fields": {
-    "Address": "Address",
-    "AddressLine": "Address line",
-    "Admin": "Admin",
-    "Age": "Age",
-    "Amount": "Amount",
-    "BirthDate": "Birth date",
-    "Cart": "Cart",
-    "CartId": "Cart",
-    "Category": "Category",
-    "Code": "Code",
-    "Currency": "Currency",
-    "Customer": "Customer",
-    "CustomerId": "Customer",
-    "Description": "Description",
-    "DisplayOrder": "Display order",
-    "Email": "Email",
-    "ExternalTransactionId": "External transaction ID",
-    "Field": "Field",
-    "FirstName": "First name",
-    "Id": "ID",
-    "Image": "Image",
-    "ImageUrl": "Image URL",
-    "LastName": "Last name",
-    "Locale": "Locale",
-    "Message": "Message",
-    "Name": "Name",
-    "NickName": "Nick name",
-    "Note": "Note",
-    "Notification": "Notification",
-    "Order": "Order",
-    "OrderCode": "Order code",
-    "OrderId": "Order",
-    "Password": "Password",
-    "PhoneNumber": "Phone number",
-    "Price": "Price",
-    "Product": "Product",
-    "ProductId": "Product",
-    "Provider": "Provider",
-    "Province": "Province",
-    "Quantity": "Quantity",
-    "QuantityOnHand": "Quantity on hand",
-    "QuantityReserved": "Quantity reserved",
-    "QuantityToAdd": "Quantity to add",
-    "QuantityToRelease": "Quantity to release",
-    "QuantityToReserve": "Quantity to reserve",
-    "RecipientName": "Recipient name",
-    "RecipientPhoneNumber": "Recipient phone number",
-    "Result": "Result",
-    "Role": "Role",
-    "RowId": "Row",
-    "Seller": "Seller",
-    "SellerShop": "Seller shop",
-    "SellerWarehouse": "Seller warehouse",
-    "ShopName": "Shop name",
-    "Status": "status",
-    "TranslationEntityName": "Translation entity name",
-    "TranslationFieldName": "Translation field name",
-    "TranslationLocale": "Translation locale",
-    "TranslationValue": "Translation value",
-    "User": "User",
-    "UserId": "User",
-    "Value": "Value",
-    "VerificationToken": "Verification token",
-    "Ward": "Ward",
-    "Warehouse": "Warehouse"
+    "Entity": {
+      "Id": "ID"
+    },
+    "Address": {
+      "Address": "Address",
+      "AddressLine": "Address line",
+      "Ward": "Ward",
+      "Province": "Province"
+    },
+    "Cart": {
+      "Cart": "Cart",
+      "Customer": "Customer",
+      "CustomerId": "Customer"
+    },
+    "CartItem": {
+      "Cart": "Cart",
+      "CartId": "Cart",
+      "Product": "Product",
+      "ProductId": "Product",
+      "Quantity": "Quantity",
+      "Amount": "Amount"
+    },
+    "Category": {
+      "Category": "Category",
+      "Name": "Name",
+      "Description": "Description",
+      "Status": "status",
+      "Admin": "Admin"
+    },
+    "Credential": {
+      "Email": "Email",
+      "Password": "Password"
+    },
+    "CurrentUser": {
+      "User": "User",
+      "Role": "Role"
+    },
+    "CustomerShippingAddress": {
+      "Address": "Address",
+      "RecipientName": "Recipient name",
+      "RecipientPhoneNumber": "Recipient phone number"
+    },
+    "Inventory": {
+      "Product": "Product",
+      "SellerWarehouse": "Seller warehouse",
+      "QuantityOnHand": "Quantity on hand",
+      "QuantityReserved": "Quantity reserved",
+      "QuantityToAdd": "Quantity to add",
+      "QuantityToReserve": "Quantity to reserve",
+      "QuantityToRelease": "Quantity to release",
+      "Quantity": "Quantity"
+    },
+    "Money": {
+      "Amount": "Amount",
+      "Currency": "Currency",
+      "Result": "Result"
+    },
+    "Notification": {
+      "Notification": "Notification",
+      "User": "User",
+      "UserId": "User",
+      "Message": "Message"
+    },
+    "Order": {
+      "Order": "Order",
+      "OrderCode": "Order code",
+      "Note": "Note",
+      "Status": "status",
+      "ShopName": "Shop name",
+      "RecipientName": "Recipient name",
+      "RecipientPhoneNumber": "Recipient phone number",
+      "Customer": "Customer",
+      "Seller": "Seller"
+    },
+    "OrderItem": {
+      "Order": "Order",
+      "OrderId": "Order",
+      "Product": "Product",
+      "ProductId": "Product",
+      "Quantity": "Quantity",
+      "Amount": "Amount"
+    },
+    "Payment": {
+      "Order": "Order",
+      "OrderId": "Order",
+      "Provider": "Provider",
+      "ExternalTransactionId": "External transaction ID",
+      "Status": "status"
+    },
+    "Product": {
+      "Product": "Product",
+      "Name": "Name",
+      "Description": "Description",
+      "Status": "status",
+      "Category": "Category",
+      "Seller": "Seller",
+      "Image": "Image"
+    },
+    "ProductImage": {
+      "ImageUrl": "Image URL",
+      "DisplayOrder": "Display order",
+      "Description": "Description"
+    },
+    "ProductPrice": {
+      "Price": "Price"
+    },
+    "Role": {
+      "Role": "Role"
+    },
+    "SellerShop": {
+      "SellerShop": "Seller shop",
+      "PhoneNumber": "Phone number",
+      "Seller": "Seller",
+      "Warehouse": "Warehouse"
+    },
+    "SellerWarehouse": {
+      "Warehouse": "Warehouse",
+      "SellerShop": "Seller shop"
+    },
+    "Sex": {
+      "Sex": "Sex"
+    },
+    "Token": {
+      "VerificationToken": "Verification token"
+    },
+    "TranslationEntry": {
+      "TranslationEntityName": "Translation entity name",
+      "TranslationFieldName": "Translation field name",
+      "RowId": "Row",
+      "TranslationLocale": "Translation locale",
+      "TranslationValue": "Translation value"
+    },
+    "Unique": {
+      "Field": "Field",
+      "Value": "Value"
+    },
+    "UserProfile": {
+      "FirstName": "First name",
+      "LastName": "Last name",
+      "NickName": "Nick name",
+      "BirthDate": "Birth date",
+      "Age": "Age"
+    },
+    "VnAddress": {
+      "Address": "Address",
+      "Ward": "Ward",
+      "Province": "Province"
+    }
   },
   "errors": {
-    "Entity_EmptyId": "{field} cannot be empty.",
-    "Address_AddressLineRequired": "{field} is required.",
-    "Address_AddressLineMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Address_WardRequired": "{field} is required.",
-    "Address_ProvinceRequired": "{field} is required.",
-    "Cart_CustomerIdRequired": "{field} is required.",
-    "CartItem_ProductIdRequired": "{field} is required.",
-    "CartItem_CartIdRequired": "{field} is required.",
-    "CartItem_QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
-    "CartItem_QuantityCannotExceed": "{field} cannot exceed {max}.",
-    "CartItem_AmountMustBePositive": "{field} must be positive.",
-    "Category_NameRequired": "{field} is required.",
-    "Category_NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Category_DescriptionMustNotBeBlank": "{field} must not be blank.",
-    "Category_DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Category_ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Category_DeactivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Category_AlreadyArchived": "{field} is already archived.",
-    "Category_AdminRequired": "{field} is required.",
-    "Credential_EmailRequired": "{field} is required.",
-    "Credential_EmailMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Credential_EmailInvalidFormat": "{field} format is invalid.",
-    "Credential_PasswordRequired": "{field} is required.",
-    "Credential_PasswordMinLengthNotMet": "{field} must be at least {min} characters long.",
-    "Credential_PasswordMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Credential_PasswordInvalidFormat": "{field} format is invalid.",
-    "CustomerShippingAddress_AlreadyDeleted": "{field} is already deleted.",
-    "CustomerShippingAddress_RecipientNameRequired": "{field} is required.",
-    "CustomerShippingAddress_RecipientNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "CustomerShippingAddress_RecipientPhoneNumberRequired": "{field} is required.",
-    "CustomerShippingAddress_RecipientPhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "CustomerShippingAddress_AlreadyDefault": "{field} is already default.",
-    "CustomerShippingAddress_NotDefault": "{field} is not default.",
-    "Inventory_ProductRequired": "{field} is required.",
-    "Inventory_SellerWarehouseRequired": "{field} is required.",
-    "Inventory_QuantityOnHandCannotBeNegative": "{field} cannot be negative.",
-    "Inventory_QuantityOnHandCannotExceed": "{field} cannot exceed {max}.",
-    "Inventory_QuantityReservedCannotBeNegative": "{field} cannot be negative.",
-    "Inventory_QuantityReservedCannotExceedQuantityOnHand": "{field} cannot exceed {max}.",
-    "Inventory_QuantityToAddMustBePositive": "{field} must be positive.",
-    "Inventory_QuantityToReserveMustBePositive": "{field} must be positive.",
-    "Inventory_InsufficientStock": "Insufficient available stock.",
-    "Inventory_QuantityToReleaseMustBePositive": "{field} must be positive.",
-    "Inventory_QuantityToReleaseCannotExceedReserved": "{field} cannot exceed {max}.",
-    "Money_AmountCannotBeNegative": "{field} cannot be negative.",
-    "Money_CurrencyRequired": "{field} is required.",
-    "Money_CurrencyUnsupported": "{field} '{value}' is not supported.",
-    "Money_CurrencyMismatch": "{field} mismatch: cannot operate between {left} and {right}.",
-    "Money_ResultCannotBeNegative": "{field} cannot be negative.",
-    "Notification_UserIdRequired": "{field} is required.",
-    "Notification_MessageRequired": "{field} is required.",
-    "Notification_MessageMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Notification_AlreadyMarkedAsRead": "{field} is already processed.",
-    "Order_CodeRequired": "{field} is required.",
-    "Order_CodeMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Order_NoteMustNotBeBlank": "{field} must not be blank.",
-    "Order_NoteMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Order_PickupNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_ShipNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_AwaitConfirmationNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_DeliverNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_CancelNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_ReturnNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_ExpireNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Order_ShopNameRequired": "{field} is required.",
-    "Order_ShopNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Order_RecipientNameRequired": "{field} is required.",
-    "Order_RecipientNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Order_RecipientPhoneNumberRequired": "{field} is required.",
-    "Order_RecipientPhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Order_CustomerRequired": "{field} is required.",
-    "Order_SellerRequired": "{field} is required.",
-    "OrderItem_ProductIdRequired": "{field} is required.",
-    "OrderItem_OrderIdRequired": "{field} is required.",
-    "OrderItem_QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
-    "OrderItem_AmountCannotBeNegative": "{field} cannot be negative.",
-    "Payment_OrderIdRequired": "{field} is required.",
-    "Payment_ProviderMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Payment_ExternalTransactionIdMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Payment_CompleteNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Payment_FailNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Payment_RefundNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Product_NameRequired": "{field} is required.",
-    "Product_NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Product_DescriptionRequired": "{field} is required.",
-    "Product_DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "Product_ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Product_HideNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
-    "Product_CategoryRequired": "{field} is required.",
-    "Product_SellerRequired": "{field} is required.",
-    "Product_ImageNotFound": "{field} was not found.",
-    "ProductImage_ImageUrlRequired": "{field} is required.",
-    "ProductImage_DisplayOrderCannotBeNegative": "{field} cannot be negative.",
-    "ProductImage_DescriptionMustNotBeBlank": "{field} must not be blank.",
-    "ProductImage_DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "ProductPrice_PriceMustBePositive": "{field} must be positive.",
-    "Role_InvalidRole": "{field} is invalid. Allowed values: {allowedValues}.",
-    "Role_UnsupportedRole": "{field} '{value}' is not supported.",
-    "SellerShop_NameRequired": "{field} is required.",
-    "SellerShop_NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "SellerShop_PhoneNumberRequired": "{field} is required.",
-    "SellerShop_PhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "SellerShop_SellerRequired": "{field} is required.",
-    "SellerShop_WarehouseNotFound": "{field} was not found.",
-    "SellerWarehouse_AlreadyDeleted": "{field} is already deleted.",
-    "SellerWarehouse_SellerShopRequired": "{field} is required.",
-    "Token_VerificationTokenRequired": "{field} is required.",
-    "TranslationEntry_EntityNameRequired": "{field} is required.",
-    "TranslationEntry_FieldNameRequired": "{field} is required.",
-    "TranslationEntry_RowIdRequired": "{field} is required.",
-    "TranslationEntry_LocaleRequired": "{field} is required.",
-    "TranslationEntry_ValueRequired": "{field} is required.",
-    "Unique_DuplicateValue": "{field} = '{value}' already exists.",
-    "Unique_HasNoIndex": "The unique constraint cannot be resolved because the database index metadata is missing.",
-    "Unique_UnknownError": "A unique constraint error occurred.",
-    "UserProfile_FirstNameRequired": "{field} is required.",
-    "UserProfile_FirstNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "UserProfile_LastNameRequired": "{field} is required.",
-    "UserProfile_LastNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "UserProfile_NickNameMustNotBeBlank": "{field} must not be blank.",
-    "UserProfile_NickNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
-    "UserProfile_BirthDateCannotBeFuture": "{field} cannot be in the future.",
-    "UserProfile_AgeCannotBeLessThan": "{field} cannot be less than {min}.",
-    "UserProfile_AgeCannotExceed": "{field} cannot exceed {max}.",
-    "VnAddress_AddressInvalid": "{field} is invalid.",
-    "VnAddress_WardInvalid": "{field} is invalid.",
-    "VnAddress_ProvinceInvalid": "{field} is invalid."
+    "Entity": {
+      "EmptyId": "{field} cannot be empty."
+    },
+    "Address": {
+      "AddressLineRequired": "{field} is required.",
+      "AddressLineMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "WardRequired": "{field} is required.",
+      "ProvinceRequired": "{field} is required."
+    },
+    "Cart": {
+      "CustomerIdRequired": "{field} is required."
+    },
+    "CartItem": {
+      "ProductIdRequired": "{field} is required.",
+      "CartIdRequired": "{field} is required.",
+      "QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
+      "QuantityCannotExceed": "{field} cannot exceed {max}.",
+      "AmountMustBePositive": "{field} must be positive."
+    },
+    "Category": {
+      "NameRequired": "{field} is required.",
+      "NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "DescriptionMustNotBeBlank": "{field} must not be blank.",
+      "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "DeactivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "AlreadyArchived": "{field} is already archived.",
+      "AdminRequired": "{field} is required."
+    },
+    "Credential": {
+      "EmailRequired": "{field} is required.",
+      "EmailMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "EmailInvalidFormat": "{field} format is invalid.",
+      "PasswordRequired": "{field} is required.",
+      "PasswordMinLengthNotMet": "{field} must be at least {min} characters long.",
+      "PasswordMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "PasswordInvalidFormat": "{field} format is invalid."
+    },
+    "CurrentUser": {
+      "Unauthenticated": "Current user is not authenticated.",
+      "UserIdMissing": "Current user ID is missing.",
+      "UserIdInvalid": "Current user ID '{value}' is invalid.",
+      "RoleMissing": "Current user role is missing."
+    },
+    "CustomerShippingAddress": {
+      "AlreadyDeleted": "{field} is already deleted.",
+      "RecipientNameRequired": "{field} is required.",
+      "RecipientNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "RecipientPhoneNumberRequired": "{field} is required.",
+      "RecipientPhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "AlreadyDefault": "{field} is already default.",
+      "NotDefault": "{field} is not default."
+    },
+    "Inventory": {
+      "ProductRequired": "{field} is required.",
+      "SellerWarehouseRequired": "{field} is required.",
+      "QuantityOnHandCannotBeNegative": "{field} cannot be negative.",
+      "QuantityOnHandCannotExceed": "{field} cannot exceed {max}.",
+      "QuantityReservedCannotBeNegative": "{field} cannot be negative.",
+      "QuantityReservedCannotExceedQuantityOnHand": "{field} cannot exceed {max}.",
+      "QuantityToAddMustBePositive": "{field} must be positive.",
+      "QuantityToReserveMustBePositive": "{field} must be positive.",
+      "InsufficientStock": "Insufficient available stock.",
+      "QuantityToReleaseMustBePositive": "{field} must be positive.",
+      "QuantityToReleaseCannotExceedReserved": "{field} cannot exceed {max}."
+    },
+    "Money": {
+      "AmountCannotBeNegative": "{field} cannot be negative.",
+      "CurrencyRequired": "{field} is required.",
+      "CurrencyUnsupported": "{field} '{value}' is not supported.",
+      "CurrencyMismatch": "{field} mismatch: cannot operate between {left} and {right}.",
+      "ResultCannotBeNegative": "{field} cannot be negative."
+    },
+    "Notification": {
+      "UserIdRequired": "{field} is required.",
+      "MessageRequired": "{field} is required.",
+      "MessageMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "AlreadyMarkedAsRead": "{field} is already processed."
+    },
+    "Order": {
+      "CodeRequired": "{field} is required.",
+      "CodeMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "NoteMustNotBeBlank": "{field} must not be blank.",
+      "NoteMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "PickupNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "ShipNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "AwaitConfirmationNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "DeliverNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "CancelNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "ReturnNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "ExpireNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "ShopNameRequired": "{field} is required.",
+      "ShopNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "RecipientNameRequired": "{field} is required.",
+      "RecipientNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "RecipientPhoneNumberRequired": "{field} is required.",
+      "RecipientPhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "CustomerRequired": "{field} is required.",
+      "SellerRequired": "{field} is required."
+    },
+    "OrderItem": {
+      "ProductIdRequired": "{field} is required.",
+      "OrderIdRequired": "{field} is required.",
+      "QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
+      "AmountCannotBeNegative": "{field} cannot be negative."
+    },
+    "Payment": {
+      "OrderIdRequired": "{field} is required.",
+      "ProviderMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "ExternalTransactionIdMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "CompleteNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "FailNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "RefundNotAllowed": "{operation} is only allowed when {field} is {allowedStates}."
+    },
+    "Product": {
+      "NameRequired": "{field} is required.",
+      "NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "DescriptionRequired": "{field} is required.",
+      "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "HideNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
+      "CategoryRequired": "{field} is required.",
+      "SellerRequired": "{field} is required.",
+      "ImageNotFound": "{field} was not found."
+    },
+    "ProductImage": {
+      "ImageUrlRequired": "{field} is required.",
+      "DisplayOrderCannotBeNegative": "{field} cannot be negative.",
+      "DescriptionMustNotBeBlank": "{field} must not be blank.",
+      "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters."
+    },
+    "ProductPrice": {
+      "PriceMustBePositive": "{field} must be positive."
+    },
+    "Role": {
+      "InvalidRole": "{field} is invalid. Allowed values: {allowedValues}.",
+      "UnsupportedRole": "{field} '{value}' is not supported."
+    },
+    "SellerShop": {
+      "NameRequired": "{field} is required.",
+      "NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "PhoneNumberRequired": "{field} is required.",
+      "PhoneNumberMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "SellerRequired": "{field} is required.",
+      "WarehouseNotFound": "{field} was not found."
+    },
+    "SellerWarehouse": {
+      "AlreadyDeleted": "{field} is already deleted.",
+      "SellerShopRequired": "{field} is required."
+    },
+    "Sex": {
+      "InvalidSex": "{field} is invalid. Allowed values: {allowedValues}.",
+      "UnsupportedSex": "{field} '{value}' is not supported."
+    },
+    "Token": {
+      "VerificationTokenRequired": "{field} is required."
+    },
+    "TranslationEntry": {
+      "EntityNameRequired": "{field} is required.",
+      "FieldNameRequired": "{field} is required.",
+      "RowIdRequired": "{field} is required.",
+      "LocaleRequired": "{field} is required.",
+      "ValueRequired": "{field} is required."
+    },
+    "Unique": {
+      "DuplicateValue": "{field} = '{value}' already exists.",
+      "HasNoIndex": "The unique constraint cannot be resolved because the database index metadata is missing.",
+      "UnknownError": "A unique constraint error occurred."
+    },
+    "UserProfile": {
+      "FirstNameRequired": "{field} is required.",
+      "FirstNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "LastNameRequired": "{field} is required.",
+      "LastNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "NickNameMustNotBeBlank": "{field} must not be blank.",
+      "NickNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "BirthDateCannotBeFuture": "{field} cannot be in the future.",
+      "AgeCannotBeLessThan": "{field} cannot be less than {min}.",
+      "AgeCannotExceed": "{field} cannot exceed {max}."
+    },
+    "VnAddress": {
+      "AddressInvalid": "{field} is invalid.",
+      "WardInvalid": "{field} is invalid.",
+      "ProvinceInvalid": "{field} is invalid."
+    }
   }
 }

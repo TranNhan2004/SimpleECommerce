@@ -4,15 +4,17 @@ using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-public class CustomerShippingAddressRepository : GenericRepository<CustomerShippingAddress>,
-    ICustomerShippingAddressRepository
+public class CustomerShippingAddressRepository : GenericRepository<CustomerShippingAddress>, ICustomerShippingAddressRepository
 {
     public CustomerShippingAddressRepository(AppDbContext appDbContext) : base(appDbContext)
     {
     }
 
-    public async Task<IReadOnlyList<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId)
+    public async Task<IReadOnlyList<CustomerShippingAddress>> FindByCustomerIdAsync(Guid customerId, bool trackChanges = false)
     {
-        return await base.FindAllByConditionAsync(csa => csa.CustomerId == customerId);
+        return await base.FindAllByConditionAsync(
+            q => q.Where(c => c.CustomerId == customerId),
+            trackChanges
+        );
     }
 }

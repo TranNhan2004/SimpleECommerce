@@ -1,30 +1,20 @@
-using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-[AutoConstructor]
-public partial class InventoryRepository : IInventoryRepository
+public partial class InventoryRepository : GenericRepository<Inventory>, IInventoryRepository
 {
-    private readonly AppDbContext _db;
-
-    public async Task<Inventory?> FindByProductIdAsync(Guid productId)
+    public InventoryRepository(AppDbContext appDbContext) : base(appDbContext)
     {
-        return await _db.Inventories
-            .FirstOrDefaultAsync(i => i.ProductId == productId);
     }
 
-    public Inventory Add(Inventory inventory)
+    public async Task<Inventory?> FindByProductIdAsync(Guid productId, bool trackChanges = false)
     {
-        _db.Inventories.Add(inventory);
-        return inventory;
-    }
-
-    public Inventory Update(Inventory inventory)
-    {
-        _db.Inventories.Update(inventory);
-        return inventory;
+        return await base.FindFirstByConditionAsync(
+            q => q.Where(i => i.ProductId == productId),
+            trackChanges: trackChanges
+        );
     }
 }

@@ -1,17 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
+using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
+using SimpleECommerceBackend.Infrastructure.Contexts;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
+using SimpleECommerceBackend.Infrastructure.Repositories;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
+using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
 
@@ -32,14 +37,14 @@ public static class DependencyInjection
         // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
 
-        // Translation Services
-        services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
-        services.Configure<OpenAiTranslationOptions>(configuration.GetSection(OpenAiTranslationOptions.SectionName));
-        services.Configure<GoogleAiTranslationOptions>(
-            configuration.GetSection(GoogleAiTranslationOptions.SectionName));
+        // Request User Context
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContextHolder, UserContextHolder>();
 
-        var redisConnectionString = configuration["Translation:Redis:ConnectionString"];
-        var redisInstanceName = configuration["Translation:Redis:InstanceName"];
+        // Cache Services
+        services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
+        var redisConnectionString = configuration[$"{RedisOptions.SectionName}:ConnectionString"];
+        var redisInstanceName = configuration[$"{RedisOptions.SectionName}:InstanceName"];
         if (!string.IsNullOrWhiteSpace(redisConnectionString))
             services.AddStackExchangeRedisCache(options =>
             {
@@ -49,17 +54,25 @@ public static class DependencyInjection
         else
             services.AddDistributedMemoryCache();
 
+        services.AddScoped<ICacheService, DistributedCacheService>();
+
+        // Translation Services
+        services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
+        services.Configure<OpenAITranslationOptions>(configuration.GetSection(OpenAITranslationOptions.SectionName));
+        services.Configure<GoogleAITranslationOptions>(
+            configuration.GetSection(GoogleAITranslationOptions.SectionName));
+
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
         services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
-        services.AddScoped<ITranslationCache, DistributedTranslationCache>();
         services.AddScoped<ITranslationEntryRepository, TranslationEntryRepository>();
+        services.AddScoped<ITranslationProvider, GoogleAITranslationProvider>();
 
-        services.AddSingleton<NullTranslationProvider>();
-        services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());
-        services.AddHttpClient<OpenAiTranslationProvider>();
-        services.AddHttpClient<GoogleAiTranslationProvider>();
-        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<OpenAiTranslationProvider>());
-        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<GoogleAiTranslationProvider>());
+        // services.AddSingleton<NullTranslationProvider>();
+        // services.AddScoped<OpenAITranslationProvider>();
+        // services.AddScoped<GoogleAITranslationProvider>();
+        // services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());
+        // services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<OpenAITranslationProvider>());
+        // services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<GoogleAITranslationProvider>());
 
         // Database
         services.AddScoped<AuditSaveChangesInterceptor>();
@@ -72,7 +85,7 @@ public static class DependencyInjection
         });
 
         // Unit of Work
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // Business Repositories
         services.AddScoped<ICartRepository, CartRepository>();

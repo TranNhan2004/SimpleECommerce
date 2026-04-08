@@ -8,199 +8,340 @@
     "Problem.Unexpected": "Có lỗi xảy ra khi xử lý yêu cầu"
   },
   "fields": {
-    "Address": "Địa chỉ",
-    "AddressLine": "Dòng địa chỉ",
-    "Admin": "Quản trị viên",
-    "Age": "Tuổi",
-    "Amount": "Số tiền",
-    "BirthDate": "Ngày sinh",
-    "Cart": "Giỏ hàng",
-    "CartId": "ID giỏ hàng",
-    "Category": "Danh mục",
-    "Code": "Mã",
-    "Currency": "Tiền tệ",
-    "Customer": "Khách hàng",
-    "CustomerId": "ID khách hàng",
-    "Description": "Mô tả",
-    "DisplayOrder": "Thứ tự hiển thị",
-    "Email": "Email",
-    "ExternalTransactionId": "ID giao dịch ngoài",
-    "Field": "Trường dữ liệu",
-    "FirstName": "Tên",
-    "Id": "ID",
-    "Image": "Hình ảnh",
-    "ImageUrl": "URL hình ảnh",
-    "LastName": "Họ",
-    "Locale": "Ngôn ngữ",
-    "Message": "Thông báo",
-    "Name": "Tên",
-    "NickName": "Biệt danh",
-    "Note": "Ghi chú",
-    "Notification": "Thông báo",
-    "Order": "Đơn hàng",
-    "OrderCode": "Mã đơn hàng",
-    "OrderId": "Đơn hàng",
-    "Password": "Mật khẩu",
-    "PhoneNumber": "Số điện thoại",
-    "Price": "Giá",
-    "Product": "Sản phẩm",
-    "ProductId": "Sản phẩm",
-    "Provider": "Nhà cung cấp",
-    "Province": "Tỉnh/Thành phố",
-    "Quantity": "Số lượng",
-    "QuantityOnHand": "Số lượng tồn",
-    "QuantityReserved": "Số lượng giữ chỗ",
-    "QuantityToAdd": "Số lượng thêm",
-    "QuantityToRelease": "Số lượng giải phóng",
-    "QuantityToReserve": "Số lượng giữ chỗ",
-    "RecipientName": "Tên người nhận",
-    "RecipientPhoneNumber": "Số điện thoại người nhận",
-    "Result": "Kết quả",
-    "Role": "Vai trò",
-    "RowId": "Id bản ghi",
-    "Seller": "Người bán",
-    "SellerShop": "Cửa hàng",
-    "SellerWarehouse": "Kho người bán",
-    "ShopName": "Tên cửa hàng",
-    "Status": "trạng thái",
-    "TranslationEntityName": "Tên thực thể dịch",
-    "TranslationFieldName": "Tên trường dịch",
-    "TranslationLocale": "Ngôn ngữ dịch",
-    "TranslationValue": "Giá trị dịch",
-    "User": "Người dùng",
-    "UserId": "ID người dùng",
-    "Value": "Giá trị",
-    "VerificationToken": "Mã xác thực",
-    "Ward": "Phường/Xã",
-    "Warehouse": "Kho"
+    "Entity": {
+      "Id": "ID"
+    },
+    "Address": {
+      "Address": "Địa chỉ",
+      "AddressLine": "Dòng địa chỉ",
+      "Ward": "Phường/Xã",
+      "Province": "Tỉnh/Thành phố"
+    },
+    "Cart": {
+      "Cart": "Giỏ hàng",
+      "Customer": "Khách hàng",
+      "CustomerId": "ID khách hàng"
+    },
+    "CartItem": {
+      "Cart": "Giỏ hàng",
+      "CartId": "ID giỏ hàng",
+      "Product": "Sản phẩm",
+      "ProductId": "Sản phẩm",
+      "Quantity": "Số lượng",
+      "Amount": "Số tiền"
+    },
+    "Category": {
+      "Category": "Danh mục",
+      "Name": "Tên",
+      "Description": "Mô tả",
+      "Status": "trạng thái",
+      "Admin": "Quản trị viên"
+    },
+    "Credential": {
+      "Email": "Email",
+      "Password": "Mật khẩu"
+    },
+    "CurrentUser": {
+      "User": "Người dùng",
+      "Role": "Vai trò"
+    },
+    "CustomerShippingAddress": {
+      "Address": "Địa chỉ",
+      "RecipientName": "Tên người nhận",
+      "RecipientPhoneNumber": "Số điện thoại người nhận"
+    },
+    "Inventory": {
+      "Product": "Sản phẩm",
+      "SellerWarehouse": "Kho người bán",
+      "QuantityOnHand": "Số lượng tồn",
+      "QuantityReserved": "Số lượng giữ chỗ",
+      "QuantityToAdd": "Số lượng thêm",
+      "QuantityToReserve": "Số lượng giữ chỗ",
+      "QuantityToRelease": "Số lượng giải phóng",
+      "Quantity": "Số lượng"
+    },
+    "Money": {
+      "Amount": "Số tiền",
+      "Currency": "Tiền tệ",
+      "Result": "Kết quả"
+    },
+    "Notification": {
+      "Notification": "Thông báo",
+      "User": "Người dùng",
+      "UserId": "ID người dùng",
+      "Message": "Thông báo"
+    },
+    "Order": {
+      "Order": "Đơn hàng",
+      "OrderCode": "Mã đơn hàng",
+      "Note": "Ghi chú",
+      "Status": "trạng thái",
+      "ShopName": "Tên cửa hàng",
+      "RecipientName": "Tên người nhận",
+      "RecipientPhoneNumber": "Số điện thoại người nhận",
+      "Customer": "Khách hàng",
+      "Seller": "Người bán"
+    },
+    "OrderItem": {
+      "Order": "Đơn hàng",
+      "OrderId": "Đơn hàng",
+      "Product": "Sản phẩm",
+      "ProductId": "Sản phẩm",
+      "Quantity": "Số lượng",
+      "Amount": "Số tiền"
+    },
+    "Payment": {
+      "Order": "Đơn hàng",
+      "OrderId": "Đơn hàng",
+      "Provider": "Nhà cung cấp",
+      "ExternalTransactionId": "ID giao dịch ngoài",
+      "Status": "trạng thái"
+    },
+    "Product": {
+      "Product": "Sản phẩm",
+      "Name": "Tên",
+      "Description": "Mô tả",
+      "Status": "trạng thái",
+      "Category": "Danh mục",
+      "Seller": "Người bán",
+      "Image": "Hình ảnh"
+    },
+    "ProductImage": {
+      "ImageUrl": "URL hình ảnh",
+      "DisplayOrder": "Thứ tự hiển thị",
+      "Description": "Mô tả"
+    },
+    "ProductPrice": {
+      "Price": "Giá"
+    },
+    "Role": {
+      "Role": "Vai trò"
+    },
+    "SellerShop": {
+      "SellerShop": "Cửa hàng",
+      "PhoneNumber": "Số điện thoại",
+      "Seller": "Người bán",
+      "Warehouse": "Kho"
+    },
+    "SellerWarehouse": {
+      "Warehouse": "Kho",
+      "SellerShop": "Cửa hàng"
+    },
+    "Sex": {
+      "Sex": "Giới tính"
+    },
+    "Token": {
+      "VerificationToken": "Mã xác thực"
+    },
+    "TranslationEntry": {
+      "TranslationEntityName": "Tên thực thể dịch",
+      "TranslationFieldName": "Tên trường dịch",
+      "RowId": "Id bản ghi",
+      "TranslationLocale": "Ngôn ngữ dịch",
+      "TranslationValue": "Giá trị dịch"
+    },
+    "Unique": {
+      "Field": "Trường dữ liệu",
+      "Value": "Giá trị"
+    },
+    "UserProfile": {
+      "FirstName": "Tên",
+      "LastName": "Họ",
+      "NickName": "Biệt danh",
+      "BirthDate": "Ngày sinh",
+      "Age": "Tuổi"
+    },
+    "VnAddress": {
+      "Address": "Địa chỉ",
+      "Ward": "Phường/Xã",
+      "Province": "Tỉnh/Thành phố"
+    }
   },
   "errors": {
-    "Entity_EmptyId": "{field} không được để trống.",
-    "Address_AddressLineRequired": "{field} là bắt buộc.",
-    "Address_AddressLineMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Address_WardRequired": "{field} là bắt buộc.",
-    "Address_ProvinceRequired": "{field} là bắt buộc.",
-    "Cart_CustomerIdRequired": "{field} là bắt buộc.",
-    "CartItem_ProductIdRequired": "{field} là bắt buộc.",
-    "CartItem_CartIdRequired": "{field} là bắt buộc.",
-    "CartItem_QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
-    "CartItem_QuantityCannotExceed": "{field} không được vượt quá {max}.",
-    "CartItem_AmountMustBePositive": "{field} phải là số dương.",
-    "Category_NameRequired": "{field} là bắt buộc.",
-    "Category_NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Category_DescriptionMustNotBeBlank": "{field} không được để trắng.",
-    "Category_DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Category_ActivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Category_DeactivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Category_AlreadyArchived": "{field} đã được lưu trữ.",
-    "Category_AdminRequired": "{field} là bắt buộc.",
-    "Credential_EmailRequired": "{field} là bắt buộc.",
-    "Credential_EmailMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Credential_EmailInvalidFormat": "Định dạng của {field} không hợp lệ.",
-    "Credential_PasswordRequired": "{field} là bắt buộc.",
-    "Credential_PasswordMinLengthNotMet": "{field} phải có ít nhất {min} ký tự.",
-    "Credential_PasswordMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Credential_PasswordInvalidFormat": "Định dạng của {field} không hợp lệ.",
-    "CustomerShippingAddress_AlreadyDeleted": "{field} đã bị xóa.",
-    "CustomerShippingAddress_RecipientNameRequired": "{field} là bắt buộc.",
-    "CustomerShippingAddress_RecipientNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "CustomerShippingAddress_RecipientPhoneNumberRequired": "{field} là bắt buộc.",
-    "CustomerShippingAddress_RecipientPhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "CustomerShippingAddress_AlreadyDefault": "{field} đã là mặc định.",
-    "CustomerShippingAddress_NotDefault": "{field} không phải mặc định.",
-    "Inventory_ProductRequired": "{field} là bắt buộc.",
-    "Inventory_SellerWarehouseRequired": "{field} là bắt buộc.",
-    "Inventory_QuantityOnHandCannotBeNegative": "{field} không được âm.",
-    "Inventory_QuantityOnHandCannotExceed": "{field} không được vượt quá {max}.",
-    "Inventory_QuantityReservedCannotBeNegative": "{field} không được âm.",
-    "Inventory_QuantityReservedCannotExceedQuantityOnHand": "{field} không được vượt quá {max}.",
-    "Inventory_QuantityToAddMustBePositive": "{field} phải là số dương.",
-    "Inventory_QuantityToReserveMustBePositive": "{field} phải là số dương.",
-    "Inventory_InsufficientStock": "Không đủ tồn kho khả dụng.",
-    "Inventory_QuantityToReleaseMustBePositive": "{field} phải là số dương.",
-    "Inventory_QuantityToReleaseCannotExceedReserved": "{field} không được vượt quá {max}.",
-    "Money_AmountCannotBeNegative": "{field} không được âm.",
-    "Money_CurrencyRequired": "{field} là bắt buộc.",
-    "Money_CurrencyUnsupported": "{field} '{value}' không được hỗ trợ.",
-    "Money_CurrencyMismatch": "{field} không khớp: không thể thao tác giữa {left} và {right}.",
-    "Money_ResultCannotBeNegative": "{field} không được âm.",
-    "Notification_UserIdRequired": "{field} là bắt buộc.",
-    "Notification_MessageRequired": "{field} là bắt buộc.",
-    "Notification_MessageMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Notification_AlreadyMarkedAsRead": "{field} đã được xử lý.",
-    "Order_CodeRequired": "{field} là bắt buộc.",
-    "Order_CodeMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Order_NoteMustNotBeBlank": "{field} không được để trắng.",
-    "Order_NoteMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Order_PickupNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_ShipNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_AwaitConfirmationNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_DeliverNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_CancelNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_ReturnNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_ExpireNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Order_ShopNameRequired": "{field} là bắt buộc.",
-    "Order_ShopNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Order_RecipientNameRequired": "{field} là bắt buộc.",
-    "Order_RecipientNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Order_RecipientPhoneNumberRequired": "{field} là bắt buộc.",
-    "Order_RecipientPhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Order_CustomerRequired": "{field} là bắt buộc.",
-    "Order_SellerRequired": "{field} là bắt buộc.",
-    "OrderItem_ProductIdRequired": "{field} là bắt buộc.",
-    "OrderItem_OrderIdRequired": "{field} là bắt buộc.",
-    "OrderItem_QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
-    "OrderItem_AmountCannotBeNegative": "{field} không được âm.",
-    "Payment_OrderIdRequired": "{field} là bắt buộc.",
-    "Payment_ProviderMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Payment_ExternalTransactionIdMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Payment_CompleteNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Payment_FailNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Payment_RefundNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Product_NameRequired": "{field} là bắt buộc.",
-    "Product_NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Product_DescriptionRequired": "{field} là bắt buộc.",
-    "Product_DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "Product_ActivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Product_HideNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
-    "Product_CategoryRequired": "{field} là bắt buộc.",
-    "Product_SellerRequired": "{field} là bắt buộc.",
-    "Product_ImageNotFound": "Không tìm thấy {field}.",
-    "ProductImage_ImageUrlRequired": "{field} là bắt buộc.",
-    "ProductImage_DisplayOrderCannotBeNegative": "{field} không được âm.",
-    "ProductImage_DescriptionMustNotBeBlank": "{field} không được để trắng.",
-    "ProductImage_DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "ProductPrice_PriceMustBePositive": "{field} phải là số dương.",
-    "Role_InvalidRole": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",
-    "Role_UnsupportedRole": "{field} '{value}' không được hỗ trợ.",
-    "SellerShop_NameRequired": "{field} là bắt buộc.",
-    "SellerShop_NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "SellerShop_PhoneNumberRequired": "{field} là bắt buộc.",
-    "SellerShop_PhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "SellerShop_SellerRequired": "{field} là bắt buộc.",
-    "SellerShop_WarehouseNotFound": "Không tìm thấy {field}.",
-    "SellerWarehouse_AlreadyDeleted": "{field} đã bị xóa.",
-    "SellerWarehouse_SellerShopRequired": "{field} là bắt buộc.",
-    "Token_VerificationTokenRequired": "{field} là bắt buộc.",
-    "TranslationEntry_EntityNameRequired": "{field} là bắt buộc.",
-    "TranslationEntry_FieldNameRequired": "{field} là bắt buộc.",
-    "TranslationEntry_RowIdRequired": "{field} là bắt buộc.",
-    "TranslationEntry_LocaleRequired": "{field} là bắt buộc.",
-    "TranslationEntry_ValueRequired": "{field} là bắt buộc.",
-    "Unique_DuplicateValue": "{field} = '{value}' đã tồn tại.",
-    "Unique_HasNoIndex": "Không thể xác định xung đột duy nhất vì thiếu metadata của index trong cơ sở dữ liệu.",
-    "Unique_UnknownError": "Đã xảy ra lỗi ràng buộc duy nhất.",
-    "UserProfile_FirstNameRequired": "{field} là bắt buộc.",
-    "UserProfile_FirstNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "UserProfile_LastNameRequired": "{field} là bắt buộc.",
-    "UserProfile_LastNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "UserProfile_NickNameMustNotBeBlank": "{field} không được để trắng.",
-    "UserProfile_NickNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
-    "UserProfile_BirthDateCannotBeFuture": "{field} không được ở tương lai.",
-    "UserProfile_AgeCannotBeLessThan": "{field} không được nhỏ hơn {min}.",
-    "UserProfile_AgeCannotExceed": "{field} không được vượt quá {max}.",
-    "VnAddress_AddressInvalid": "{field} không hợp lệ.",
-    "VnAddress_WardInvalid": "{field} không hợp lệ.",
-    "VnAddress_ProvinceInvalid": "{field} không hợp lệ."
+    "Entity": {
+      "EmptyId": "{field} không được để trống."
+    },
+    "Address": {
+      "AddressLineRequired": "{field} là bắt buộc.",
+      "AddressLineMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "WardRequired": "{field} là bắt buộc.",
+      "ProvinceRequired": "{field} là bắt buộc."
+    },
+    "Cart": {
+      "CustomerIdRequired": "{field} là bắt buộc."
+    },
+    "CartItem": {
+      "ProductIdRequired": "{field} là bắt buộc.",
+      "CartIdRequired": "{field} là bắt buộc.",
+      "QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
+      "QuantityCannotExceed": "{field} không được vượt quá {max}.",
+      "AmountMustBePositive": "{field} phải là số dương."
+    },
+    "Category": {
+      "NameRequired": "{field} là bắt buộc.",
+      "NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "DescriptionMustNotBeBlank": "{field} không được để trắng.",
+      "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "ActivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "DeactivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "AlreadyArchived": "{field} đã được lưu trữ.",
+      "AdminRequired": "{field} là bắt buộc."
+    },
+    "Credential": {
+      "EmailRequired": "{field} là bắt buộc.",
+      "EmailMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "EmailInvalidFormat": "Định dạng của {field} không hợp lệ.",
+      "PasswordRequired": "{field} là bắt buộc.",
+      "PasswordMinLengthNotMet": "{field} phải có ít nhất {min} ký tự.",
+      "PasswordMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "PasswordInvalidFormat": "Định dạng của {field} không hợp lệ."
+    },
+    "CurrentUser": {
+      "Unauthenticated": "Người dùng hiện tại chưa được xác thực.",
+      "UserIdMissing": "Thiếu ID người dùng hiện tại.",
+      "UserIdInvalid": "ID người dùng hiện tại '{value}' không hợp lệ.",
+      "RoleMissing": "Thiếu vai trò của người dùng hiện tại."
+    },
+    "CustomerShippingAddress": {
+      "AlreadyDeleted": "{field} đã bị xóa.",
+      "RecipientNameRequired": "{field} là bắt buộc.",
+      "RecipientNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "RecipientPhoneNumberRequired": "{field} là bắt buộc.",
+      "RecipientPhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "AlreadyDefault": "{field} đã là mặc định.",
+      "NotDefault": "{field} không phải mặc định."
+    },
+    "Inventory": {
+      "ProductRequired": "{field} là bắt buộc.",
+      "SellerWarehouseRequired": "{field} là bắt buộc.",
+      "QuantityOnHandCannotBeNegative": "{field} không được âm.",
+      "QuantityOnHandCannotExceed": "{field} không được vượt quá {max}.",
+      "QuantityReservedCannotBeNegative": "{field} không được âm.",
+      "QuantityReservedCannotExceedQuantityOnHand": "{field} không được vượt quá {max}.",
+      "QuantityToAddMustBePositive": "{field} phải là số dương.",
+      "QuantityToReserveMustBePositive": "{field} phải là số dương.",
+      "InsufficientStock": "Không đủ tồn kho khả dụng.",
+      "QuantityToReleaseMustBePositive": "{field} phải là số dương.",
+      "QuantityToReleaseCannotExceedReserved": "{field} không được vượt quá {max}."
+    },
+    "Money": {
+      "AmountCannotBeNegative": "{field} không được âm.",
+      "CurrencyRequired": "{field} là bắt buộc.",
+      "CurrencyUnsupported": "{field} '{value}' không được hỗ trợ.",
+      "CurrencyMismatch": "{field} không khớp: không thể thao tác giữa {left} và {right}.",
+      "ResultCannotBeNegative": "{field} không được âm."
+    },
+    "Notification": {
+      "UserIdRequired": "{field} là bắt buộc.",
+      "MessageRequired": "{field} là bắt buộc.",
+      "MessageMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "AlreadyMarkedAsRead": "{field} đã được xử lý."
+    },
+    "Order": {
+      "CodeRequired": "{field} là bắt buộc.",
+      "CodeMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "NoteMustNotBeBlank": "{field} không được để trắng.",
+      "NoteMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "PickupNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "ShipNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "AwaitConfirmationNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "DeliverNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "CancelNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "ReturnNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "ExpireNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "ShopNameRequired": "{field} là bắt buộc.",
+      "ShopNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "RecipientNameRequired": "{field} là bắt buộc.",
+      "RecipientNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "RecipientPhoneNumberRequired": "{field} là bắt buộc.",
+      "RecipientPhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "CustomerRequired": "{field} là bắt buộc.",
+      "SellerRequired": "{field} là bắt buộc."
+    },
+    "OrderItem": {
+      "ProductIdRequired": "{field} là bắt buộc.",
+      "OrderIdRequired": "{field} là bắt buộc.",
+      "QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
+      "AmountCannotBeNegative": "{field} không được âm."
+    },
+    "Payment": {
+      "OrderIdRequired": "{field} là bắt buộc.",
+      "ProviderMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "ExternalTransactionIdMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "CompleteNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "FailNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "RefundNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}."
+    },
+    "Product": {
+      "NameRequired": "{field} là bắt buộc.",
+      "NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "DescriptionRequired": "{field} là bắt buộc.",
+      "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "ActivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "HideNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
+      "CategoryRequired": "{field} là bắt buộc.",
+      "SellerRequired": "{field} là bắt buộc.",
+      "ImageNotFound": "Không tìm thấy {field}."
+    },
+    "ProductImage": {
+      "ImageUrlRequired": "{field} là bắt buộc.",
+      "DisplayOrderCannotBeNegative": "{field} không được âm.",
+      "DescriptionMustNotBeBlank": "{field} không được để trắng.",
+      "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự."
+    },
+    "ProductPrice": {
+      "PriceMustBePositive": "{field} phải là số dương."
+    },
+    "Role": {
+      "InvalidRole": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",
+      "UnsupportedRole": "{field} '{value}' không được hỗ trợ."
+    },
+    "SellerShop": {
+      "NameRequired": "{field} là bắt buộc.",
+      "NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "PhoneNumberRequired": "{field} là bắt buộc.",
+      "PhoneNumberMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "SellerRequired": "{field} là bắt buộc.",
+      "WarehouseNotFound": "Không tìm thấy {field}."
+    },
+    "SellerWarehouse": {
+      "AlreadyDeleted": "{field} đã bị xóa.",
+      "SellerShopRequired": "{field} là bắt buộc."
+    },
+    "Sex": {
+      "InvalidSex": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",
+      "UnsupportedSex": "{field} '{value}' không được hỗ trợ."
+    },
+    "Token": {
+      "VerificationTokenRequired": "{field} là bắt buộc."
+    },
+    "TranslationEntry": {
+      "EntityNameRequired": "{field} là bắt buộc.",
+      "FieldNameRequired": "{field} là bắt buộc.",
+      "RowIdRequired": "{field} là bắt buộc.",
+      "LocaleRequired": "{field} là bắt buộc.",
+      "ValueRequired": "{field} là bắt buộc."
+    },
+    "Unique": {
+      "DuplicateValue": "{field} = '{value}' đã tồn tại.",
+      "HasNoIndex": "Không thể xác định xung đột duy nhất vì thiếu metadata của index trong cơ sở dữ liệu.",
+      "UnknownError": "Đã xảy ra lỗi ràng buộc duy nhất."
+    },
+    "UserProfile": {
+      "FirstNameRequired": "{field} là bắt buộc.",
+      "FirstNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "LastNameRequired": "{field} là bắt buộc.",
+      "LastNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "NickNameMustNotBeBlank": "{field} không được để trắng.",
+      "NickNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "BirthDateCannotBeFuture": "{field} không được ở tương lai.",
+      "AgeCannotBeLessThan": "{field} không được nhỏ hơn {min}.",
+      "AgeCannotExceed": "{field} không được vượt quá {max}."
+    },
+    "VnAddress": {
+      "AddressInvalid": "{field} không hợp lệ.",
+      "WardInvalid": "{field} không hợp lệ.",
+      "ProvinceInvalid": "{field} không hợp lệ."
+    }
   }
 }

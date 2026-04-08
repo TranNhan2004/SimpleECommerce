@@ -8,16 +8,21 @@ public interface IGenericRepository<T> where T : class, IEntity
     Task<T?> FindByIdAsync(Guid id, bool trackChanges = false);
 
     Task<T?> FindFirstByConditionAsync(
-        Expression<Func<T, bool>> expression,
-        Func<IQueryable<T>, IQueryable<T>>? include = null,
+        Func<IQueryable<T>, IQueryable<T>> condition,
+        bool trackChanges = false
+    );
+
+    IQueryable<T> QueryAll(bool trackChanges = false);
+
+    IQueryable<T> QueryAllByCondition(
+        Func<IQueryable<T>, IQueryable<T>> condition,
         bool trackChanges = false
     );
 
     Task<IReadOnlyList<T>> FindAllAsync(bool trackChanges = false);
 
     Task<IReadOnlyList<T>> FindAllByConditionAsync(
-        Expression<Func<T, bool>> expression,
-        Func<IQueryable<T>, IQueryable<T>>? include = null,
+        Func<IQueryable<T>, IQueryable<T>> condition,
         bool trackChanges = false
     );
 

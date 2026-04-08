@@ -1,45 +1,32 @@
-using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-[AutoConstructor]
-public partial class NotificationRepository : INotificationRepository
+public class NotificationRepository : GenericRepository<Notification>, INotificationRepository
 {
-    private readonly AppDbContext _db;
-
-    public async Task<IReadOnlyList<Notification>> FindByUserIdAsync(Guid userId)
+    public NotificationRepository(AppDbContext appDbContext) : base(appDbContext)
     {
-        return await _db.Notifications
-            .Where(n => n.UserId == userId)
-            .OrderByDescending(n => n.CreatedAt)
-            .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Notification>> FindUnreadByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<Notification>> FindByUserIdAsync(Guid userId, bool trackChanges = false)
     {
-        return await _db.Notifications
-            .Where(n => n.UserId == userId && !n.IsRead)
-            .OrderByDescending(n => n.CreatedAt)
-            .ToListAsync();
+        return await base.FindAllByConditionAsync(
+            q => q
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt),
+            trackChanges
+        );
     }
 
-    public async Task<Notification?> FindByIdAsync(Guid id)
+    public async Task<IReadOnlyList<Notification>> FindUnreadByUserIdAsync(Guid userId, bool trackChanges = false)
     {
-        return await _db.Notifications.FindAsync(id);
-    }
-
-    public Notification Add(Notification notification)
-    {
-        _db.Notifications.Add(notification);
-        return notification;
-    }
-
-    public Notification Update(Notification notification)
-    {
-        _db.Notifications.Update(notification);
-        return notification;
+        return await base.FindAllByConditionAsync(
+            q => q
+                .Where(n => n.UserId == userId && !n.IsRead)
+                .OrderByDescending(n => n.CreatedAt),
+            trackChanges
+        );
     }
 }

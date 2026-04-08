@@ -14,8 +14,9 @@ public class CartRepository : GenericRepository<Cart>, ICartRepository
     public async Task<Cart?> FindByCustomerIdAsync(Guid customerId, bool trackChanges = false)
     {
         return await base.FindFirstByConditionAsync(
-            c => c.CustomerId == customerId,
-            q => q.Include(c => c.CartItems),
+            q => q
+                .Include(c => c.CartItems)
+                .Where(c => c.CustomerId == customerId),
             trackChanges
         );
     }

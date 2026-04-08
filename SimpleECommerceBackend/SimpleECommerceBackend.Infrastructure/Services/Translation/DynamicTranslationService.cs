@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
+using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
 using SimpleECommerceBackend.Domain.Entities.Translation;
@@ -10,11 +12,12 @@ namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 [AutoConstructor]
 public partial class DynamicTranslationService : IDynamicTranslationService
 {
-    private readonly ITranslationCache _cache;
+    private readonly ICacheService _cache;
     private readonly ILogger<DynamicTranslationService> _logger;
     private readonly IOptions<TranslationOptions> _options;
     private readonly IEnumerable<ITranslationProvider> _providers;
     private readonly ITranslationEntryRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public async Task<string> TranslateAsync(
         DynamicTranslationRequest request,
@@ -35,7 +38,7 @@ public partial class DynamicTranslationService : IDynamicTranslationService
             normalizedTargetLocale
         );
 
-        var cachedValue = await _cache.GetAsync(cacheKey, cancellationToken);
+        var cachedValue = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (!string.IsNullOrWhiteSpace(cachedValue)) return cachedValue;
 
         var existing = await _repository.FindAsync(
@@ -43,12 +46,12 @@ public partial class DynamicTranslationService : IDynamicTranslationService
             request.FieldName,
             request.RowId,
             normalizedTargetLocale,
-            cancellationToken
+            trackChanges: false
         );
 
         if (existing is not null)
         {
-            await _cache.SetAsync(cacheKey, existing.Value, GetCacheDuration(), cancellationToken);
+            await _cache.SetStringAsync(cacheKey, existing.Value, GetCacheDuration(), cancellationToken);
             return existing.Value;
         }
 
@@ -77,8 +80,9 @@ public partial class DynamicTranslationService : IDynamicTranslationService
                 translatedValue
             );
 
-            await _repository.UpsertAsync(entry, cancellationToken);
-            await _cache.SetAsync(cacheKey, translatedValue, GetCacheDuration(), cancellationToken);
+            _repository.Add(entry);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _cache.SetStringAsync(cacheKey, translatedValue, GetCacheDuration(), cancellationToken);
 
             return translatedValue;
         }

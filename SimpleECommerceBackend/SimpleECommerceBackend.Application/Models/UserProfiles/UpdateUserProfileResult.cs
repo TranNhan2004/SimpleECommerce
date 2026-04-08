@@ -2,7 +2,7 @@ using SimpleECommerceBackend.Domain.Enums;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
-public class UpdateResult
+public class UpdateUserProfileResult
 {
     public Guid UserId { get; init; }
     public string Email { get; init; } = null!;

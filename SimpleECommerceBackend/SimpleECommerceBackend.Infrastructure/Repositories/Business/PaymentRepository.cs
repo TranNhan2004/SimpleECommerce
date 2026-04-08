@@ -1,42 +1,21 @@
-using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
-[AutoConstructor]
-public partial class PaymentRepository : IPaymentRepository
+public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository
 {
-    private readonly AppDbContext _db;
-
-    public async Task<Payment?> FindByIdAsync(Guid id)
+    public PaymentRepository(AppDbContext appDbContext) : base(appDbContext)
     {
-        return await _db.Payments.FindAsync(id);
     }
 
-    public async Task<Payment?> FindByOrderIdAsync(Guid orderId)
+    public async Task<Payment?> FindByOrderIdAsync(Guid orderId, bool trackChanges = false)
     {
-        return await _db.Payments
-            .FirstOrDefaultAsync(p => p.OrderId == orderId);
+        return await base.FindFirstByConditionAsync(
+            q => q.Where(p => p.OrderId == orderId),
+            trackChanges
+        );
     }
 
-    public async Task<IReadOnlyList<Payment>> FindAllAsync()
-    {
-        return await _db.Payments
-            .OrderByDescending(p => p.CreatedAt)
-            .ToListAsync();
-    }
-
-    public Payment Add(Payment payment)
-    {
-        _db.Payments.Add(payment);
-        return payment;
-    }
-
-    public Payment Update(Payment payment)
-    {
-        _db.Payments.Update(payment);
-        return payment;
-    }
 }

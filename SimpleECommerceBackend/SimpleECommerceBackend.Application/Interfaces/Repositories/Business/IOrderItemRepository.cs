@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
 public interface IOrderItemRepository : IGenericRepository<OrderItem>
 {
-    Task<IReadOnlyList<OrderItem>> FindByOrderIdAsync(Guid orderId);
+    Task<IReadOnlyList<OrderItem>> FindAllByOrderIdAsync(Guid orderId, bool trackChanges = false);
 }

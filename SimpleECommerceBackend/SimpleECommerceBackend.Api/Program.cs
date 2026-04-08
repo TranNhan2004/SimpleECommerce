@@ -1,32 +1,20 @@
-using Keycloak.AuthServices.Authentication;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
 using SimpleECommerceBackend.Api.Extensions;
-using SimpleECommerceBackend.Api.Mapping;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddOptions();
+builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
-
-var mapsterConfig = TypeAdapterConfig.GlobalSettings;
-mapsterConfig.Scan(typeof(AuthMapping).Assembly);
-builder.Services.AddSingleton(mapsterConfig);
-builder.Services.AddScoped<IMapper, ServiceMapper>();
-
-// Keycloak Authentication
-builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, options =>
-{
-    options.Audience = builder.Configuration["Keycloak:resource"];
-    options.RequireHttpsMetadata = false; // Set to true in production
-});
-
+builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddKeycloakPolicies();
+builder.Services.AddCustomRateLimiter(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddApiVersioning(options =>
@@ -64,7 +52,6 @@ builder.Services.AddVersionedApiExplorer(options =>
 });
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -89,6 +76,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Mapster configuration
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 var app = builder.Build();
 
@@ -106,9 +97,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseGlobalExceptionHandler();
-app.MapControllers();
 
+app.UseForwardedHeaders();
+app.UseRateLimiter();
+
+app.MapControllers().RequireRateLimiting("ip-route");
 app.Run();
-
-// Make the implicit Program class public for testing
-public partial class Program { }

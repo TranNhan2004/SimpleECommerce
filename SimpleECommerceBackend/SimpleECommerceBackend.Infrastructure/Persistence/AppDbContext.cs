@@ -1,22 +1,22 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
-using SimpleECommerceBackend.Infrastructure.Persistence.DbExceptions;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities.Translation;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext, IUnitOfWork
+public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
+    // Business entities
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Category> Categories => Set<Category>();
-    public DbSet<EmailVerification> EmailVerifications => Set<EmailVerification>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
@@ -29,6 +29,9 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
+
+    // Translation
+    public DbSet<TranslationEntry> TranslationEntries => Set<TranslationEntry>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -44,6 +47,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema(DbSchemas.Business);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         ApplyCommonConventions(modelBuilder);

@@ -16,6 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{889AEAED
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
 		.gitignore = .gitignore
+		..\.env = ..\.env
+		..\.codex = ..\.codex
+		..\.env.example = ..\.env.example
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleECommerceBackend.Domain.Tests", "SimpleECommerceBackend.Domain.Tests\SimpleECommerceBackend.Domain.Tests.csproj", "{2E8EDB8E-F4A5-414B-947F-8EF8FE08B22E}"

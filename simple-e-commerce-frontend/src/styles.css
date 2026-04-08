@@ -1,3 +1,251 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+@import 'material-icons/iconfont/outlined.css';
+
+@layer base {
+	html {
+		@apply min-h-full;
+	}
+
+	body {
+		@apply min-h-screen bg-linear-to-b from-white via-sky-50 to-red-50 text-slate-900 antialiased;
+		font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+	}
+
+	button,
+	input,
+	textarea,
+	select {
+		font: inherit;
+	}
+
+	a {
+		@apply no-underline;
+	}
+}
+
+@layer components {
+	.se-page {
+		@apply min-h-screen py-6 sm:py-8;
+	}
+
+	.se-shell {
+		@apply mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-12;
+	}
+
+	.se-card {
+		@apply rounded-sm border border-slate-200 bg-white shadow-xl shadow-slate-200/70;
+	}
+
+	.se-hero {
+		@apply p-3 sm:p-5;
+	}
+
+	.se-grid {
+		@apply grid gap-6 lg:grid-cols-2;
+	}
+
+	.se-copy {
+		@apply rounded-sm bg-linear-to-br from-sky-50 via-white to-red-50 p-6 sm:p-8;
+	}
+
+	.se-chip {
+		@apply inline-flex items-center gap-2 rounded-sm border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-700;
+	}
+
+	.se-title {
+		@apply mt-4 text-5xl font-semibold leading-none tracking-tight text-slate-900 sm:text-6xl lg:text-7xl;
+	}
+
+	.se-grad-text {
+		@apply bg-linear-to-r from-blue-500 via-violet-400 to-rose-300 bg-clip-text text-transparent;
+	}
+
+	.se-text {
+		@apply max-w-2xl text-base leading-8 text-slate-600;
+	}
+
+	.se-actions {
+		@apply mt-6 flex flex-wrap gap-3;
+	}
+
+	.se-btn {
+		@apply inline-flex min-h-12 items-center justify-center rounded-sm border-0 px-5 text-sm font-semibold transition duration-150;
+	}
+
+	.se-btn-pri {
+		@apply bg-linear-to-r from-blue-500 via-violet-400 to-rose-300 text-white shadow-lg shadow-indigo-200 hover:brightness-105;
+	}
+
+	.se-btn-sec {
+		@apply border border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:text-blue-700;
+	}
+
+	.se-list {
+		@apply mt-8 grid gap-3;
+	}
+
+	.se-list-item {
+		@apply flex items-center gap-3 rounded-sm border border-slate-200 bg-white px-4 py-3 text-slate-700;
+	}
+
+	.se-dot {
+		@apply h-2.5 w-2.5 rounded-full bg-linear-to-r from-blue-500 to-rose-300;
+	}
+
+	.se-side {
+		@apply rounded-sm border border-slate-200 bg-slate-50 p-5 sm:p-6;
+	}
+
+	.se-label {
+		@apply text-xs font-bold uppercase tracking-[0.22em] text-slate-500;
+	}
+
+	.se-stat-grid {
+		@apply mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-1;
+	}
+
+	.se-stat {
+		@apply rounded-sm border border-slate-200 bg-white p-4;
+	}
+
+	.se-bar {
+		@apply h-2 rounded-full bg-linear-to-r from-blue-500 via-violet-400 to-rose-300;
+	}
+
+	.se-stat-value {
+		@apply mt-3 text-xl font-semibold text-slate-900;
+	}
+
+	.se-stat-label {
+		@apply mt-1 text-sm text-slate-500;
+	}
+
+	.se-route {
+		@apply mt-6;
+	}
+
+	.se-mi {
+		@apply inline-flex select-none items-center justify-center leading-none;
+		font-size: 20px;
+	}
+
+	.se-mi-sm {
+		font-size: 18px;
+	}
+
+	.se-nav-wrap {
+		@apply sticky top-0 z-20;
+	}
+
+	.se-nav {
+		@apply flex flex-col gap-4 rounded-sm border border-slate-200/90 bg-white/95 px-4 py-4 shadow-lg shadow-slate-200/70 backdrop-blur sm:px-5 lg:px-6;
+	}
+
+	.se-nav-strip {
+		@apply flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 text-xs font-medium text-slate-500;
+	}
+
+	.se-nav-strip-group {
+		@apply flex flex-wrap items-center gap-4;
+	}
+
+	.se-nav-strip-item {
+		@apply inline-flex items-center gap-1.5;
+	}
+
+	.se-lang-btn {
+		@apply inline-flex min-h-10 items-center gap-2 rounded-sm border border-transparent px-2.5 text-xs font-semibold text-slate-500 transition hover:border-sky-200 hover:bg-sky-100 hover:text-blue-700;
+	}
+
+	.se-lang-btn-active {
+		@apply border-sky-200 bg-sky-100 text-blue-700;
+	}
+
+	.se-flag {
+		@apply h-3.5 w-4.5 rounded-xs border border-slate-200 object-cover shadow-sm shadow-slate-200/60;
+	}
+
+	.se-nav-top {
+		@apply flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between;
+	}
+
+	.se-brand {
+		@apply flex items-center gap-3;
+	}
+
+	.se-brand-mark {
+		@apply flex h-10 w-10 items-center justify-center rounded-sm bg-linear-to-br from-blue-500 via-violet-400 to-rose-300 text-lg font-bold text-white;
+	}
+
+	.se-brand-copy {
+		@apply flex flex-col;
+	}
+
+	.se-brand-name {
+		@apply text-2xl font-semibold tracking-tight text-slate-950;
+	}
+
+	.se-brand-tag {
+		@apply text-xs font-medium uppercase tracking-[0.18em] text-slate-400;
+	}
+
+	.se-search-row {
+		@apply flex flex-1 flex-col gap-3 lg:mx-8 lg:flex-row lg:items-center;
+	}
+
+	.se-search {
+		@apply flex min-h-12 flex-1 items-center gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 shadow-inner shadow-slate-100;
+	}
+
+	.se-search-icon {
+		@apply text-sm text-slate-400;
+	}
+
+	.se-search-input {
+		@apply w-full border-0 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400;
+	}
+
+	.se-nav-actions {
+		@apply flex items-center gap-2 sm:gap-3;
+	}
+
+	.se-icon-btn {
+		@apply inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:bg-sky-50 hover:text-blue-700;
+	}
+
+	.se-icon-badge {
+		@apply inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-400 px-1 text-[11px] font-semibold text-white;
+	}
+
+	.se-nav-bottom {
+		@apply flex flex-col gap-3 border-t border-slate-100 pt-4 lg:flex-row lg:items-center lg:justify-between;
+	}
+
+	.se-nav-links {
+		@apply flex flex-wrap items-center gap-2 sm:gap-3;
+	}
+
+	.se-nav-link {
+		@apply inline-flex min-h-10 items-center gap-2 rounded-sm border-0 bg-transparent px-3 text-sm font-medium text-slate-600 transition hover:bg-sky-50 hover:text-blue-700;
+	}
+
+	.se-nav-link-icon {
+		@apply inline-flex h-5 w-5 items-center justify-center;
+	}
+
+	.se-nav-link-pri {
+		@apply bg-linear-to-r from-blue-500 via-violet-400 to-rose-300 text-white hover:text-white hover:brightness-105;
+	}
+
+	.se-nav-meta {
+		@apply flex flex-wrap items-center gap-3 text-sm text-slate-500;
+	}
+
+	.se-nav-meta-item {
+		@apply inline-flex items-center gap-2;
+	}
+
+	.se-nav-meta-dot {
+		@apply h-2 w-2 rounded-full bg-linear-to-r from-blue-500 to-rose-300;
+	}
+}

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Utils;
@@ -20,7 +21,14 @@ public class TokenUtils
     public static string NormalizeToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
-            throw new BusinessException("Verification token is required");
+            throw new ValidationException(
+                TokenErrorCode.VerificationTokenRequired,
+                "Verification token is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "VerificationToken"
+                }
+            );
 
         return token.Trim();
     }

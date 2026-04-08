@@ -1,0 +1,93 @@
+{
+  "brand": {
+    "tagline": "Thương mại hiện đại"
+  },
+  "home": {
+    "chip": "Quyền truy cập khách",
+    "title": "Chào mừng đến với SimpleECommerce",
+    "description": "Đây là trang giới thiệu công khai trước khi đăng nhập. Bạn có thể xem tổng quan về ứng dụng rồi chọn cách tiếp tục.",
+    "loginAction": "Đăng nhập",
+    "registerAction": "Tạo tài khoản",
+    "panelLabel": "Bạn nhận được gì",
+    "panelTitle": "Giao diện thân thiện",
+    "panelMessage": "Bố cục được thiết kế để tạo ấn tượng nhanh và dẫn đến bước tiếp theo dễ dàng.",
+    "featureCatalogTitle": "Danh mục linh hoạt",
+    "featureCatalogDescription": "Các khu vực sản phẩm tự thích ứng theo kích thước màn hình.",
+    "featureSecurityTitle": "Truy cập an toàn",
+    "featureSecurityDescription": "Dùng chức năng đăng nhập hoặc tạo tài khoản khi bạn sẵn sàng tiếp tục.",
+    "featureResponsiveTitle": "Tối ưu cho mọi màn hình",
+    "featureResponsiveDescription": "Bố cục dễ đọc trên cả desktop, tablet và mobile."
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Tạo tài khoản",
+    "logout": "Đăng xuất",
+    "account": "Tài khoản",
+    "returnHome": "Về trang chủ",
+    "accessToken": "Access token",
+    "realmRoles": "Vai trò realm",
+    "resourceRoles": "Vai trò resource"
+  },
+  "account": {
+    "chip": "Khu vực bảo vệ",
+    "title": "Tài khoản của bạn",
+    "description": "Trang này đọc trạng thái người dùng đã xác thực và hiển thị vai trò cùng bản xem trước token.",
+    "username": "Tên đăng nhập",
+    "roles": "Vai trò",
+    "unknown": "Không rõ",
+    "noRoles": "Không có vai trò",
+    "tokenLabel": "Bản xem trước ngắn của bearer token hiện tại"
+  },
+  "seller": {
+    "chip": "Bảo vệ theo vai trò",
+    "title": "Khu vực người bán",
+    "description": "Chỉ người dùng có vai trò seller mới có thể đi tiếp ở route này.",
+    "requiredRoles": "Vai trò bắt buộc",
+    "accessSummary": "Màn hình này được chặn trước khi render.",
+    "session": "Đang đăng nhập dưới tên",
+    "roles": "Vai trò đang có",
+    "none": "Không có"
+  },
+  "admin": {
+    "chip": "Bảo vệ theo vai trò",
+    "title": "Khu vực quản trị",
+    "description": "Chỉ người dùng có vai trò admin mới mở được khu vực này.",
+    "requiredRoles": "Vai trò bắt buộc",
+    "accessSummary": "Được bảo vệ bằng cùng luồng frontend.",
+    "session": "Đang đăng nhập dưới tên",
+    "roles": "Vai trò đang có",
+    "none": "Không có"
+  },
+  "forbidden": {
+    "code": "403",
+    "title": "Không có quyền truy cập",
+    "message": "Bạn không có quyền truy cập trang này."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Không tìm thấy",
+    "message": "Không tìm thấy trang bạn yêu cầu."
+  },
+  "search": {
+    "placeholder": "Tìm sản phẩm, thương hiệu và bộ sưu tập",
+    "action": "Tìm kiếm"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "seller": "Người bán",
+    "admin": "Quản trị",
+    "support": "Hỗ trợ",
+    "login": "Đăng nhập",
+    "account": "Tài khoản",
+    "cart": "Giỏ hàng"
+  },
+  "meta": {
+    "freeShipping": "Miễn phí vận chuyển",
+    "returns": "Đổi trả trong 30 ngày",
+    "secureCheckout": "Thanh toán an toàn"
+  },
+  "language": {
+    "switchToEnglish": "Chuyển ngôn ngữ sang tiếng Anh",
+    "switchToVietnamese": "Chuyển ngôn ngữ sang tiếng Việt"
+  }
+}

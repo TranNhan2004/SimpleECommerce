@@ -1,0 +1,42 @@
+<section class="home-page">
+	<div class="home-shell">
+		<div class="home-hero">
+			<div class="home-copy">
+				<span class="home-chip">{{ t('home.chip') }}</span>
+				<h1 class="home-title">{{ t('home.title') }}</h1>
+				<p class="home-description">{{ t('home.description') }}</p>
+
+				<div class="home-actions">
+					<button class="home-action home-action-pri" type="button" (click)="login()">
+						<span class="material-icons-outlined home-action-icon" aria-hidden="true">login</span>
+						<span>{{ t('home.loginAction') }}</span>
+					</button>
+					<button class="home-action home-action-sec" type="button" (click)="register()">
+						<span class="material-icons-outlined home-action-icon" aria-hidden="true">person_add</span>
+						<span>{{ t('home.registerAction') }}</span>
+					</button>
+				</div>
+			</div>
+
+			<aside class="home-panel" aria-label="Home highlights">
+				<div class="home-panel-head">
+					<span class="home-panel-label">{{ t('home.panelLabel') }}</span>
+					<h2 class="home-panel-title">{{ t('home.panelTitle') }}</h2>
+					<p class="home-panel-message">{{ t('home.panelMessage') }}</p>
+				</div>
+
+				<div class="home-feature-list">
+					@for (feature of features; track feature.titleKey) {
+						<div class="home-feature">
+							<span class="material-icons-outlined home-feature-icon" aria-hidden="true">{{ feature.icon }}</span>
+							<div class="home-feature-copy">
+								<div class="home-feature-title">{{ t(feature.titleKey) }}</div>
+								<p class="home-feature-text">{{ t(feature.descriptionKey) }}</p>
+							</div>
+						</div>
+					}
+				</div>
+			</aside>
+		</div>
+	</div>
+</section>

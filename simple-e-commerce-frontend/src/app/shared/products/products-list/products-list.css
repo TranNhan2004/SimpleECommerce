@@ -1,0 +1,10 @@
+@reference '../../../../styles.css';
+
+:host {
+	@apply block;
+}
+
+.se-products-list {
+	@apply grid gap-6;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}

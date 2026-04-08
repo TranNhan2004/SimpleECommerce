@@ -1,0 +1,93 @@
+{
+  "brand": {
+    "tagline": "Modern Commerce"
+  },
+  "home": {
+    "chip": "Guest access",
+    "title": "Welcome to SimpleECommerce",
+    "description": "This public landing page introduces the store before sign in. Use it to understand the app, then choose how you want to continue.",
+    "loginAction": "Sign in",
+    "registerAction": "Create account",
+    "panelLabel": "What you get",
+    "panelTitle": "A clean entry point",
+    "panelMessage": "Everything is laid out for a quick first impression and an easy next step.",
+    "featureCatalogTitle": "Responsive catalog",
+    "featureCatalogDescription": "Product sections adapt to the screen size without clutter.",
+    "featureSecurityTitle": "Secure access",
+    "featureSecurityDescription": "Use sign in or registration when you are ready to continue.",
+    "featureResponsiveTitle": "Built for every screen",
+    "featureResponsiveDescription": "The layout stays readable on desktop, tablet, and mobile."
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Sign out",
+    "account": "Account",
+    "returnHome": "Back home",
+    "accessToken": "Access token",
+    "realmRoles": "Realm roles",
+    "resourceRoles": "Resource roles"
+  },
+  "account": {
+    "chip": "Protected area",
+    "title": "Your account",
+    "description": "This page reads the authenticated user state and exposes the active roles and token preview.",
+    "username": "Username",
+    "roles": "Roles",
+    "unknown": "Unknown",
+    "noRoles": "No roles",
+    "tokenLabel": "Short preview of the current bearer token"
+  },
+  "seller": {
+    "chip": "Role protected",
+    "title": "Seller workspace",
+    "description": "Only users with the seller role can keep moving through this route.",
+    "requiredRoles": "Required role",
+    "accessSummary": "This screen is guarded before rendering.",
+    "session": "Signed in as",
+    "roles": "Active roles",
+    "none": "None"
+  },
+  "admin": {
+    "chip": "Role protected",
+    "title": "Admin workspace",
+    "description": "Only users with the admin role can open this area.",
+    "requiredRoles": "Required role",
+    "accessSummary": "Guarded with the same frontend flow.",
+    "session": "Signed in as",
+    "roles": "Active roles",
+    "none": "None"
+  },
+  "forbidden": {
+    "code": "403",
+    "title": "Forbidden",
+    "message": "You do not have permission to access this page."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Not Found",
+    "message": "The page you requested could not be found."
+  },
+  "search": {
+    "placeholder": "Search products, brands, and collections",
+    "action": "Search"
+  },
+  "nav": {
+    "home": "Home",
+    "account": "Account",
+    "seller": "Seller",
+    "admin": "Admin",
+    "support": "Support",
+    "login": "Login",
+    "cart": "Cart"
+  },
+  "meta": {
+    "freeShipping": "Free shipping",
+    "returns": "30-day returns",
+    "secureCheckout": "Secure checkout"
+  },
+  "language": {
+    "switchToEnglish": "Switch language to English",
+    "switchToVietnamese": "Switch language to Vietnamese"
+  }
+}

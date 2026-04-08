@@ -1,0 +1,29 @@
+@reference '../../../styles.css';
+
+:host {
+	@apply block h-full;
+}
+
+.se-status-page {
+	@apply flex h-full min-h-full w-full items-center justify-center bg-linear-to-br from-white via-sky-50 to-rose-50 px-6 py-12;
+}
+
+.se-status-content {
+	@apply flex w-full max-w-4xl flex-col items-center text-center;
+}
+
+.se-status-icon {
+	@apply inline-flex h-16 w-16 items-center justify-center rounded-sm bg-linear-to-br from-blue-100 via-indigo-100 to-rose-100 text-[32px] text-blue-600 shadow-lg shadow-sky-100;
+}
+
+.se-status-code {
+	@apply mt-6 text-8xl font-bold leading-none tracking-tight text-slate-950 sm:text-9xl;
+}
+
+.se-status-title {
+	@apply mt-4 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl;
+}
+
+.se-status-message {
+	@apply mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg;
+}

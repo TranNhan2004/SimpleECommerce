@@ -1,0 +1,104 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.ValueObjects;
+
+namespace SimpleECommerceBackend.Domain.Entities.Business;
+
+public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
+{
+    private OrderItem()
+    {
+    }
+
+    private OrderItem(Guid productId, Guid orderId, int quantity, Money currentPrice)
+    {
+        SetId(Guid.NewGuid());
+        SetProductId(productId);
+        SetOrderId(orderId);
+        SetQuantity(quantity);
+        SetCurrentPrice(currentPrice);
+    }
+
+    public Guid ProductId { get; private set; }
+    public Product? Product { get; private set; }
+
+    public Guid OrderId { get; private set; }
+    public Order? Order { get; private set; }
+
+    public int Quantity { get; private set; }
+    public Money CurrentPrice { get; private set; }
+
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
+
+    public static OrderItem Create(Guid productId, Guid orderId, int quantity, Money currentPrice)
+    {
+        return new OrderItem(productId, orderId, quantity, currentPrice);
+    }
+
+    private void SetProductId(Guid productId)
+    {
+        if (productId == Guid.Empty)
+            throw new ValidationException(
+                OrderItemErrorCode.ProductIdRequired,
+                "Product ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "ProductId"
+                }
+            );
+
+        ProductId = productId;
+    }
+
+    private void SetOrderId(Guid orderId)
+    {
+        if (orderId == Guid.Empty)
+            throw new ValidationException(
+                OrderItemErrorCode.OrderIdRequired,
+                "Order ID is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "OrderId"
+                }
+            );
+
+        OrderId = orderId;
+    }
+
+    public void SetQuantity(int quantity)
+    {
+        if (quantity <= 0)
+            throw new ValidationException(
+                OrderItemErrorCode.QuantityMustBeGreaterThanZero,
+                "Quantity must be greater than zero",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Quantity"
+                }
+            );
+
+        Quantity = quantity;
+    }
+
+    public void SetCurrentPrice(Money currentPrice)
+    {
+        if (currentPrice.Amount < 0)
+            throw new ValidationException(
+                OrderItemErrorCode.AmountCannotBeNegative,
+                "Amount cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Amount"
+                }
+            );
+
+        CurrentPrice = currentPrice;
+    }
+
+    public Money GetLineTotal()
+    {
+        return new Money(CurrentPrice.Amount * Quantity, CurrentPrice.Currency);
+    }
+}

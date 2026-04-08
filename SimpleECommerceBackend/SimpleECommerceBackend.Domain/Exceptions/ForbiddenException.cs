@@ -4,20 +4,10 @@ namespace SimpleECommerceBackend.Domain.Exceptions;
 ///     Exception for authorization failures.
 ///     Maps to HTTP 403 Forbidden.
 /// </summary>
-public class ForbiddenException : Exception
+public class ForbiddenException : ExceptionBase
 {
-    public ForbiddenException(string message = "You don't have permission to perform this action")
-        : base(message)
+    public ForbiddenException(string errorCode, string? internalMessage = null, IReadOnlyDictionary<string, object?>? details = null)
+        : base(errorCode, internalMessage, details)
     {
     }
-
-    public ForbiddenException(string message, string resource, string action)
-        : base(message)
-    {
-        Resource = resource;
-        Action = action;
-    }
-
-    public string? Resource { get; }
-    public string? Action { get; }
 }

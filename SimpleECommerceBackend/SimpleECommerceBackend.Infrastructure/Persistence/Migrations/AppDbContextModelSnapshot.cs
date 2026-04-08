@@ -18,12 +18,13 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("business")
                 .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Cart", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Cart", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -42,10 +43,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.CartItem", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.CartItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -71,10 +72,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Category", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -104,10 +105,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.CustomerShippingAddress", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.CustomerShippingAddress", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -142,7 +143,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "RecipientAddress", "SimpleECommerceBackend.Domain.Entities.CustomerShippingAddress.RecipientAddress#Address", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "RecipientAddress", "SimpleECommerceBackend.Domain.Entities.Business.CustomerShippingAddress.RecipientAddress#Address", b1 =>
                         {
                             b1.IsRequired();
 
@@ -167,49 +168,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("CustomerShippingAddresses", (string)null);
+                    b.ToTable("CustomerShippingAddresses", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.EmailVerification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("ConfirmedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExpiresAt");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("EmailVerifications", (string)null);
-                });
-
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Inventory", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -242,10 +204,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId", "SellerWarehouseId")
                         .IsUnique();
 
-                    b.ToTable("Inventories", (string)null);
+                    b.ToTable("Inventories", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Notification", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -272,10 +234,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Order", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -322,7 +284,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "RecipientAddress", "SimpleECommerceBackend.Domain.Entities.Order.RecipientAddress#Address", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "RecipientAddress", "SimpleECommerceBackend.Domain.Entities.Business.Order.RecipientAddress#Address", b1 =>
                         {
                             b1.IsRequired();
 
@@ -343,7 +305,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                                 .HasColumnName("RecipientWard");
                         });
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "ShippingFee", "SimpleECommerceBackend.Domain.Entities.Order.ShippingFee#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "ShippingFee", "SimpleECommerceBackend.Domain.Entities.Business.Order.ShippingFee#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -359,7 +321,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                                 .HasColumnName("TotalCurrency");
                         });
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "TotalPrice", "SimpleECommerceBackend.Domain.Entities.Order.TotalPrice#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "TotalPrice", "SimpleECommerceBackend.Domain.Entities.Business.Order.TotalPrice#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -375,7 +337,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                                 .HasColumnName("TotalCurrency");
                         });
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "WarehouseAddress", "SimpleECommerceBackend.Domain.Entities.Order.WarehouseAddress#Address", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "WarehouseAddress", "SimpleECommerceBackend.Domain.Entities.Business.Order.WarehouseAddress#Address", b1 =>
                         {
                             b1.IsRequired();
 
@@ -409,10 +371,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.OrderItem", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -432,7 +394,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "CurrentPrice", "SimpleECommerceBackend.Domain.Entities.OrderItem.CurrentPrice#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "CurrentPrice", "SimpleECommerceBackend.Domain.Entities.Business.OrderItem.CurrentPrice#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -454,10 +416,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("OrderId", "ProductId")
                         .IsUnique();
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Payment", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -485,7 +447,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Money", "SimpleECommerceBackend.Domain.Entities.Payment.Money#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Money", "SimpleECommerceBackend.Domain.Entities.Business.Payment.Money#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -509,10 +471,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Product", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -545,7 +507,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "CurrentPrice", "SimpleECommerceBackend.Domain.Entities.Product.CurrentPrice#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "CurrentPrice", "SimpleECommerceBackend.Domain.Entities.Business.Product.CurrentPrice#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -566,10 +528,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.ProductImage", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.ProductImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -600,10 +562,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImages", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.ProductPrice", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.ProductPrice", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -620,7 +582,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("ProductId1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Money", "SimpleECommerceBackend.Domain.Entities.ProductPrice.Money#Money", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Money", "SimpleECommerceBackend.Domain.Entities.Business.ProductPrice.Money#Money", b1 =>
                         {
                             b1.IsRequired();
 
@@ -641,10 +603,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId1");
 
-                    b.ToTable("ProductPrices", (string)null);
+                    b.ToTable("ProductPrices", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.SellerShop", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.SellerShop", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -675,10 +637,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("SellerId")
                         .IsUnique();
 
-                    b.ToTable("SellerShops", (string)null);
+                    b.ToTable("SellerShops", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.SellerWarehouse", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.SellerWarehouse", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -700,7 +662,7 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "FullAddress", "SimpleECommerceBackend.Domain.Entities.SellerWarehouse.FullAddress#Address", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "FullAddress", "SimpleECommerceBackend.Domain.Entities.Business.SellerWarehouse.FullAddress#Address", b1 =>
                         {
                             b1.IsRequired();
 
@@ -725,10 +687,10 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("SellerShopId");
 
-                    b.ToTable("SellerWarehouses", (string)null);
+                    b.ToTable("SellerWarehouses", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.UserProfile", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -775,29 +737,64 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasFilter("[Status] <> 99");
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles", "business");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Cart", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Translation.TranslationEntry", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Customer")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntityName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid>("RowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityName", "FieldName", "RowId", "Locale")
+                        .IsUnique();
+
+                    b.ToTable("Translations", "translation");
+                });
+
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Cart", b =>
+                {
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Customer")
                         .WithOne()
-                        .HasForeignKey("SimpleECommerceBackend.Domain.Entities.Cart", "CustomerId")
+                        .HasForeignKey("SimpleECommerceBackend.Domain.Entities.Business.Cart", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.CartItem", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.CartItem", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Cart", "Cart")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Cart", "Cart")
                         .WithMany("CartItems")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", "Product")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -808,9 +805,9 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Category", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Category", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Admin")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Admin")
                         .WithMany()
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -819,9 +816,9 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Admin");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.CustomerShippingAddress", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.CustomerShippingAddress", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Customer")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -830,26 +827,15 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.EmailVerification", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Inventory", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Inventory", b =>
-                {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", "Product")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.SellerWarehouse", "SellerWarehouse")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.SellerWarehouse", "SellerWarehouse")
                         .WithMany()
                         .HasForeignKey("SellerWarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -860,9 +846,9 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("SellerWarehouse");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Notification", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "User")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -871,15 +857,15 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Order", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Order", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Customer")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Seller")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Seller")
                         .WithMany()
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -890,15 +876,15 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.OrderItem", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.OrderItem", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Order", "Order")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", "Product")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -909,9 +895,9 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Payment", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Payment", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Order", "Order")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Order", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -920,15 +906,15 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Product", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Product", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Category", "Category")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Seller")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Seller")
                         .WithMany()
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -939,9 +925,9 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.ProductImage", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.ProductImage", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", "Product")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", "Product")
                         .WithMany("ProductImages")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -950,35 +936,35 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.ProductPrice", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.ProductPrice", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", "Product")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Product", null)
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.Product", null)
                         .WithMany("ProductPrices")
                         .HasForeignKey("ProductId1");
 
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.SellerShop", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.SellerShop", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.UserProfile", "Seller")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.UserProfile", "Seller")
                         .WithOne()
-                        .HasForeignKey("SimpleECommerceBackend.Domain.Entities.SellerShop", "SellerId")
+                        .HasForeignKey("SimpleECommerceBackend.Domain.Entities.Business.SellerShop", "SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.SellerWarehouse", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.SellerWarehouse", b =>
                 {
-                    b.HasOne("SimpleECommerceBackend.Domain.Entities.SellerShop", "SellerShop")
+                    b.HasOne("SimpleECommerceBackend.Domain.Entities.Business.SellerShop", "SellerShop")
                         .WithMany("SellerWarehouses")
                         .HasForeignKey("SellerShopId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -987,24 +973,24 @@ namespace SimpleECommerceBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("SellerShop");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Cart", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Cart", b =>
                 {
                     b.Navigation("CartItems");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Order", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Product", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.Product", b =>
                 {
                     b.Navigation("ProductImages");
 
                     b.Navigation("ProductPrices");
                 });
 
-            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.SellerShop", b =>
+            modelBuilder.Entity("SimpleECommerceBackend.Domain.Entities.Business.SellerShop", b =>
                 {
                     b.Navigation("SellerWarehouses");
                 });

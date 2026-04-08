@@ -1,27 +1,27 @@
 using SimpleECommerceBackend.Api.DTOs.Errors;
+using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Api.Middleware;
 
-/// <summary>
-///     Global exception handler middleware.
-///     Catches all unhandled exceptions and map to appropriate HTTP responses.
-/// </summary>
 public sealed class GlobalExceptionHandlerMiddleware
 {
     private readonly IHostEnvironment _environment;
     private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
     private readonly RequestDelegate _next;
+    private readonly IStaticTextLocalizer _staticTextLocalizer;
 
     public GlobalExceptionHandlerMiddleware(
         RequestDelegate next,
         ILogger<GlobalExceptionHandlerMiddleware> logger,
-        IHostEnvironment environment
+        IHostEnvironment environment,
+        IStaticTextLocalizer staticTextLocalizer
     )
     {
         _next = next;
         _logger = logger;
         _environment = environment;
+        _staticTextLocalizer = staticTextLocalizer;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -38,13 +38,11 @@ public sealed class GlobalExceptionHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        // Log exception với appropriate level
         LogException(exception);
 
-        // Map exception to HTTP response
-        var (statusCode, errorResponse) = MapExceptionToResponse(context, exception);
+        var locale = ResolveLocale(context);
+        var (statusCode, errorResponse) = MapExceptionToResponse(context, exception, locale);
 
-        // Set response
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
 
@@ -53,167 +51,165 @@ public sealed class GlobalExceptionHandlerMiddleware
 
     private void LogException(Exception exception)
     {
-        switch (exception)
+        if (exception is ExceptionBase ex)
         {
-            case BusinessException:
-            case NotFoundException:
-            case ConflictException:
-                // Expected exceptions - log as warning
-                _logger.LogWarning(exception,
-                    "Domain exception occurred: {ExceptionType} - {Message}",
-                    exception.GetType().Name,
-                    exception.Message);
-                break;
-
-            case UnauthorizedException:
-            case ForbiddenException:
-                // Security-related - log as warning with details
-                _logger.LogWarning(exception,
-                    "Security exception occurred: {ExceptionType} - {Message}",
-                    exception.GetType().Name,
-                    exception.Message);
-                break;
-
-            default:
-                // Unexpected exceptions - log as error
-                _logger.LogError(exception,
-                    "Unhandled exception occurred: {ExceptionType} - {Message}",
-                    exception.GetType().Name,
-                    exception.Message);
-                break;
+            _logger.LogError(
+                ex,
+                "Handled exception occurred: {ExceptionType} - {Message}",
+                ex.GetType().Name,
+                ex.InternalMessage
+            );
+        }
+        else
+        {
+            _logger.LogError(
+                exception,
+                "Unhandled exception occurred: {ExceptionType} - {Message}",
+                exception.GetType().Name,
+                exception.Message
+            );
         }
     }
 
-    private (int StatusCode, ErrorResponse Response) MapExceptionToResponse(HttpContext context, Exception exception)
+    private (int StatusCode, ErrorResponse Response) MapExceptionToResponse(
+        HttpContext context,
+        Exception exception,
+        string locale
+    )
     {
         return exception switch
         {
-            BusinessException domainException => (
+            ValidationException validationException => (
                 StatusCodes.Status422UnprocessableEntity,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc4918#section-11.2",
-                    Title = "One or more validation errors occurred",
-                    Status = StatusCodes.Status422UnprocessableEntity,
-                    Detail = domainException.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null
-                }
+                CreateErrorResponse(
+                    context,
+                    validationException,
+                    StatusCodes.Status422UnprocessableEntity,
+                    "Problem.Validation",
+                    "https://tools.ietf.org/html/rfc4918#section-11.2",
+                    locale
+                )
             ),
 
-            // BusinessException businessEx => (
-            //     StatusCodes.Status400BadRequest,
-            //     new ErrorResponse
-            //     {
-            //         Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            //         Title = "Business rule violation",
-            //         Status = StatusCodes.Status400BadRequest,
-            //         Detail = businessEx.Message,
-            //         Instance = context.Request.Path,
-            //         TraceId = context.TraceIdentifier,
-            //         Extensions = businessEx.Code is not null
-            //             ? new Dictionary<string, object> { ["code"] = businessEx.Code }
-            //             : null
-            //     }
-            // ),
-
-            NotFoundException notFoundEx => (
+            ResourceNotFoundException notFoundException => (
                 StatusCodes.Status404NotFound,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-                    Title = "Resource not found",
-                    Status = StatusCodes.Status404NotFound,
-                    Detail = notFoundEx.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-                    Extensions = _environment.IsDevelopment() ? new Dictionary<string, object>
-                    {
-                        ["entityName"] = notFoundEx.EntityName,
-                        ["entityId"] = notFoundEx.EntityId
-                    } : null
-                }
+                CreateErrorResponse(
+                    context,
+                    notFoundException,
+                    StatusCodes.Status404NotFound,
+                    "Problem.NotFound",
+                    "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+                    locale
+                )
             ),
 
-            ConflictException conflictEx => (
+            ConflictException conflictException => (
                 StatusCodes.Status409Conflict,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
-                    Title = "Resource conflict",
-                    Status = StatusCodes.Status409Conflict,
-                    Detail = conflictEx.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-                    Extensions = (_environment.IsDevelopment()
-                        && conflictEx.EntityName is not null
-                        && conflictEx.ConflictingField is not null)
-                        ? new Dictionary<string, object>
-                        {
-                            ["entityName"] = conflictEx.EntityName,
-                            ["conflictingField"] = conflictEx.ConflictingField,
-                            ["conflictingValue"] = conflictEx.ConflictingValue ?? string.Empty
-                        }
-                        : null
-                }
+                CreateErrorResponse(
+                    context,
+                    conflictException,
+                    StatusCodes.Status409Conflict,
+                    "Problem.Conflict",
+                    "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+                    locale
+                )
             ),
 
-            UnauthorizedException unauthorizedEx => (
+            UnauthorizedException unauthorizedException => (
                 StatusCodes.Status401Unauthorized,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-                    Title = "Unauthorized",
-                    Status = StatusCodes.Status401Unauthorized,
-                    Detail = unauthorizedEx.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null
-                }
+                CreateErrorResponse(
+                    context,
+                    unauthorizedException,
+                    StatusCodes.Status401Unauthorized,
+                    "Problem.Unauthorized",
+                    "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    locale
+                )
             ),
 
-            ForbiddenException forbiddenEx => (
+            ForbiddenException forbiddenException => (
                 StatusCodes.Status403Forbidden,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-                    Title = "Forbidden",
-                    Status = StatusCodes.Status403Forbidden,
-                    Detail = forbiddenEx.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-                    Extensions = (_environment.IsDevelopment() && forbiddenEx.Resource is not null)
-                        ? new Dictionary<string, object>
-                        {
-                            ["resource"] = forbiddenEx.Resource,
-                            ["action"] = forbiddenEx.Action ?? string.Empty
-                        }
-                        : null
-                }
+                CreateErrorResponse(
+                    context,
+                    forbiddenException,
+                    StatusCodes.Status403Forbidden,
+                    "Problem.Forbidden",
+                    "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+                    locale
+                )
             ),
 
-            // Catch-all for unexpected exceptions
             _ => (
                 StatusCodes.Status500InternalServerError,
                 new ErrorResponse
                 {
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                    Title = "An error occurred while processing your request",
+                    Title = _staticTextLocalizer.LocalizeProblemTitle("Problem.Unexpected", locale),
                     Status = StatusCodes.Status500InternalServerError,
-                    Detail = _environment.IsDevelopment()
-                        ? exception.Message
-                        : "An unexpected error occurred. Please try again later.",
+                    Message = exception.Message,
                     Instance = context.Request.Path,
                     TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-                    // Include stack trace only in development
-                    Extensions = _environment.IsDevelopment()
-                        ? new Dictionary<string, object>
-                        {
-                            ["stackTrace"] = exception.StackTrace ?? string.Empty,
-                            ["exceptionType"] = exception.GetType().FullName ?? string.Empty
-                        }
-                        : null
+                    Extensions = new Dictionary<string, object>
+                    {
+                        ["locale"] = locale
+                    }
                 }
             )
         };
+    }
+
+    private ErrorResponse CreateErrorResponse(
+        HttpContext context,
+        ExceptionBase exception,
+        int statusCode,
+        string titleKey,
+        string type,
+        string locale
+    )
+    {
+        var localizedError = _staticTextLocalizer.LocalizeError(exception.ErrorCode, exception.Details, locale);
+        var extensions = new Dictionary<string, object>
+        {
+            ["errorCode"] = exception.ErrorCode,
+            ["locale"] = locale
+        };
+
+        if (exception.Details is not null)
+            extensions["details"] = exception.Details;
+
+        if (!string.IsNullOrWhiteSpace(localizedError.FieldKey))
+            extensions["field"] = localizedError.FieldKey;
+
+        if (!string.IsNullOrWhiteSpace(localizedError.FieldDisplayName))
+            extensions["fieldDisplayName"] = localizedError.FieldDisplayName;
+
+        if (_environment.IsDevelopment() && !string.IsNullOrWhiteSpace(exception.InternalMessage))
+            extensions["internalMessage"] = exception.InternalMessage;
+
+        return new ErrorResponse
+        {
+            Type = type,
+            Title = _staticTextLocalizer.LocalizeProblemTitle(titleKey, locale),
+            Status = statusCode,
+            Message = localizedError.Message,
+            Instance = context.Request.Path,
+            TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
+            Errors = string.IsNullOrWhiteSpace(localizedError.FieldKey)
+                ? null
+                : new Dictionary<string, string[]>
+                {
+                    [localizedError.FieldKey] = [localizedError.Message]
+                },
+            Extensions = extensions
+        };
+    }
+
+    private static string ResolveLocale(HttpContext context)
+    {
+        var header = context.Request.Headers.AcceptLanguage.ToString();
+        if (string.IsNullOrWhiteSpace(header))
+            return "en";
+
+        return header.Split(',', ';')[0].Trim().ToLowerInvariant();
     }
 }

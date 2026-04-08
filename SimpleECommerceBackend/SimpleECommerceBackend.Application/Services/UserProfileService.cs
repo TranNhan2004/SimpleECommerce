@@ -1,0 +1,32 @@
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Exceptions;
+
+namespace SimpleECommerceBackend.Application.Services;
+
+[AutoConstructor]
+public partial class UserProfileService : IUserProfileService
+{
+    private readonly IUserProfileRepository _userProfileRepository;
+
+    public async Task<UserProfile> GetByIdAsync(Guid id)
+    {
+        return await _userProfileRepository.FindByIdAsync(id, false)
+            ?? throw new ResourceNotFoundException(
+                UserProfileErrorCode.NotFoundById,
+                $"User profile with Id = {id} not found."
+            );
+    }
+
+    public async Task<UserProfile> GetByIdForUpdateAsync(Guid id)
+    {
+        return await _userProfileRepository.FindByIdAsync(id, true)
+            ?? throw new ResourceNotFoundException(
+                UserProfileErrorCode.NotFoundById,
+                $"User profile with Id = {id} not found."
+            );
+    }
+
+}

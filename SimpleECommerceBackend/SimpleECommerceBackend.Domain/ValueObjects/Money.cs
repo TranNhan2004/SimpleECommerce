@@ -1,4 +1,5 @@
 using NodaMoney;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.ValueObjects;
@@ -8,10 +9,24 @@ public readonly record struct Money
     public Money(decimal amount, string currency)
     {
         if (amount < 0)
-            throw new BusinessException("Money amount cannot be negative");
+            throw new ValidationException(
+                MoneyErrorCode.AmountCannotBeNegative,
+                "Money amount cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Amount"
+                }
+            );
 
         if (string.IsNullOrWhiteSpace(currency))
-            throw new BusinessException("Currency is required");
+            throw new ValidationException(
+                MoneyErrorCode.CurrencyRequired,
+                "Currency is required",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Currency"
+                }
+            );
 
         try
         {
@@ -22,7 +37,15 @@ public readonly record struct Money
         }
         catch (Exception)
         {
-            throw new BusinessException($"Currency '{currency}' is not supported");
+            throw new ValidationException(
+                MoneyErrorCode.CurrencyUnsupported,
+                $"Currency '{currency}' is not supported",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Currency",
+                    ["value"] = currency
+                }
+            );
         }
     }
 
@@ -33,7 +56,16 @@ public readonly record struct Money
     private static void CheckSameCurrency(Money a, Money b)
     {
         if (a.Currency != b.Currency)
-            throw new BusinessException($"Currency mismatch: Cannot operate between {a.Currency} and {b.Currency}");
+            throw new ValidationException(
+                MoneyErrorCode.CurrencyMismatch,
+                $"Currency mismatch: Cannot operate between {a.Currency} and {b.Currency}",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Currency",
+                    ["left"] = a.Currency,
+                    ["right"] = b.Currency
+                }
+            );
     }
 
     public override string ToString()
@@ -54,7 +86,15 @@ public readonly record struct Money
     {
         CheckSameCurrency(a, b);
         var result = a.Amount - b.Amount;
-        if (result < 0) throw new BusinessException("Result of subtraction cannot be negative");
+        if (result < 0)
+            throw new ValidationException(
+                MoneyErrorCode.ResultCannotBeNegative,
+                "Result of subtraction cannot be negative",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Result"
+                }
+            );
         return new Money(result, a.Currency);
     }
 

@@ -137,7 +137,7 @@ builder.Services.AddAuthentication(options =>
 | `/api/v1/auth/login` | POST | Login user |
 | `/api/v1/auth/refresh` | POST | Refresh access token |
 
-**Implementation**: Uses Keycloak OAuth2/OIDC for authentication. Endpoints proxy requests to Keycloak server and maintain local UserProfile synchronization.
+**Target Implementation**: The frontend should authenticate directly with Keycloak using the browser authorization-code flow with PKCE. The backend should not broker interactive login or refresh; it should accept Keycloak access tokens and keep only business-profile synchronization where needed.
 
 ---
 
@@ -150,14 +150,13 @@ builder.Services.AddAuthentication(options =>
 - Command: `SimpleECommerceBackend.Application.Models.Auth.Login.LoginCommand`
 - Result: `SimpleECommerceBackend.Application.Models.Auth.Login.LoginResult`
 
-**Current Flow**:
+**Target Flow**:
 
-1. Authenticate with Keycloak via `IKeycloakTokenService`
-2. Get user information from Keycloak token
-3. Find local UserProfile by Keycloak user ID
-4. Auto-create UserProfile if not exists (for existing Keycloak users)
-5. Extract role from Keycloak token claims
-6. Return user profile with Keycloak tokens
+1. The SPA redirects the browser to Keycloak
+2. Keycloak authenticates the user and returns tokens to the SPA
+3. The SPA calls the backend with the access token in `Authorization: Bearer ...`
+4. The backend validates the token and loads or creates the local `UserProfile` when needed
+5. User identity is mapped by the Keycloak `sub` claim
 
 **Security**: Authentication handled by Keycloak OAuth2/OIDC. Tokens are JWT format with configurable expiration times.
 
@@ -172,14 +171,11 @@ builder.Services.AddAuthentication(options =>
 - Command: `SimpleECommerceBackend.Application.Models.Auth.Register.RegisterCommand`
 - Result: `SimpleECommerceBackend.Application.Models.Auth.Register.RegisterResult`
 
-**Current Flow**:
+**Target Flow**:
 
-1. Check if user exists in Keycloak
-2. Validate role (customer, seller, admin)
-3. Create user in Keycloak via `IKeycloakAdminService`
-4. Create local UserProfile with Keycloak user UUID
-5. Save to database
-6. Return success response
+1. Keycloak owns registration, password reset, email verification, and account management
+2. The backend may still create or update a local `UserProfile` after the user authenticates, but it should not own the interactive registration experience
+3. If the project keeps an onboarding endpoint, it should only bootstrap business data after a valid Keycloak session exists
 
 **Post-Registration**: User accounts are immediately active in Keycloak. Email verification can be configured in Keycloak realm settings.
 
@@ -194,11 +190,11 @@ builder.Services.AddAuthentication(options =>
 - Command: `SimpleECommerceBackend.Application.Models.Auth.RefreshToken.RefreshTokenCommand`
 - Result: `SimpleECommerceBackend.Application.Models.Auth.RefreshToken.RefreshTokenResult`
 
-**Current Flow**:
+**Target Flow**:
 
-1. Receive refresh token from client
-2. Send refresh request to Keycloak via `IKeycloakTokenService`
-3. Return new access token and refresh token
+1. The SPA handles token renewal through Keycloak
+2. The backend does not proxy refresh tokens for browser users
+3. If a server-side client needs refresh or service-account access, that is a separate machine-to-machine concern
 
 **Security**: Stateless token refresh handled entirely by Keycloak.
 
@@ -224,8 +220,8 @@ Deprecated use cases from custom authentication system:
 
 **Services**:
 
-- **KeycloakTokenService**: Token generation, refresh, and user info retrieval
-- **KeycloakAdminService**: User management operations (create, update, delete, role assignment)
+- **KeycloakTokenService**: Legacy helper for backend-mediated auth flows; not part of the preferred SPA login path
+- **KeycloakAdminService**: User management operations for backend provisioning and admin tasks
 
 **Configuration**: Configured via `appsettings.json` with Keycloak server URL, realm, and client credentials.
 
@@ -252,12 +248,18 @@ Deprecated use cases from custom authentication system:
 
 ### 6. Authentication Architecture
 
-**Previous System** (Deprecated):
+**Deprecated System**:
 
 - Custom JWT generation via `IJwtGenerator`
 - BCrypt password hashing via `IPasswordHasher`
 - Credential entity for storing passwords
-- Custom token claims
+- Backend-owned login and refresh flow
+
+**Target System**:
+
+- Keycloak handles interactive authentication in the browser
+- The SPA receives tokens directly from Keycloak
+- The backend validates Keycloak bearer tokens and uses the `sub` claim to map the local profile
 
 **Current System** (Keycloak):
 

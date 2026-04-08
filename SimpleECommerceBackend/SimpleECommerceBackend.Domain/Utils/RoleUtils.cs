@@ -1,57 +1,39 @@
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Utils;
 
 public static class RoleUtils
 {
-    private static readonly Role[] SupportedRoles =
-    [
-        Role.Customer,
-        Role.Seller,
-        Role.Admin
-    ];
-
     public static Role DefaultRole => Role.Customer;
+
+    public const string RequireAdminRole = "__SimpleECommerce_RequireAdminRole__";
+    public const string RequireSellerRole = "__SimpleECommerce_RequireSellerRole__";
+    public const string RequireCustomerRole = "__SimpleECommerce_RequireCustomerRole__";
 
     public static IReadOnlyList<Role> GetSupportedRoles()
     {
-        return SupportedRoles;
+        return EnumUtils.GetSupportedValues<Role>();
     }
 
     public static IReadOnlyList<string> GetSupportedRoleNames()
     {
-        return SupportedRoles.Select(ToKeycloakRoleName).ToArray();
+        return EnumUtils.GetSupportedNames<Role>(ToKeycloakRoleName);
     }
 
     public static string GetSupportedRolesDisplay()
     {
-        return string.Join(", ", GetSupportedRoleNames());
+        return EnumUtils.GetSupportedDisplay<Role>(ToKeycloakRoleName);
     }
 
     public static Role Parse(string? input)
     {
-        if (TryParse(input, out var role))
-            return role;
-
-        throw new BusinessException($"Invalid role. Must be one of: {GetSupportedRolesDisplay()}");
+        return EnumUtils.Parse<Role>(input, "Role", RoleErrorCode.InvalidRole, ToKeycloakRoleName);
     }
 
     public static bool TryParse(string? input, out Role role)
     {
-        role = DefaultRole;
-
-        if (string.IsNullOrWhiteSpace(input))
-            return false;
-
-        var normalized = input.Trim().ToLowerInvariant();
-        return normalized switch
-        {
-            "customer" => Assign(Role.Customer, out role),
-            "seller" => Assign(Role.Seller, out role),
-            "admin" => Assign(Role.Admin, out role),
-            _ => false
-        };
+        return EnumUtils.TryParse(input, out role, ToKeycloakRoleName);
     }
 
     public static Role ResolvePrimaryRole(IEnumerable<string>? roleNames)
@@ -70,18 +52,6 @@ public static class RoleUtils
 
     public static string ToKeycloakRoleName(Role role)
     {
-        return role switch
-        {
-            Role.Customer => "customer",
-            Role.Seller => "seller",
-            Role.Admin => "admin",
-            _ => throw new BusinessException($"Unsupported role value: {role}")
-        };
-    }
-
-    private static bool Assign(Role parsedRole, out Role role)
-    {
-        role = parsedRole;
-        return true;
+        return EnumUtils.ToName(role, "Role", RoleErrorCode.UnsupportedRole, value => value.ToString().ToLowerInvariant());
     }
 }

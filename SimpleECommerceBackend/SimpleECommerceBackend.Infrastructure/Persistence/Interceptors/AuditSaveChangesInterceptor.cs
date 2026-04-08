@@ -8,7 +8,8 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
-        InterceptionResult<int> result)
+        InterceptionResult<int> result
+    )
     {
         ApplyAudit(eventData.Context);
         return base.SavingChanges(eventData, result);
@@ -17,7 +18,8 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         ApplyAudit(eventData.Context);
         return base.SavingChangesAsync(eventData, result, cancellationToken);

@@ -1,5 +1,6 @@
 using FluentAssertions;
-using SimpleECommerceBackend.Domain.Entities;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
@@ -10,17 +11,12 @@ public class OrderItemTests
     [Fact]
     public void Create_ShouldCreateOrderItem_WhenInputIsValid()
     {
-        // Arrange
-        var productId = Guid.Parse("6984453b-0a40-4f24-833a-ad6649374fce");
-        var orderId = Guid.Parse("7895564c-1b51-4a35-944b-be7750485fde");
+        var productId = Guid.NewGuid();
+        var orderId = Guid.NewGuid();
         var quantity = 5;
         var currentPrice = new Money(100000, "VND");
-
-        // Act
         var orderItem = OrderItem.Create(productId, orderId, quantity, currentPrice);
 
-        // Assert
-        orderItem.Should().NotBeNull();
         orderItem.ProductId.Should().Be(productId);
         orderItem.OrderId.Should().Be(orderId);
         orderItem.Quantity.Should().Be(quantity);
@@ -32,33 +28,44 @@ public class OrderItemTests
     [InlineData(-1)]
     public void Create_ShouldThrow_WhenQuantityIsNotPositive(int quantity)
     {
-        // Arrange
-        var productId = Guid.Parse("6984453b-0a40-4f24-833a-ad6649374fce");
-        var orderId = Guid.Parse("7895564c-1b51-4a35-944b-be7750485fde");
+        var productId = Guid.NewGuid();
+        var orderId = Guid.NewGuid();
         var currentPrice = new Money(100000, "VND");
-
-        // Act
         var act = () => OrderItem.Create(productId, orderId, quantity, currentPrice);
 
-        // Assert
-        var exception = act.Should().Throw<BusinessException>().Which;
-        exception.Message.Should().Be("Quantity must be greater than zero");
+        act.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(OrderItemErrorCode.QuantityMustBeGreaterThanZero);
+    }
+
+    [Fact]
+    public void Create_ShouldThrowValidationException_WhenOrderIdIsEmpty()
+    {
+        var action = () => OrderItem.Create(Guid.NewGuid(), Guid.Empty, 1, new Money(100000, "VND"));
+
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be(OrderItemErrorCode.OrderIdRequired);
+    }
+
+    [Fact]
+    public void SetCurrentPrice_ShouldThrowValidationException_WhenAmountIsNegative()
+    {
+        var orderItem = OrderItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1, new Money(100000, "VND"));
+        var action = () => orderItem.SetCurrentPrice(new Money(-1, "VND"));
+
+        action.Should().Throw<ValidationException>()
+            .Which.ErrorCode.Should().Be("Money_AmountCannotBeNegative");
     }
 
     [Fact]
     public void GetLineTotal_ShouldCalculateCorrectly()
     {
-        // Arrange
-        var productId = Guid.Parse("6984453b-0a40-4f24-833a-ad6649374fce");
-        var orderId = Guid.Parse("7895564c-1b51-4a35-944b-be7750485fde");
+        var productId = Guid.NewGuid();
+        var orderId = Guid.NewGuid();
         var quantity = 5;
         var currentPrice = new Money(100000, "VND");
         var orderItem = OrderItem.Create(productId, orderId, quantity, currentPrice);
-
-        // Act
         var lineTotal = orderItem.GetLineTotal();
 
-        // Assert
         lineTotal.Amount.Should().Be(500000);
         lineTotal.Currency.Should().Be("VND");
     }

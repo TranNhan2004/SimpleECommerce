@@ -36,6 +36,8 @@ services:
       KC_HOSTNAME_PORT: 8080
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT_HTTPS: false
+    volumes:
+      - ./keycloak-theme:/opt/keycloak/themes/simple-e-commerce
     command: start-dev
     ports:
       - "8080:8080"
@@ -63,6 +65,8 @@ services:
     restart: unless-stopped
     networks:
       - default
+    profiles:
+      - tunnel
 
 volumes:
   sqlserver_data:

@@ -1,8 +1,9 @@
-using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
+using SimpleECommerceBackend.Infrastructure.Options.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;
 

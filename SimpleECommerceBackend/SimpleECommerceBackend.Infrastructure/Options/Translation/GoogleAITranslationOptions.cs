@@ -7,6 +7,6 @@ public sealed class GoogleAITranslationOptions
     public string ApiKey { get; init; } = null!;
     public string Model { get; init; } = null!;
     public double? Temperature { get; init; }
-    public int? MaxOutputTokens { get; init; }
-    public string SystemInstruction { get; init; } = null!;
+    public int? MaxOutputTokenCount { get; init; }
+    public string Instructions { get; init; } = null!;
 }

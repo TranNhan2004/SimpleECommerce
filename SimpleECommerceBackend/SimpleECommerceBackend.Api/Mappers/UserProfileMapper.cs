@@ -8,7 +8,7 @@ public class UserProfileMapper : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<UpdateUserProfileRequest, UpdateUserProfileCommand>();
-        config.NewConfig<UpdateUserProfileResult, UpdateUserProfileResponse>();
+        config.NewConfig<UpdateMyProfileRequest, UpdateMyProfileCommand>();
+        config.NewConfig<UpdateMyProfileResult, UpdateMyProfileResponse>();
     }
 }

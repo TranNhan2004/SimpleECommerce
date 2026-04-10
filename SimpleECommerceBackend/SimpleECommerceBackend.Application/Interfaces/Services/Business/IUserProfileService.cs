@@ -6,4 +6,6 @@ public interface IUserProfileService
 {
     Task<UserProfile> GetByIdForUpdateAsync(Guid id);
     Task<UserProfile> GetByIdAsync(Guid id);
+
+    Task InvalidateCacheAsync(Guid id);
 }

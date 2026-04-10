@@ -1,6 +1,6 @@
 namespace SimpleECommerceBackend.Api.DTOs.UserProfiles;
 
-public class UpdateUserProfileRequest
+public class UpdateMyProfileRequest
 {
     public string FirstName { get; init; } = null!;
     public string LastName { get; init; } = null!;

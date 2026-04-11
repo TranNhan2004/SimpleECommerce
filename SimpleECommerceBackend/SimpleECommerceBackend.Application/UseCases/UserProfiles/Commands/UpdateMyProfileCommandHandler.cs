@@ -22,11 +22,16 @@ public partial class UpdateMyProfileCommandHandler : IRequestHandler<UpdateMyPro
         var currentUser = _userContextHolder.GetUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
-        userProfile.SetFirstName(request.FirstName);
-        userProfile.SetLastName(request.LastName);
-        userProfile.SetNickName(request.NickName);
-        userProfile.SetSex(SexUtils.Parse(request.Sex));
-        userProfile.SetBirthDate(request.BirthDate);
+        if (request.FirstName is not null)
+            userProfile.SetFirstName(request.FirstName);
+        if (request.LastName is not null)
+            userProfile.SetLastName(request.LastName);
+        if (request.Sex is not null)
+            userProfile.SetSex(SexUtils.Parse(request.Sex));
+        if (request.NickName is not null)
+            userProfile.SetNickName(request.NickName);
+        if (request.BirthDate.HasValue)
+            userProfile.SetBirthDate(request.BirthDate.Value);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userProfileService.InvalidateCacheAsync(userProfile.Id);

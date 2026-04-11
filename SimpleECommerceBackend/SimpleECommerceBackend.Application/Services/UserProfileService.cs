@@ -11,48 +11,41 @@ namespace SimpleECommerceBackend.Application.Services;
 [AutoConstructor]
 public partial class UserProfileService : IUserProfileService
 {
-    private readonly IUserProfileRepository _userProfileRepository;
     private readonly ICacheService _cacheService;
+    private readonly IUserProfileRepository _userProfileRepository;
 
     public async Task<UserProfile> GetByIdAsync(Guid id)
     {
         if (id == Guid.Empty)
-        {
             throw new ResourceNotFoundException(
                 UserProfileErrorCode.NotFoundById,
                 $"User profile with Id = {id} not found."
             );
-        }
 
         var cachedProfile = await _cacheService.GetAsync<UserProfile>(UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()));
-        if (cachedProfile != null)
-        {
-            return cachedProfile;
-        }
-        else
-        {
-            var userProfile = await _userProfileRepository.FindByIdAsync(id, false)
-                ?? throw new ResourceNotFoundException(
-                    UserProfileErrorCode.NotFoundById,
-                    $"User profile with Id = {id} not found."
-                );
+        if (cachedProfile != null) return cachedProfile;
 
-            await _cacheService.SetAsync(
-                UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()),
-                userProfile,
-                TimeSpan.FromMinutes(UserProfileCacheKey.GetProfileTtlMinutes)
-            );
-            return userProfile;
-        }
+        var userProfile = await _userProfileRepository.FindByIdAsync(id)
+                          ?? throw new ResourceNotFoundException(
+                              UserProfileErrorCode.NotFoundById,
+                              $"User profile with Id = {id} not found."
+                          );
+
+        await _cacheService.SetAsync(
+            UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()),
+            userProfile,
+            TimeSpan.FromMinutes(UserProfileCacheKey.GetProfileTtlMinutes)
+        );
+        return userProfile;
     }
 
     public async Task<UserProfile> GetByIdForUpdateAsync(Guid id)
     {
         return await _userProfileRepository.FindByIdAsync(id, true)
-            ?? throw new ResourceNotFoundException(
-                UserProfileErrorCode.NotFoundById,
-                $"User profile with Id = {id} not found."
-            );
+               ?? throw new ResourceNotFoundException(
+                   UserProfileErrorCode.NotFoundById,
+                   $"User profile with Id = {id} not found."
+               );
     }
 
     public async Task InvalidateCacheAsync(Guid id)

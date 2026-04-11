@@ -336,7 +336,8 @@
       "NickNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
       "BirthDateCannotBeFuture": "{field} không được ở tương lai.",
       "AgeCannotBeLessThan": "{field} không được nhỏ hơn {min}.",
-      "AgeCannotExceed": "{field} không được vượt quá {max}."
+      "AgeCannotExceed": "{field} không được vượt quá {max}.",
+      "NotFoundById": "Không tìm thấy thông tin người dùng."
     },
     "VnAddress": {
       "AddressInvalid": "{field} không hợp lệ.",

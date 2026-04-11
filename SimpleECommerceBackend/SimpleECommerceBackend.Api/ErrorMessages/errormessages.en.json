@@ -336,7 +336,8 @@
       "NickNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
       "BirthDateCannotBeFuture": "{field} cannot be in the future.",
       "AgeCannotBeLessThan": "{field} cannot be less than {min}.",
-      "AgeCannotExceed": "{field} cannot exceed {max}."
+      "AgeCannotExceed": "{field} cannot exceed {max}.",
+      "NotFoundById": "User profile not found."
     },
     "VnAddress": {
       "AddressInvalid": "{field} is invalid.",

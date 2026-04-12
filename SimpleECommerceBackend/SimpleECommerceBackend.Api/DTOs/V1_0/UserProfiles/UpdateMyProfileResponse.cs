@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Api.DTOs.UserProfiles;
+namespace SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
 
-public class GetMyProfileResponse
+public class UpdateMyProfileResponse
 {
     public Guid Id { get; init; }
     public string Email { get; init; } = null!;

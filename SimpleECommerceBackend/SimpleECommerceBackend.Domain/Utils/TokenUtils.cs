@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Utils;
 
-public class TokenUtils
+public static class TokenUtils
 {
     public static string CreateVerificationToken()
     {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace SimpleECommerceBackend.Api.Controllers;
+namespace SimpleECommerceBackend.Api.Controllers.V1_0;
 
 [EnableRateLimiting("ip-route")]
 [Route("api/v{version:apiVersion}/health-check")]

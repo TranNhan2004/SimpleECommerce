@@ -82,14 +82,13 @@ public static class DependencyInjection
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
         services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
         services.AddScoped<ITranslationEntryRepository, TranslationEntryRepository>();
-        services.AddScoped<ITranslationProvider, GoogleAITranslationProvider>();
-
-        // services.AddSingleton<NullTranslationProvider>();
-        // services.AddScoped<OpenAITranslationProvider>();
-        // services.AddScoped<GoogleAITranslationProvider>();
-        // services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());
-        // services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<OpenAITranslationProvider>());
-        // services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<GoogleAITranslationProvider>());
+        
+        services.AddSingleton<NullTranslationProvider>();
+        services.AddScoped<OpenAITranslationProvider>();
+        services.AddScoped<GoogleAITranslationProvider>();
+        services.AddSingleton<ITranslationProvider>(sp => sp.GetRequiredService<NullTranslationProvider>());
+        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<OpenAITranslationProvider>());
+        services.AddScoped<ITranslationProvider>(sp => sp.GetRequiredService<GoogleAITranslationProvider>());
 
         // Database
         services.AddScoped<AuditSaveChangesInterceptor>();

@@ -1,5 +1,6 @@
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
-public class GetMyProfileQuery
+public class DeleteMyProfileCommand
 {
+    
 }

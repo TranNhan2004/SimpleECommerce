@@ -52,4 +52,5 @@ public partial class UserProfileService : IUserProfileService
     {
         await _cacheService.RemoveAsync(UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()));
     }
+    
 }

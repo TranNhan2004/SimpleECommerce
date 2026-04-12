@@ -10,7 +10,7 @@ namespace SimpleECommerceBackend.Api.Controllers;
 public class HealthCheckController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Healthy()
+    public IActionResult Healthy(CancellationToken cancellationToken)
     {
         return Ok("Healthy");
     }

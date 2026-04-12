@@ -4,18 +4,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY SimpleECommerce.sln .
+COPY SimpleECommerceBackend.Api/*.csproj SimpleECommerceBackend.Api/
+COPY SimpleECommerceBackend.Application/*.csproj SimpleECommerceBackend.Application/
+COPY SimpleECommerceBackend.Domain/*.csproj SimpleECommerceBackend.Domain/
+COPY SimpleECommerceBackend.Infrastructure/*.csproj SimpleECommerceBackend.Infrastructure/
 
-COPY SimpleECommerce.Api/*.csproj SimpleECommerce.Api/
-COPY SimpleECommerce.Application/*.csproj SimpleECommerce.Application/
-COPY SimpleECommerce.Domain/*.csproj SimpleECommerce.Domain/
-COPY SimpleECommerce.Infrastructure/*.csproj SimpleECommerce.Infrastructure/
-
-RUN dotnet restore
+RUN dotnet restore SimpleECommerceBackend.Api/SimpleECommerceBackend.Api.csproj
 
 COPY . .
 
-RUN dotnet publish SimpleECommerce.Api/SimpleECommerce.Api.csproj \
+RUN dotnet publish SimpleECommerceBackend.Api/SimpleECommerceBackend.Api.csproj \
     -c Release \
     -o /publish \
     /p:UseAppHost=false
@@ -26,11 +24,11 @@ RUN dotnet publish SimpleECommerce.Api/SimpleECommerce.Api.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 5001
 
-ENV ASPNETCORE_URLS=http://+:8080 \
+ENV ASPNETCORE_URLS=http://+:5001 \
     ASPNETCORE_ENVIRONMENT=Production
 
 COPY --from=build /publish .
 
-ENTRYPOINT ["dotnet", "SimpleECommerce.Api.dll"]
+ENTRYPOINT ["dotnet", "SimpleECommerceBackend.Api.dll"]

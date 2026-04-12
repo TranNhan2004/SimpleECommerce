@@ -1,11 +1,10 @@
-using MediatR;
-
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
-public record UpdateMyProfileCommand(
-    string? FirstName,
-    string? LastName,
-    string? NickName,
-    string? Sex,
-    DateOnly? BirthDate
-) : IRequest<UpdateMyProfileResult>;
+public class UpdateMyProfileCommand
+{
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
+    public string? NickName { get; init; }
+    public string? Sex { get; init; }
+    public DateOnly? BirthDate { get; init; }
+}

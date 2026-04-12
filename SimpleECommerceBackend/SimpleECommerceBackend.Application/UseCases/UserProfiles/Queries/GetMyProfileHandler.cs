@@ -1,18 +1,18 @@
-using MediatR;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Queries;
 
 [AutoConstructor]
-public partial class GetUserProfileQueryHandler : IRequestHandler<GetMyProfileQuery, GetMyProfileResult>
+public partial class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, GetMyProfileResult>
 {
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserProfileService _userProfileService;
 
-    public async Task<GetMyProfileResult> Handle(
+    public async Task<GetMyProfileResult> HandleAsync(
         GetMyProfileQuery request,
         CancellationToken cancellationToken
     )

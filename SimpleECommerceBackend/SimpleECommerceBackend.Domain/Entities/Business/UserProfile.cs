@@ -200,6 +200,15 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         AvatarUrl = avatarUrl;
     }
 
+    public void Archived()
+    {
+        if (Status == UserStatus.Archived)
+        {
+        }
+
+        Status = UserStatus.Archived;
+    }
+
     public static UserProfile Create(
         Guid keycloakUserId,
         string email,

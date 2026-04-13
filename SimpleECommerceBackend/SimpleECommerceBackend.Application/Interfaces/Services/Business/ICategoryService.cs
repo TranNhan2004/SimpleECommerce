@@ -4,5 +4,5 @@ namespace SimpleECommerceBackend.Application.Interfaces.Services.Business;
 
 public interface ICategoryService
 {
-    Task<IReadOnlyCollection<Category>> GetAllCategoriesAsync();
+    Task<IReadOnlyList<Category>> GetAllCategoriesAsync();
 }

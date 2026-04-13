@@ -17,7 +17,7 @@ public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQ
     {
         var categories = await _categoryService.GetAllCategoriesAsync();
 
-        return categories.Select(c => new GetAllCategoriesResult
+        return [..categories.Select(c => new GetAllCategoriesResult
         {
             Id = c.Id,
             Name = c.Name,
@@ -26,6 +26,6 @@ public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQ
             AdminId = c.AdminId,
             CreatedAt = c.CreatedAt,
             UpdatedAt = c.UpdatedAt
-        }).ToList();
+        })];
     }
 }

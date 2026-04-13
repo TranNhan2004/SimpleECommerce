@@ -11,7 +11,7 @@ public partial class CategoryService : ICategoryService
     private readonly ICacheService _cacheService;
     private readonly ICategoryRepository _categoryRepository;
 
-    public async Task<IReadOnlyCollection<Category>> GetAllCategoriesAsync()
+    public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
     {
         return await _categoryRepository.FindAllAsync();
     }

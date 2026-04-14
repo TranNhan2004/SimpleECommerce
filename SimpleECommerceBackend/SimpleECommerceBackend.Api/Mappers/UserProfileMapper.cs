@@ -13,5 +13,8 @@ public class UserProfileMapper : IRegister
 
         config.NewConfig<UpdateMyProfileRequest, UpdateMyProfileCommand>();
         config.NewConfig<UpdateMyProfileResult, UpdateMyProfileResponse>();
+
+        config.NewConfig<CreateMyProfileRequest, CreateMyProfileCommand>();
+        config.NewConfig<CreateMyProfileResult, CreateMyProfileResponse>();
     }
 }

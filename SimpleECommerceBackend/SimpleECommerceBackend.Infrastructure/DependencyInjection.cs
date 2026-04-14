@@ -25,6 +25,7 @@ using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
+using StackExchange.Redis;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -71,18 +72,16 @@ public static class DependencyInjection
 
         // Cache Services
         var redisOptions = configuration.GetRequiredOptions<RedisOptions>(RedisOptions.SectionName);
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = redisOptions.ConnectionString;
-            options.InstanceName = redisOptions.InstanceName;
-        });
-        services.AddScoped<ICacheService, DistributedCacheService>();
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(redisOptions.ConnectionString));
+
+        services.AddScoped<ICacheService, RedisCacheService>();
 
         // Translation Services
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();
         services.AddScoped<IDynamicTranslationService, DynamicTranslationService>();
         services.AddScoped<ITranslationEntryRepository, TranslationEntryRepository>();
-        
+
         services.AddSingleton<NullTranslationProvider>();
         services.AddScoped<OpenAITranslationProvider>();
         services.AddScoped<GoogleAITranslationProvider>();

@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
@@ -13,6 +14,12 @@ public partial class UserProfileService : IUserProfileService
 {
     private readonly ICacheService _cacheService;
     private readonly IUserProfileRepository _userProfileRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public UserProfile CreateUserProfile(UserProfile userProfile)
+    {
+        return _userProfileRepository.Add(userProfile);
+    }
 
     public async Task<UserProfile> GetByIdAsync(Guid id)
     {
@@ -48,9 +55,14 @@ public partial class UserProfileService : IUserProfileService
                );
     }
 
-    public async Task InvalidateCacheAsync(Guid id)
+    public async Task InvalidateCacheByIdAsync(Guid id)
     {
         await _cacheService.RemoveAsync(UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()));
     }
-    
+
+    public async Task InvalidateCacheByKeyAsync(string key)
+    {
+        await _cacheService.RemoveAsync(key);
+    }
+
 }

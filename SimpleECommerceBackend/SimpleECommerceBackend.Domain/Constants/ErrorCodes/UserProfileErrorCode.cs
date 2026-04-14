@@ -11,5 +11,7 @@ public static class UserProfileErrorCode
     public const string BirthDateCannotBeFuture = "UserProfile_BirthDateCannotBeFuture";
     public const string AgeCannotBeLessThan = "UserProfile_AgeCannotBeLessThan";
     public const string AgeCannotExceed = "UserProfile_AgeCannotExceed";
+    public const string ArchiveNotAllowed = "UserProfile_ArchiveNotAllowed";
+    public const string ActivateNotAllowed = "UserProfile_ActivateNotAllowed";
     public const string NotFoundById = "UserProfile_NotFoundById";
 }

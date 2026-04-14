@@ -202,6 +202,10 @@
       "UserIdInvalid": "ID người dùng hiện tại '{value}' không hợp lệ.",
       "RoleMissing": "Thiếu vai trò của người dùng hiện tại."
     },
+    "Authorization": {
+      "Unauthorized": "Bạn cần đăng nhập để truy cập tài nguyên này.",
+      "Forbidden": "Bạn không có quyền truy cập tài nguyên này."
+    },
     "CustomerShippingAddress": {
       "AlreadyDeleted": "{field} đã bị xóa.",
       "RecipientNameRequired": "{field} là bắt buộc.",

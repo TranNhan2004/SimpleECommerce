@@ -34,7 +34,7 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
             userProfile.SetBirthDate(request.BirthDate.Value);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateCacheAsync(userProfile.Id);
+        await _userProfileService.InvalidateCacheByIdAsync(userProfile.Id);
         return new UpdateMyProfileResult
         {
             Id = userProfile.Id,

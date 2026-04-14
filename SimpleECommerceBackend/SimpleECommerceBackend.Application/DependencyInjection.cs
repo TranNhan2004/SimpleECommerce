@@ -45,6 +45,7 @@ public static class DependencyInjection
                 t is { IsClass: true, IsAbstract: false } &&
                 !excludedSet.Contains(t));
 
+        Console.WriteLine($"Registering Use Case Handlers: {allTypes.Count()} found.");
         foreach (var implementationType in allTypes)
         {
             var serviceTypes = implementationType

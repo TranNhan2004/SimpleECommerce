@@ -1,4 +1,5 @@
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.DTOs.Errors;
@@ -18,7 +19,27 @@ public partial class UserProfileController : ControllerBase
     private readonly IUseCaseDispatcher _dispatcher;
     private readonly IMapper _mapper;
 
+    [HttpPost("me/info")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateMyProfileResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> CreateMyProfileAsync([FromBody] CreateMyProfileRequest request)
+    {
+        var command = _mapper.Map<CreateMyProfileCommand>(request);
+        var result = await _dispatcher.SendAsync<CreateMyProfileCommand, CreateMyProfileResult>(command);
+        var response = _mapper.Map<CreateMyProfileResponse>(result);
+        return Ok(response);
+    }
+
+
+
     [HttpGet("me/info")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMyProfileResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -35,6 +56,7 @@ public partial class UserProfileController : ControllerBase
     }
 
     [HttpPut("me/info")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateMyProfileResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

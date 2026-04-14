@@ -11,5 +11,8 @@ public class CategoryMapper : IRegister
         config.NewConfig<GetAllCategoriesRequest, GetAllCategoriesQuery>();
         config.NewConfig<GetAllCategoriesResult, GetAllCategoriesResponse>();
         config.NewConfig<GetAllCategoriesResult, GetAllCategoriesForAdminResponse>();
+
+        config.NewConfig<CreateCategoryForAdminRequest, CreateCategoryCommand>();
+        config.NewConfig<CreateCategoryResult, CreateCategoryForAdminResponse>();
     }
 }

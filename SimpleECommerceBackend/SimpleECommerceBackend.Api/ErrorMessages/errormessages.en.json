@@ -202,6 +202,10 @@
       "UserIdInvalid": "Current user ID '{value}' is invalid.",
       "RoleMissing": "Current user role is missing."
     },
+    "Authorization": {
+      "Unauthorized": "Authentication is required to access this resource.",
+      "Forbidden": "You do not have permission to access this resource."
+    },
     "CustomerShippingAddress": {
       "AlreadyDeleted": "{field} is already deleted.",
       "RecipientNameRequired": "{field} is required.",
@@ -337,12 +341,18 @@
       "BirthDateCannotBeFuture": "{field} cannot be in the future.",
       "AgeCannotBeLessThan": "{field} cannot be less than {min}.",
       "AgeCannotExceed": "{field} cannot exceed {max}.",
+      "ArchiveNotAllowed": "Cannot archive this user profile.",
+      "ActivateNotAllowed": "Cannot activate this user profile.",
       "NotFoundById": "User profile not found."
     },
     "VnAddress": {
       "AddressInvalid": "{field} is invalid.",
       "WardInvalid": "{field} is invalid.",
       "ProvinceInvalid": "{field} is invalid."
+    },
+    "UserStatus": {
+      "InvalidUserStatus": "{field} is invalid. Allowed values: {allowedValues}.",
+      "UnsupportedUserStatus": "{field} '{value}' is not supported."
     }
   }
 }

@@ -1,4 +1,5 @@
 using SimpleECommerceBackend.Api.DTOs.Errors;
+using SimpleECommerceBackend.Api.Factories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -40,8 +41,7 @@ public sealed class GlobalExceptionHandlerMiddleware
     {
         LogException(exception);
 
-        var locale = ResolveLocale(context);
-        var (statusCode, errorResponse) = MapExceptionToResponse(context, exception, locale);
+        var (statusCode, errorResponse) = MapExceptionToResponse(context, exception);
 
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
@@ -73,143 +73,80 @@ public sealed class GlobalExceptionHandlerMiddleware
 
     private (int StatusCode, ErrorResponse Response) MapExceptionToResponse(
         HttpContext context,
-        Exception exception,
-        string locale
+        Exception exception
     )
     {
         return exception switch
         {
             ValidationException validationException => (
                 StatusCodes.Status422UnprocessableEntity,
-                CreateErrorResponse(
+                ErrorResponseFactory.CreateFromException(
                     context,
                     validationException,
                     StatusCodes.Status422UnprocessableEntity,
                     "Problem.Validation",
                     "https://tools.ietf.org/html/rfc4918#section-11.2",
-                    locale
+                    _environment,
+                    _staticTextLocalizer
                 )
             ),
 
             ResourceNotFoundException notFoundException => (
                 StatusCodes.Status404NotFound,
-                CreateErrorResponse(
+                ErrorResponseFactory.CreateFromException(
                     context,
                     notFoundException,
                     StatusCodes.Status404NotFound,
                     "Problem.NotFound",
                     "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-                    locale
+                    _environment,
+                    _staticTextLocalizer
                 )
             ),
 
             ConflictException conflictException => (
                 StatusCodes.Status409Conflict,
-                CreateErrorResponse(
+                ErrorResponseFactory.CreateFromException(
                     context,
                     conflictException,
                     StatusCodes.Status409Conflict,
                     "Problem.Conflict",
                     "https://tools.ietf.org/html/rfc7231#section-6.5.8",
-                    locale
+                    _environment,
+                    _staticTextLocalizer
                 )
             ),
 
             UnauthorizedException unauthorizedException => (
                 StatusCodes.Status401Unauthorized,
-                CreateErrorResponse(
+                ErrorResponseFactory.CreateFromException(
                     context,
                     unauthorizedException,
                     StatusCodes.Status401Unauthorized,
                     "Problem.Unauthorized",
                     "https://tools.ietf.org/html/rfc7235#section-3.1",
-                    locale
+                    _environment,
+                    _staticTextLocalizer
                 )
             ),
 
             ForbiddenException forbiddenException => (
                 StatusCodes.Status403Forbidden,
-                CreateErrorResponse(
+                ErrorResponseFactory.CreateFromException(
                     context,
                     forbiddenException,
                     StatusCodes.Status403Forbidden,
                     "Problem.Forbidden",
                     "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-                    locale
+                    _environment,
+                    _staticTextLocalizer
                 )
             ),
 
             _ => (
                 StatusCodes.Status500InternalServerError,
-                new ErrorResponse
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                    Title = _staticTextLocalizer.LocalizeProblemTitle("Problem.Unexpected", locale),
-                    Status = StatusCodes.Status500InternalServerError,
-                    Message = exception.Message,
-                    Instance = context.Request.Path,
-                    TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-                    Extensions = new Dictionary<string, object>
-                    {
-                        ["locale"] = locale
-                    }
-                }
+                ErrorResponseFactory.CreateUnexpected(context, exception, _environment, _staticTextLocalizer)
             )
         };
-    }
-
-    private ErrorResponse CreateErrorResponse(
-        HttpContext context,
-        ExceptionBase exception,
-        int statusCode,
-        string titleKey,
-        string type,
-        string locale
-    )
-    {
-        var localizedError = _staticTextLocalizer.LocalizeError(exception.ErrorCode, exception.Details, locale);
-        var extensions = new Dictionary<string, object>
-        {
-            ["errorCode"] = exception.ErrorCode,
-            ["locale"] = locale
-        };
-
-        if (exception.Details is not null)
-            extensions["details"] = exception.Details;
-
-        if (!string.IsNullOrWhiteSpace(localizedError.FieldKey))
-            extensions["field"] = localizedError.FieldKey;
-
-        if (!string.IsNullOrWhiteSpace(localizedError.FieldDisplayName))
-            extensions["fieldDisplayName"] = localizedError.FieldDisplayName;
-
-        if (_environment.IsDevelopment() && !string.IsNullOrWhiteSpace(exception.InternalMessage))
-            extensions["internalMessage"] = exception.InternalMessage;
-
-        return new ErrorResponse
-        {
-            Type = type,
-            Title = _staticTextLocalizer.LocalizeProblemTitle(titleKey, locale),
-            Status = statusCode,
-            Message = localizedError.Message,
-            Instance = context.Request.Path,
-            TraceId = _environment.IsDevelopment() ? context.TraceIdentifier : null,
-            Errors = string.IsNullOrWhiteSpace(localizedError.FieldKey)
-                ? null
-                : new Dictionary<string, string[]>
-                {
-                    [localizedError.FieldKey] = [localizedError.Message]
-                },
-            Extensions = extensions
-        };
-    }
-
-    private static string ResolveLocale(HttpContext context)
-    {
-        var header = context.Request.Headers.AcceptLanguage.ToString();
-        if (string.IsNullOrWhiteSpace(header))
-            return "en";
-
-        return header.Split(',', ';')[0].Trim().ToLowerInvariant();
     }
 }

@@ -36,6 +36,59 @@ public class UserContextHolderTests
     }
 
     [Fact]
+    public void GetRequired_ShouldReturnCurrentUserContext_WhenUserIdClaimIsMapped()
+    {
+        var userId = Guid.NewGuid();
+        var httpContextAccessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = CreatePrincipal(
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                    new Claim("roles", "seller"),
+                    new Claim("email", "seller@example.com")
+                )
+            }
+        };
+
+        var sut = new UserContextHolder(httpContextAccessor);
+
+        var result = sut.GetUserContext();
+
+        result.Id.Should().Be(userId);
+        result.Role.Should().Be(Role.Seller);
+        result.Email.Should().Be("seller@example.com");
+    }
+
+    [Fact]
+    public void GetRequired_ShouldReturnCurrentUserContext_WhenRoleIsInRealmAccessClaim()
+    {
+        var userId = Guid.NewGuid();
+        var httpContextAccessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = CreatePrincipal(
+                    new Claim("sub", userId.ToString()),
+                    new Claim(
+                        "realm_access",
+                        "{\"roles\":[\"offline_access\",\"admin\",\"default-roles-simpleecommerce\",\"uma_authorization\"]}"
+                    ),
+                    new Claim("email", "admin@example.com")
+                )
+            }
+        };
+
+        var sut = new UserContextHolder(httpContextAccessor);
+
+        var result = sut.GetUserContext();
+
+        result.Id.Should().Be(userId);
+        result.Role.Should().Be(Role.Admin);
+        result.Email.Should().Be("admin@example.com");
+    }
+
+    [Fact]
     public void GetRequired_ShouldThrowUnauthorizedException_WhenUserIsNotAuthenticated()
     {
         var httpContextAccessor = new HttpContextAccessor

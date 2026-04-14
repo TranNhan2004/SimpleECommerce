@@ -1,10 +1,10 @@
-namespace SimpleECommerceBackend.Api.DTOs.UserProfiles;
+namespace SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
 
-public class UpdateUserProfileRequest
+public class CreateMyProfileResponse
 {
     public string FirstName { get; init; } = null!;
     public string LastName { get; init; } = null!;
-    public string? NickName { get; init; } = null!;
+    public string? NickName { get; init; }
     public string Sex { get; init; } = null!;
     public DateOnly BirthDate { get; init; }
 }

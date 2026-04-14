@@ -200,6 +200,40 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         AvatarUrl = avatarUrl;
     }
 
+    public void Archived()
+    {
+        if (Status == UserStatus.Archived)
+        {
+            throw new ValidationException(
+                UserProfileErrorCode.ArchiveNotAllowed,
+                "Cannot archive this user profile",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                }
+            );
+        }
+
+        Status = UserStatus.Archived;
+    }
+
+    public void Activate()
+    {
+        if (Status == UserStatus.Active)
+        {
+            throw new ValidationException(
+                UserProfileErrorCode.ActivateNotAllowed,
+                "Cannot activate this user profile",
+                new Dictionary<string, object?>
+                {
+                    ["field"] = "Status",
+                }
+            );
+        }
+
+        Status = UserStatus.Active;
+    }
+
     public static UserProfile Create(
         Guid keycloakUserId,
         string email,

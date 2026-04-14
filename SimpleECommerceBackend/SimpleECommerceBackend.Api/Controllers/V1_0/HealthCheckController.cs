@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace SimpleECommerceBackend.Api.Controllers;
+namespace SimpleECommerceBackend.Api.Controllers.V1_0;
 
 [EnableRateLimiting("ip-route")]
 [Route("api/v{version:apiVersion}/health-check")]
@@ -10,7 +10,7 @@ namespace SimpleECommerceBackend.Api.Controllers;
 public class HealthCheckController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Healthy()
+    public IActionResult Healthy(CancellationToken cancellationToken)
     {
         return Ok("Healthy");
     }

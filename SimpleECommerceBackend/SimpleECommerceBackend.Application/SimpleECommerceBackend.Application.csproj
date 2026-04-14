@@ -7,11 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoConstructor" Version="5.6.0">
+        <PackageReference Include="AutoConstructor" Version="5.5.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MediatR" Version="14.0.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2"/>
     </ItemGroup>
 
@@ -20,7 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="UseCases\Auth\ResetPassword\" />
+        <Folder Include="UseCases\Auth\ResetPassword\"/>
+        <Folder Include="UseCases\Categories\Commands\"/>
     </ItemGroup>
 
 </Project>

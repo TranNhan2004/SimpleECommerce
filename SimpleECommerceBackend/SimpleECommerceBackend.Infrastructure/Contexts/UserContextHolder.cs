@@ -33,7 +33,7 @@ public partial class UserContextHolder : IUserContextHolder
         if (principal?.Identity?.IsAuthenticated != true)
             return false;
 
-        var rawUserId = FindFirstValue(principal, "sub");
+        var rawUserId = KeycloakPayloadExtractionHelper.FindUserId(principal);
         if (string.IsNullOrWhiteSpace(rawUserId))
             throw new UnauthorizedException(
                 CurrentUserErrorCode.UserIdMissing,
@@ -65,10 +65,7 @@ public partial class UserContextHolder : IUserContextHolder
                 }
             );
 
-        var email = FindFirstValue(principal, ClaimTypes.Email)
-                    ?? FindFirstValue(principal, "email")
-                    ?? FindFirstValue(principal, "preferred_username")
-                    ?? string.Empty;
+        var email = KeycloakPayloadExtractionHelper.FindEmail(principal) ?? string.Empty;
 
         userContext = new UserContext(userId, email, role);
         return true;
@@ -76,9 +73,7 @@ public partial class UserContextHolder : IUserContextHolder
 
     private static bool TryResolveRole(ClaimsPrincipal principal, out Role role)
     {
-        foreach (var roleName in principal.FindAll("roles").Select(claim => claim.Value)
-                     .Concat(principal.FindAll(ClaimTypes.Role).Select(claim => claim.Value))
-                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        foreach (var roleName in KeycloakPayloadExtractionHelper.GetRoleNames(principal))
         {
             if (RoleUtils.TryParse(roleName, out role))
                 return true;
@@ -86,11 +81,6 @@ public partial class UserContextHolder : IUserContextHolder
 
         role = default;
         return false;
-    }
-
-    private static string? FindFirstValue(ClaimsPrincipal principal, string claimType)
-    {
-        return principal.FindFirst(claimType)?.Value;
     }
 
     private sealed record UserContext(Guid Id, string Email, Role Role) : IUserContext;

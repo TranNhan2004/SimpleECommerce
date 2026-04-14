@@ -46,14 +46,14 @@ public class GoogleAITranslationProvider : ITranslationProvider
     {
         var config = new GenerateContentConfig();
 
-        if (!string.IsNullOrWhiteSpace(_options.SystemInstruction))
+        if (!string.IsNullOrWhiteSpace(_options.Instructions))
             config.SystemInstruction = new Content
             {
                 Parts =
                 [
                     new Part
                     {
-                        Text = _options.SystemInstruction
+                        Text = _options.Instructions
                     }
                 ]
             };
@@ -61,8 +61,8 @@ public class GoogleAITranslationProvider : ITranslationProvider
         if (_options.Temperature is >= 0)
             config.Temperature = _options.Temperature;
 
-        if (_options.MaxOutputTokens is > 0)
-            config.MaxOutputTokens = _options.MaxOutputTokens;
+        if (_options.MaxOutputTokenCount is > 0)
+            config.MaxOutputTokens = _options.MaxOutputTokenCount;
 
         return config;
     }

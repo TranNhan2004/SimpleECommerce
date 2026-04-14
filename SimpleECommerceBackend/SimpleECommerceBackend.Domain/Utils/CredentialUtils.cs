@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -6,7 +5,7 @@ using SimpleECommerceBackend.Domain.RegExps;
 
 namespace SimpleECommerceBackend.Domain.Utils;
 
-public class CredentialUtils
+public static class CredentialUtils
 {
     public static string ValidateEmail(string email)
     {

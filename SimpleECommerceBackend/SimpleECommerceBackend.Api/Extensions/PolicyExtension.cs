@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Api.Authorization;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Utils;
 
@@ -7,6 +8,11 @@ public static class PolicyExtension
 {
     public static IServiceCollection AddKeycloakPolicies(this IServiceCollection services)
     {
+        services.AddSingleton<
+            Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
+            AuthorizationErrorResponseHandler
+        >();
+
         services.AddAuthorization(options =>
         {
             options.AddPolicy(RoleUtils.RequireCustomerRole, policy =>

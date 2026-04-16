@@ -6,11 +6,6 @@ namespace SimpleECommerceBackend.Domain.Utils;
 public static class RoleUtils
 {
     public static Role DefaultRole => Role.Customer;
-
-    public const string RequireAdminRole = "__SimpleECommerce_RequireAdminRole__";
-    public const string RequireSellerRole = "__SimpleECommerce_RequireSellerRole__";
-    public const string RequireCustomerRole = "__SimpleECommerce_RequireCustomerRole__";
-
     public static IReadOnlyList<Role> GetSupportedRoles()
     {
         return EnumUtils.GetSupportedValues<Role>();

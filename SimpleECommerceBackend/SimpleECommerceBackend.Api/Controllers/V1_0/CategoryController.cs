@@ -2,6 +2,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using SimpleECommerceBackend.Api.Authorization;
 using SimpleECommerceBackend.Api.DTOs.Errors;
 using SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
@@ -29,16 +30,16 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> GetAllCategoriesAsync([FromQuery] GetAllCategoriesRequest request)
+    public async Task<IActionResult> GetAllCategoriesAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetAllCategoriesQuery>(request);
-        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query);
+        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query, cancellationToken);
         var response = _mapper.Map<IReadOnlyList<GetAllCategoriesResponse>>(result);
         return Ok(response);
     }
 
-    [HttpGet("for-amdin")]
-    [Authorize(Policy = RoleUtils.RequireAdminRole)]
+    [HttpGet("for-admin")]
+    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<GetAllCategoriesForAdminResponse>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -46,26 +47,26 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> GetAllCategoriesForAdminAsync([FromQuery] GetAllCategoriesRequest request)
+    public async Task<IActionResult> GetAllCategoriesForAdminAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetAllCategoriesQuery>(request);
-        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query);
+        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query, cancellationToken);
         var response = _mapper.Map<IReadOnlyList<GetAllCategoriesForAdminResponse>>(result);
         return Ok(response);
     }
 
     [HttpPost("for-admin")]
-    [Authorize(Policy = RoleUtils.RequireAdminRole)]
+    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateCategoryForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> CreateCategoryForAdminAsync([FromBody] CreateCategoryForAdminRequest request)
+    public async Task<IActionResult> CreateCategoryForAdminAsync([FromBody] CreateCategoryForAdminRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<CreateCategoryCommand>(request);
-        var result = await _dispatcher.SendAsync<CreateCategoryCommand, CreateCategoryResult>(command);
+        var result = await _dispatcher.SendAsync<CreateCategoryCommand, CreateCategoryResult>(command, cancellationToken);
         var response = _mapper.Map<CreateCategoryForAdminResponse>(result);
         return Ok(response);
     }

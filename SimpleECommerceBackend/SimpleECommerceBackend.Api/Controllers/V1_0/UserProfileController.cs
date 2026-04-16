@@ -28,15 +28,13 @@ public partial class UserProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> CreateMyProfileAsync([FromBody] CreateMyProfileRequest request)
+    public async Task<IActionResult> CreateMyProfileAsync([FromBody] CreateMyProfileRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<CreateMyProfileCommand>(request);
-        var result = await _dispatcher.SendAsync<CreateMyProfileCommand, CreateMyProfileResult>(command);
+        var result = await _dispatcher.SendAsync<CreateMyProfileCommand, CreateMyProfileResult>(command, cancellationToken);
         var response = _mapper.Map<CreateMyProfileResponse>(result);
         return Ok(response);
     }
-
-
 
     [HttpGet("me/info")]
     [Authorize]
@@ -47,10 +45,10 @@ public partial class UserProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> GetMyInfoAsync([FromQuery] GetMyProfileRequest request)
+    public async Task<IActionResult> GetMyInfoAsync([FromQuery] GetMyProfileRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetMyProfileQuery>(request);
-        var result = await _dispatcher.SendAsync<GetMyProfileQuery, GetMyProfileResult>(query);
+        var result = await _dispatcher.SendAsync<GetMyProfileQuery, GetMyProfileResult>(query, cancellationToken);
         var response = _mapper.Map<GetMyProfileResponse>(result);
         return Ok(response);
     }
@@ -64,10 +62,10 @@ public partial class UserProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> UpdateMyInfoAsync([FromBody] UpdateMyProfileRequest request)
+    public async Task<IActionResult> UpdateMyInfoAsync([FromBody] UpdateMyProfileRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<UpdateMyProfileCommand>(request);
-        var result = await _dispatcher.SendAsync<UpdateMyProfileCommand, UpdateMyProfileResult>(command);
+        var result = await _dispatcher.SendAsync<UpdateMyProfileCommand, UpdateMyProfileResult>(command, cancellationToken);
         var response = _mapper.Map<UpdateMyProfileResponse>(result);
         return Ok(response);
     }
@@ -81,10 +79,10 @@ public partial class UserProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> DeleteMyProfileAsync([FromBody] DeleteMyProfileRequest request)
+    public async Task<IActionResult> DeleteMyProfileAsync([FromBody] DeleteMyProfileRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<DeleteMyProfileCommand>(request);
-        await _dispatcher.SendAsync(command);
+        await _dispatcher.SendAsync(command, cancellationToken);
         return NoContent();
     }
 
@@ -97,10 +95,10 @@ public partial class UserProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> ActivateMyAccountAsync([FromBody] ActivateMyProfileRequest request)
+    public async Task<IActionResult> ActivateMyProfileAsync([FromBody] ActivateMyProfileRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<ActivateMyProfileCommand>(request);
-        await _dispatcher.SendAsync(command);
+        await _dispatcher.SendAsync(command, cancellationToken);
         return NoContent();
     }
 }

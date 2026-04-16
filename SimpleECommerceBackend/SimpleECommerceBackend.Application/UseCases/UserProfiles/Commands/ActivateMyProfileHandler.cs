@@ -4,26 +4,26 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 
-namespace SimpleECommerceBackend.Application.Models.UserProfiles;
+namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 [AutoConstructor]
-public partial class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCommand>
+public partial class ActivateMyProfileHandler : IUseCaseHandler<ActivateMyProfileCommand>
 {
+
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserProfileService _userProfileService;
     private readonly IUnitOfWork _unitOfWork;
 
     public async Task HandleAsync(
-        DeleteMyProfileCommand request,
+        ActivateMyProfileCommand request,
         CancellationToken cancellationToken
     )
     {
-        var currentUser = _userContextHolder.GetActiveUserContext();
+        var currentUser = _userContextHolder.GetUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
-        userProfile.Archived();
+        userProfile.Activate();
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateCacheByIdAsync(userProfile.Id);
     }
 }

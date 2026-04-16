@@ -21,7 +21,8 @@ public partial class CreateCategoryHandler : IUseCaseHandler<CreateCategoryComma
         CancellationToken cancellationToken
     )
     {
-        var userContext = _userContextHolder.GetUserContext();
+        var userContext = _userContextHolder.GetActiveUserContext();
+
         var category = Category.Create(
             request.Name,
             request.Description,

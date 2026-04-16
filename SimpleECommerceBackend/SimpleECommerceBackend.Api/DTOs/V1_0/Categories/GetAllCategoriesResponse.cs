@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Api.DTOs.V1_0.Category;
+namespace SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
 
 public class GetAllCategoriesResponse
 {

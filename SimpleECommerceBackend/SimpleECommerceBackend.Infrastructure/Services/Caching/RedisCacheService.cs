@@ -39,11 +39,20 @@ public sealed class RedisCacheService : ICacheService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var value = await _database.StringGetAsync(BuildKey(key));
+        var redisKey = BuildKey(key);
+        var value = await _database.StringGetAsync(redisKey);
         if (!value.HasValue)
             return default;
 
-        return JsonSerializer.Deserialize<T>(value.ToString(), JsonOptions);
+        try
+        {
+            return JsonSerializer.Deserialize<T>(value.ToString(), JsonOptions);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            await _database.KeyDeleteAsync(redisKey);
+            return default;
+        }
     }
 
     public Task SetAsync<T>(string key, T value, TimeSpan ttl, CancellationToken cancellationToken = default)
@@ -80,9 +89,21 @@ public sealed class RedisCacheService : ICacheService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            results[i] = values[i].HasValue
-                ? JsonSerializer.Deserialize<T>(values[i].ToString(), JsonOptions)
-                : default;
+            if (!values[i].HasValue)
+            {
+                results[i] = default;
+                continue;
+            }
+
+            try
+            {
+                results[i] = JsonSerializer.Deserialize<T>(values[i].ToString(), JsonOptions);
+            }
+            catch (Exception ex) when (ex is JsonException or NotSupportedException)
+            {
+                await _database.KeyDeleteAsync(redisKeys[i]);
+                results[i] = default;
+            }
         }
 
         return results;

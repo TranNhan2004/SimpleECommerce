@@ -343,6 +343,7 @@
       "AgeCannotExceed": "{field} cannot exceed {max}.",
       "ArchiveNotAllowed": "Cannot archive this user profile.",
       "ActivateNotAllowed": "Cannot activate this user profile.",
+      "InactiveUser": "User is not active.",
       "NotFoundById": "User profile not found."
     },
     "VnAddress": {

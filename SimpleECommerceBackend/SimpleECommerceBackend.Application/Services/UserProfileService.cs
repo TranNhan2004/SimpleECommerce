@@ -5,6 +5,7 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
@@ -65,4 +66,9 @@ public partial class UserProfileService : IUserProfileService
         await _cacheService.RemoveAsync(key);
     }
 
+    public async Task<bool> IsActiveUserAsync(Guid id)
+    {
+        var userProfile = await GetByIdAsync(id);
+        return userProfile is not null && userProfile.Status == UserStatus.Active;
+    }
 }

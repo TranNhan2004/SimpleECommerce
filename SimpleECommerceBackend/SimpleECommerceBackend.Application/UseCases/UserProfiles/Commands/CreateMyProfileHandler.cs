@@ -6,7 +6,7 @@ using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
+namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
 [AutoConstructor]
 public partial class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, CreateMyProfileResult>

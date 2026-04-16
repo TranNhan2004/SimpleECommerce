@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Moq;
+using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -26,7 +28,7 @@ public class UserContextHolderTests
             }
         };
 
-        var sut = new UserContextHolder(httpContextAccessor);
+        var sut = CreateSut(httpContextAccessor);
 
         var result = sut.GetUserContext();
 
@@ -51,7 +53,7 @@ public class UserContextHolderTests
             }
         };
 
-        var sut = new UserContextHolder(httpContextAccessor);
+        var sut = CreateSut(httpContextAccessor);
 
         var result = sut.GetUserContext();
 
@@ -79,7 +81,7 @@ public class UserContextHolderTests
             }
         };
 
-        var sut = new UserContextHolder(httpContextAccessor);
+        var sut = CreateSut(httpContextAccessor);
 
         var result = sut.GetUserContext();
 
@@ -96,7 +98,7 @@ public class UserContextHolderTests
             HttpContext = new DefaultHttpContext()
         };
 
-        var sut = new UserContextHolder(httpContextAccessor);
+        var sut = CreateSut(httpContextAccessor);
 
         var action = () => sut.GetUserContext();
 
@@ -115,7 +117,7 @@ public class UserContextHolderTests
             }
         };
 
-        var sut = new UserContextHolder(httpContextAccessor);
+        var sut = CreateSut(httpContextAccessor);
 
         var action = () => sut.GetUserContext();
 
@@ -126,5 +128,15 @@ public class UserContextHolderTests
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
     {
         return new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
+    }
+
+    private static UserContextHolder CreateSut(IHttpContextAccessor httpContextAccessor)
+    {
+        var userProfileServiceMock = new Mock<IUserProfileService>();
+        userProfileServiceMock
+            .Setup(service => service.IsActiveUserAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
+
+        return new UserContextHolder(httpContextAccessor, userProfileServiceMock.Object);
     }
 }

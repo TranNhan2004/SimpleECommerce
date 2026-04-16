@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.DTOs.Errors;
-using SimpleECommerceBackend.Api.DTOs.V1_0.Category;
+using SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Domain.Utils;

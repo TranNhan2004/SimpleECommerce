@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
+namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
 [AutoConstructor]
 public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
@@ -19,7 +19,7 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
         CancellationToken cancellationToken
     )
     {
-        var currentUser = _userContextHolder.GetUserContext();
+        var currentUser = _userContextHolder.GetActiveUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
         if (request.FirstName is not null)

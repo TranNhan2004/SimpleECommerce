@@ -16,5 +16,7 @@ public class UserProfileMapper : IRegister
 
         config.NewConfig<CreateMyProfileRequest, CreateMyProfileCommand>();
         config.NewConfig<CreateMyProfileResult, CreateMyProfileResponse>();
+
+        config.NewConfig<DeleteMyProfileRequest, DeleteMyProfileCommand>();
     }
 }

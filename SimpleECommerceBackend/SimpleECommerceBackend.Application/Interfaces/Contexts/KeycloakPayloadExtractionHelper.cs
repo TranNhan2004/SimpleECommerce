@@ -58,6 +58,8 @@ public static class KeycloakPayloadExtractionHelper
         try
         {
             using var document = JsonDocument.Parse(realmAccessClaimValue);
+            if (document.RootElement.ValueKind != JsonValueKind.Object)
+                return [];
 
             if (!document.RootElement.TryGetProperty("roles", out var rolesElement)
                 || rolesElement.ValueKind != JsonValueKind.Array)
@@ -70,7 +72,7 @@ public static class KeycloakPayloadExtractionHelper
                 .Where(roleName => !string.IsNullOrWhiteSpace(roleName))
                 .Cast<string>()];
         }
-        catch (JsonException)
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException)
         {
             return [];
         }
@@ -100,6 +102,9 @@ public static class KeycloakPayloadExtractionHelper
 
             foreach (var resourceProperty in document.RootElement.EnumerateObject())
             {
+                if (resourceProperty.Value.ValueKind != JsonValueKind.Object)
+                    continue;
+
                 if (!resourceProperty.Value.TryGetProperty("roles", out var rolesElement)
                     || rolesElement.ValueKind != JsonValueKind.Array)
                 {
@@ -116,7 +121,7 @@ public static class KeycloakPayloadExtractionHelper
 
             return roleNames;
         }
-        catch (JsonException)
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException)
         {
             return [];
         }

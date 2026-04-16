@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Security;
+using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -13,10 +14,11 @@ namespace SimpleECommerceBackend.Infrastructure.Contexts;
 public partial class UserContextHolder : IUserContextHolder
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserProfileService _userProfileService;
 
     public IUserContext GetUserContext()
     {
-        if (TryGet(out var userContext) && userContext is not null)
+        if (TryGet(false, out var userContext) && userContext is not null)
             return userContext;
 
         throw new UnauthorizedException(
@@ -25,7 +27,27 @@ public partial class UserContextHolder : IUserContextHolder
         );
     }
 
-    public bool TryGet(out IUserContext? userContext)
+    public IUserContext GetActiveUserContext()
+    {
+        if (TryGet(true, out var userContext) && userContext is not null)
+            return userContext;
+
+        throw new UnauthorizedException(
+            CurrentUserErrorCode.Unauthenticated,
+            "Current user is not authenticated."
+        );
+    }
+
+    public void ThrowIfNoActiveUserContext()
+    {
+        if (!TryGet(true, out var userContext) || userContext is null)
+            throw new UnauthorizedException(
+                CurrentUserErrorCode.Unauthenticated,
+                "Current user is not authenticated."
+            );
+    }
+
+    private bool TryGet(bool isActiveUser, out IUserContext? userContext)
     {
         userContext = null;
 
@@ -43,6 +65,16 @@ public partial class UserContextHolder : IUserContextHolder
                     ["field"] = "User"
                 }
             );
+
+        if (isActiveUser)
+        {
+            var isActive = _userProfileService.IsActiveUserAsync(Guid.Parse(rawUserId)).GetAwaiter().GetResult();
+            if (!isActive)
+                throw new UnauthorizedException(
+                    UserProfileErrorCode.InactiveUser,
+                    "Current user is not active."
+                );
+        }
 
         if (!Guid.TryParse(rawUserId, out var userId))
             throw new UnauthorizedException(

@@ -26,58 +26,30 @@ public partial class CategoryService : ICategoryService
             return await LoadAllCategoriesFromDatabaseAndCacheIdsAsync();
         }
 
-        var categoryKeys = categoryIds.Select(id => CategoryCacheKey.GetCategory.Replace("{id}", id.ToString())).ToList();
-        var cachedCategories = (await _cacheService.GetBulkAsync<Category>(categoryKeys)).ToList();
+        var categories = await _categoryRepository.FindAllByConditionAsync(
+            query => query.Where(category => categoryIds.Contains(category.Id)),
+            false
+        );
 
-        var missingIds = new List<Guid>();
-        var missingIndexes = new List<int>();
+        if (categories.Count == 0)
+            return await LoadAllCategoriesFromDatabaseAndCacheIdsAsync();
 
-        for (int i = 0; i < cachedCategories.Count; i++)
+        var categoriesById = categories.ToDictionary(category => category.Id);
+        var orderedCategories = categoryIds
+            .Where(categoriesById.ContainsKey)
+            .Select(id => categoriesById[id])
+            .ToList();
+
+        if (orderedCategories.Count != categoryIds.Count)
         {
-            if (cachedCategories[i] is not null)
-            {
-                continue;
-            }
-
-            missingIds.Add(categoryIds[i]);
-            missingIndexes.Add(i);
+            await _cacheService.SetAsync(
+                CategoryCacheKey.GetAllCategory,
+                orderedCategories.Select(category => category.Id).ToList(),
+                TimeSpan.FromMinutes(CategoryCacheKey.GetAllCategoryTtlMinutes)
+            );
         }
 
-        if (missingIds.Count == 0)
-        {
-            return cachedCategories!;
-        }
-
-        var missingCategories = await _categoryRepository.FindAllByConditionAsync(
-            query => query.Where(category => missingIds.Contains(category.Id)),
-            false);
-
-        var missingCategoryMap = new Dictionary<Guid, Category>(missingCategories.Count);
-        foreach (var category in missingCategories)
-        {
-            missingCategoryMap[category.Id] = category;
-        }
-
-        foreach (var category in missingCategories)
-        {
-            var cacheKey = CategoryCacheKey.GetCategory.Replace("{id}", category.Id.ToString());
-            await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKey.GetCategoryTtlMinutes));
-        }
-
-        for (int i = 0; i < missingIndexes.Count; i++)
-        {
-            var index = missingIndexes[i];
-            var categoryId = categoryIds[index];
-
-            if (missingCategoryMap.TryGetValue(categoryId, out var category))
-            {
-                cachedCategories[index] = category;
-            }
-        }
-
-        return [..cachedCategories
-            .Where(category => category is not null)
-            .Select(category => category!)];
+        return orderedCategories;
     }
 
     public Task InvalidateCacheByIdAsync(Guid id)

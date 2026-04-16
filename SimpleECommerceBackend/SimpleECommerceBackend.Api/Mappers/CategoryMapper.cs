@@ -1,5 +1,5 @@
 using Mapster;
-using SimpleECommerceBackend.Api.DTOs.V1_0.Category;
+using SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
 using SimpleECommerceBackend.Application.Models.Categories;
 
 namespace SimpleECommerceBackend.Api.Mappers;

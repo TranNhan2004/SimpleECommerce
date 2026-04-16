@@ -56,6 +56,19 @@ public class KeycloakPayloadExtractionHelperTests
         );
     }
 
+    [Fact]
+    public void GetRoleNames_ShouldIgnoreInvalidJsonPayloads()
+    {
+        var principal = CreatePrincipal(
+            new Claim("realm_access", "\"unexpected-string\""),
+            new Claim("resource_access", "{\"account\":\"invalid-shape\"}")
+        );
+
+        var result = KeycloakPayloadExtractionHelper.GetRoleNames(principal);
+
+        result.Should().BeEmpty();
+    }
+
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
     {
         return new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));

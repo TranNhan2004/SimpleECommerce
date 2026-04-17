@@ -1,4 +1,4 @@
-namespace SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
+namespace SimpleECommerceBackend.Api.DTOs.V1.UserProfiles;
 
 public class UpdateMyProfileRequest
 {

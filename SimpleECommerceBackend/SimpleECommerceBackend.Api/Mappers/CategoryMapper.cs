@@ -1,5 +1,5 @@
 using Mapster;
-using SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
+using SimpleECommerceBackend.Api.DTOs.V1.Categories;
 using SimpleECommerceBackend.Application.Models.Categories;
 
 namespace SimpleECommerceBackend.Api.Mappers;
@@ -12,7 +12,7 @@ public class CategoryMapper : IRegister
         config.NewConfig<GetAllCategoriesResult, GetAllCategoriesResponse>();
         config.NewConfig<GetAllCategoriesResult, GetAllCategoriesForAdminResponse>();
 
-        config.NewConfig<CreateCategoryForAdminRequest, CreateCategoryCommand>();
-        config.NewConfig<CreateCategoryResult, CreateCategoryForAdminResponse>();
+        config.NewConfig<CreateCategoryRequest, CreateCategoryCommand>();
+        config.NewConfig<CreateCategoryResult, CreateCategoryResponse>();
     }
 }

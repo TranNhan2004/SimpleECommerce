@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
+namespace SimpleECommerceBackend.Api.DTOs.V1.UserProfiles;
 
-public class CreateMyProfileRequest
+public class CreateMyProfileResponse
 {
     public string FirstName { get; init; } = null!;
     public string LastName { get; init; } = null!;

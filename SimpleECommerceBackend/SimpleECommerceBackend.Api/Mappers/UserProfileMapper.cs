@@ -1,5 +1,5 @@
 using Mapster;
-using SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
+using SimpleECommerceBackend.Api.DTOs.V1.UserProfiles;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 
 namespace SimpleECommerceBackend.Api.Mappers;

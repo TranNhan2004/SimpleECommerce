@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.DTOs.Errors;
-using SimpleECommerceBackend.Api.DTOs.V1_0.UserProfiles;
+using SimpleECommerceBackend.Api.DTOs.V1.UserProfiles;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 
-namespace SimpleECommerceBackend.Api.Controllers.V1_0;
+namespace SimpleECommerceBackend.Api.Controllers.V1;
 
 [EnableRateLimiting("ip-route")]
 [Route("api/v{version:apiVersion}/user-profiles")]
@@ -87,7 +87,6 @@ public partial class UserProfileController : ControllerBase
     }
 
     [HttpPost("me/activation")]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

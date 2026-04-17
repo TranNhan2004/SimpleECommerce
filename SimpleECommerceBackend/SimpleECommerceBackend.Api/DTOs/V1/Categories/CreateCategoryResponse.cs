@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Api.DTOs.V1_0.Categories;
+namespace SimpleECommerceBackend.Api.DTOs.V1.Categories;
 
-public class GetAllCategoriesForAdminResponse
+public class CreateCategoryResponse
 {
     public Guid Id { get; init; }
     public string Name { get; init; } = null!;

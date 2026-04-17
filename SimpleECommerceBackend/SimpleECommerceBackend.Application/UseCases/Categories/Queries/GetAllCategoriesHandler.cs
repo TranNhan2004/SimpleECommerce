@@ -1,4 +1,3 @@
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
@@ -9,7 +8,6 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 [AutoConstructor]
 public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>
 {
-    private readonly IUserContextHolder _userContextHolder;
     private readonly ICategoryService _categoryService;
 
     public async Task<IReadOnlyList<GetAllCategoriesResult>> HandleAsync(
@@ -17,8 +15,6 @@ public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQ
         CancellationToken cancellationToken
     )
     {
-        _userContextHolder.ThrowIfNoActiveUserContext();
-
         var categories = await _categoryService.GetAllCategoriesAsync();
 
         return [..categories.Select(c => new GetAllCategoriesResult

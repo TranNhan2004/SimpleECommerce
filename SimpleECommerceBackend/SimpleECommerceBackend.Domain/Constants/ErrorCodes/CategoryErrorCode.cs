@@ -10,4 +10,6 @@ public static class CategoryErrorCode
     public const string DeactivateNotAllowed = "Category_DeactivateNotAllowed";
     public const string AlreadyArchived = "Category_AlreadyArchived";
     public const string AdminRequired = "Category_AdminRequired";
+    public const string NotFoundById = "Category_NotFoundById";
+    public const string OwnerRequired = "Category_OwnerRequired";
 }

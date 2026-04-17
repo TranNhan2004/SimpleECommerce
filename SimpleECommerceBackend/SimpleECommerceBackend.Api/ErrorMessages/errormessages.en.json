@@ -185,7 +185,9 @@
       "ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
       "DeactivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
       "AlreadyArchived": "{field} is already archived.",
-      "AdminRequired": "{field} is required."
+      "AdminRequired": "{field} is required.",
+      "NotFoundById": "Category not found.",
+      "OwnerRequired": "Just owner can perform this operation."
     },
     "Credential": {
       "EmailRequired": "{field} is required.",

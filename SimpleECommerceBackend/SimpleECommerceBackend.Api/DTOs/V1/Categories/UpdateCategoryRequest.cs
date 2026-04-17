@@ -1,6 +1,6 @@
 namespace SimpleECommerceBackend.Application.Models.Categories;
 
-public class UpdateCategoryCommand
+public class UpdateCategoryRequest
 {
     public Guid Id { get; init; }
     public string Name { get; init; } = null!;

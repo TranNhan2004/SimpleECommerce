@@ -2,7 +2,9 @@ using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
 
@@ -15,6 +17,11 @@ public partial class CategoryService : ICategoryService
     public Category CreateCategory(Category category)
     {
         return _categoryRepository.Add(category);
+    }
+
+    public Category DeleteCategory(Category category)
+    {
+        return _categoryRepository.Delete(category);
     }
 
     public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
@@ -50,6 +57,37 @@ public partial class CategoryService : ICategoryService
         }
 
         return orderedCategories;
+    }
+
+    public async Task<Category> GetCategoryByIdAsync(Guid id)
+    {
+        var cacheKey = CategoryCacheKey.GetCategory.Replace("{id}", id.ToString());
+        var cachedCategory = await _cacheService.GetAsync<Category>(cacheKey);
+
+        if (cachedCategory is not null)
+        {
+            return cachedCategory;
+        }
+
+        var category = await _categoryRepository.FindByIdAsync(id)
+            ?? throw new ResourceNotFoundException(
+                CategoryErrorCode.NotFoundById,
+                $"Category with Id = {id} was not found."
+            );
+
+        await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKey.GetCategoryTtlMinutes));
+        return category;
+    }
+
+    public async Task<Category> GetCategoryByIdForUpdateAsync(Guid id)
+    {
+        var category = await _categoryRepository.FindByIdAsync(id)
+           ?? throw new ResourceNotFoundException(
+               CategoryErrorCode.NotFoundById,
+               $"Category with Id = {id} was not found."
+           );
+
+        return category;
     }
 
     public Task InvalidateCacheByIdAsync(Guid id)

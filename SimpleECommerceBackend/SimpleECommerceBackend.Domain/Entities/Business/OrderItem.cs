@@ -41,7 +41,7 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (productId == Guid.Empty)
             throw new ValidationException(
-                OrderItemErrorCode.ProductIdRequired,
+                OrderItemErrorCodes.ProductIdRequired,
                 "Product ID is required",
                 new Dictionary<string, object?>
                 {
@@ -56,7 +56,7 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (orderId == Guid.Empty)
             throw new ValidationException(
-                OrderItemErrorCode.OrderIdRequired,
+                OrderItemErrorCodes.OrderIdRequired,
                 "Order ID is required",
                 new Dictionary<string, object?>
                 {
@@ -71,7 +71,7 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantity <= 0)
             throw new ValidationException(
-                OrderItemErrorCode.QuantityMustBeGreaterThanZero,
+                OrderItemErrorCodes.QuantityMustBeGreaterThanZero,
                 "Quantity must be greater than zero",
                 new Dictionary<string, object?>
                 {
@@ -86,7 +86,7 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (currentPrice.Amount < 0)
             throw new ValidationException(
-                OrderItemErrorCode.AmountCannotBeNegative,
+                OrderItemErrorCodes.AmountCannotBeNegative,
                 "Amount cannot be negative",
                 new Dictionary<string, object?>
                 {

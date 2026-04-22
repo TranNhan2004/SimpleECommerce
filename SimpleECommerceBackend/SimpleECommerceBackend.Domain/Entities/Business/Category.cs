@@ -35,7 +35,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ValidationException(
-                CategoryErrorCode.NameRequired,
+                CategoryErrorCodes.NameRequired,
                 "Name is required",
                 new Dictionary<string, object?>
                 {
@@ -45,14 +45,14 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedName = name.Trim();
 
-        if (trimmedName.Length > CategoryConstants.NameMaxLength)
+        if (trimmedName.Length > CategoryValidationRules.NameMaxLength)
             throw new ValidationException(
-                CategoryErrorCode.NameMaxLengthExceeded,
-                $"Name cannot exceed {CategoryConstants.NameMaxLength} characters",
+                CategoryErrorCodes.NameMaxLengthExceeded,
+                $"Name cannot exceed {CategoryValidationRules.NameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Name",
-                    ["max"] = CategoryConstants.NameMaxLength
+                    ["max"] = CategoryValidationRules.NameMaxLength
                 }
             );
 
@@ -69,7 +69,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (string.IsNullOrWhiteSpace(description))
             throw new ValidationException(
-                CategoryErrorCode.DescriptionMustNotBeBlank,
+                CategoryErrorCodes.DescriptionMustNotBeBlank,
                 "Description is not blank",
                 new Dictionary<string, object?>
                 {
@@ -79,14 +79,14 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedDescription = description.Trim();
 
-        if (trimmedDescription.Length > CategoryConstants.DescriptionMaxLength)
+        if (trimmedDescription.Length > CategoryValidationRules.DescriptionMaxLength)
             throw new ValidationException(
-                CategoryErrorCode.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {CategoryConstants.DescriptionMaxLength} characters",
+                CategoryErrorCodes.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {CategoryValidationRules.DescriptionMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Description",
-                    ["max"] = CategoryConstants.DescriptionMaxLength
+                    ["max"] = CategoryValidationRules.DescriptionMaxLength
                 }
             );
 
@@ -102,7 +102,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status == CategoryStatus.Archived)
             throw new ValidationException(
-                CategoryErrorCode.ActivateNotAllowed,
+                CategoryErrorCodes.ActivateNotAllowed,
                 "Archived category cannot be activated",
                 new Dictionary<string, object?>
                 {
@@ -120,7 +120,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status == CategoryStatus.Archived)
             throw new ValidationException(
-                CategoryErrorCode.DeactivateNotAllowed,
+                CategoryErrorCodes.DeactivateNotAllowed,
                 "Archived category cannot be deactivated",
                 new Dictionary<string, object?>
                 {
@@ -138,7 +138,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status == CategoryStatus.Archived)
             throw new ValidationException(
-                CategoryErrorCode.AlreadyArchived,
+                CategoryErrorCodes.AlreadyArchived,
                 "Category already archived",
                 new Dictionary<string, object?>
                 {
@@ -153,7 +153,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (adminId == Guid.Empty)
             throw new ValidationException(
-                CategoryErrorCode.AdminRequired,
+                CategoryErrorCodes.AdminRequired,
                 "Admin is required",
                 new Dictionary<string, object?>
                 {

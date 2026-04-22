@@ -35,7 +35,7 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     {
         if (IsDeleted)
             throw new ValidationException(
-                SellerWarehouseErrorCode.AlreadyDeleted,
+                SellerWarehouseErrorCodes.AlreadyDeleted,
                 "Warehouse is already deleted",
                 new Dictionary<string, object?>
                 {
@@ -69,7 +69,7 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     {
         if (sellerShopId == Guid.Empty)
             throw new ValidationException(
-                SellerWarehouseErrorCode.SellerShopRequired,
+                SellerWarehouseErrorCodes.SellerShopRequired,
                 "Seller shop is required",
                 new Dictionary<string, object?>
                 {

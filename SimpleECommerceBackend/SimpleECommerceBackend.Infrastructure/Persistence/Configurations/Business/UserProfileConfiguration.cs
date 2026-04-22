@@ -17,14 +17,14 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 
         builder.Property(u => u.FirstName)
             .IsRequired()
-            .HasMaxLength(UserProfileConstants.FirstNameMaxLength);
+            .HasMaxLength(UserProfileValidationRules.FirstNameMaxLength);
 
         builder.Property(u => u.LastName)
             .IsRequired()
-            .HasMaxLength(UserProfileConstants.LastNameMaxLength);
+            .HasMaxLength(UserProfileValidationRules.LastNameMaxLength);
 
         builder.Property(u => u.NickName)
-            .HasMaxLength(UserProfileConstants.NickNameMaxLength)
+            .HasMaxLength(UserProfileValidationRules.NickNameMaxLength)
             .HasDefaultValue(null);
 
         builder.Property(u => u.Sex).IsRequired();

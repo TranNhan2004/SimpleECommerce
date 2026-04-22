@@ -11,7 +11,7 @@ public class VnAddressService : IAddressService
     {
         if (!AddressService.IsValidCharacters(address))
             throw new ValidationException(
-                VnAddressErrorCode.AddressInvalid,
+                VnAddressErrorCodes.AddressInvalid,
                 "Address is not valid",
                 new Dictionary<string, object?>
                 {
@@ -25,7 +25,7 @@ public class VnAddressService : IAddressService
     {
         if (!AddressService.IsValidAddressPair(province, ward))
             throw new ValidationException(
-                VnAddressErrorCode.WardInvalid,
+                VnAddressErrorCodes.WardInvalid,
                 "Ward is not valid",
                 new Dictionary<string, object?>
                 {
@@ -39,7 +39,7 @@ public class VnAddressService : IAddressService
     {
         if (!AddressService.IsValidProvince(province))
             throw new ValidationException(
-                VnAddressErrorCode.ProvinceInvalid,
+                VnAddressErrorCodes.ProvinceInvalid,
                 "Province is not valid",
                 new Dictionary<string, object?>
                 {

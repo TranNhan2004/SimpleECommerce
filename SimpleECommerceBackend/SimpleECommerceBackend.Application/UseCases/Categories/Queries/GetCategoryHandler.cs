@@ -17,15 +17,6 @@ public partial class GetCategoryHandler : IUseCaseHandler<GetCategoryQuery, GetC
     {
         var category = await _categoryService.GetCategoryByIdAsync(request.Id);
 
-        return new GetCategoryResult
-        {
-            Id = category.Id,
-            Name = category.Name,
-            Description = category.Description,
-            Status = CategoryStatusUtils.ToName(category.Status),
-            AdminId = category.AdminId,
-            CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt
-        };
+        return GetCategoryResult.FromEntity(category);
     }
 }

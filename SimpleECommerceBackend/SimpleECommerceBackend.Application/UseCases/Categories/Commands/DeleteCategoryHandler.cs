@@ -27,7 +27,7 @@ public partial class DeleteCategoryHandler : IUseCaseHandler<DeleteCategoryComma
         if (category.AdminId != userContext.Id)
         {
             throw new ForbiddenException(
-                CategoryErrorCode.AdminRequired,
+                CategoryErrorCodes.AdminRequired,
                 "Only the admin who created the category can delete it."
             );
         }

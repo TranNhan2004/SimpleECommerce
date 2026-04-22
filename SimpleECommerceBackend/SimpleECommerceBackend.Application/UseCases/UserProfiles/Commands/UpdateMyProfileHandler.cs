@@ -2,8 +2,6 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
-using SimpleECommerceBackend.Application.Models.UserProfiles;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
@@ -22,29 +20,19 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
         var currentUser = _userContextHolder.GetActiveUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
+        userProfile.SetNickName(request.NickName);
+
         if (request.FirstName is not null)
             userProfile.SetFirstName(request.FirstName);
         if (request.LastName is not null)
             userProfile.SetLastName(request.LastName);
-        if (request.Sex is not null)
-            userProfile.SetSex(SexUtils.Parse(request.Sex));
-        if (request.NickName is not null)
-            userProfile.SetNickName(request.NickName);
+        if (request.Sex.HasValue)
+            userProfile.SetSex(request.Sex.Value);
         if (request.BirthDate.HasValue)
             userProfile.SetBirthDate(request.BirthDate.Value);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userProfileService.InvalidateCacheByIdAsync(userProfile.Id);
-        return new UpdateMyProfileResult
-        {
-            Id = userProfile.Id,
-            Email = userProfile.Email,
-            FirstName = userProfile.FirstName,
-            LastName = userProfile.LastName,
-            NickName = userProfile.NickName,
-            Sex = SexUtils.ToName(userProfile.Sex),
-            Status = UserStatusUtils.ToName(userProfile.Status),
-            BirthDate = userProfile.BirthDate
-        };
+        return UpdateMyProfileResult.FromEntity(userProfile);
     }
 }

@@ -13,10 +13,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.Code)
             .IsRequired()
-            .HasMaxLength(OrderConstants.CodeMaxLength);
+            .HasMaxLength(OrderValidationRules.CodeMaxLength);
 
         builder.Property(o => o.Note)
-            .HasMaxLength(OrderConstants.NoteMaxLength);
+            .HasMaxLength(OrderValidationRules.NoteMaxLength);
 
         builder.ComplexProperty(o => o.ShippingFee, money =>
         {
@@ -49,14 +49,14 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.ShopName)
             .IsRequired()
-            .HasMaxLength(SellerShopConstants.NameMaxLength);
+            .HasMaxLength(SellerShopValidationRules.NameMaxLength);
 
         builder.ComplexProperty(o => o.WarehouseAddress, address =>
         {
             address.Property(a => a.AddressLine)
                 .HasColumnName("WarehouseAddressLine")
                 .IsRequired()
-                .HasMaxLength(AddressConstants.AddressLineMaxLength);
+                .HasMaxLength(AddressValidationRules.AddressLineMaxLength);
 
             address.Property(a => a.Province)
                 .HasColumnName("WarehouseProvince")
@@ -69,18 +69,18 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.RecipientName)
             .IsRequired()
-            .HasMaxLength(ShippingAddressConstants.RecipientNameMaxLength);
+            .HasMaxLength(ShippingAddressValidationRules.RecipientNameMaxLength);
 
         builder.Property(o => o.RecipientPhoneNumber)
             .IsRequired()
-            .HasMaxLength(CommonConstants.PhoneNumberMaxLength);
+            .HasMaxLength(CommonValidationRules.PhoneNumberMaxLength);
 
         builder.ComplexProperty(o => o.RecipientAddress, address =>
         {
             address.Property(a => a.AddressLine)
                 .HasColumnName("RecipientAddressLine")
                 .IsRequired()
-                .HasMaxLength(AddressConstants.AddressLineMaxLength);
+                .HasMaxLength(AddressValidationRules.AddressLineMaxLength);
 
             address.Property(a => a.Province)
                 .HasColumnName("RecipientProvince")

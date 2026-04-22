@@ -31,7 +31,7 @@ public class ProductTests
             Guid.NewGuid());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(ProductErrorCode.NameRequired);
+            .Which.ErrorCode.Should().Be(ProductErrorCodes.NameRequired);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class ProductTests
         var action = () => product.Hide();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(ProductErrorCode.HideNotAllowed);
+            .Which.ErrorCode.Should().Be(ProductErrorCodes.HideNotAllowed);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class ProductTests
         var action = () => product.RemoveImage(Guid.NewGuid());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(ProductErrorCode.ImageNotFound);
+            .Which.ErrorCode.Should().Be(ProductErrorCodes.ImageNotFound);
     }
 
     private static Product CreateProduct()

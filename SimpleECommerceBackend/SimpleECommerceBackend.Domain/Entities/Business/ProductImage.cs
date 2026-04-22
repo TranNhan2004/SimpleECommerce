@@ -53,7 +53,7 @@ public class ProductImage : Entity, ICreatedTrackable
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ValidationException(
-                ProductImageErrorCode.ImageUrlRequired,
+                ProductImageErrorCodes.ImageUrlRequired,
                 "Image URL is required",
                 new Dictionary<string, object?>
                 {
@@ -68,7 +68,7 @@ public class ProductImage : Entity, ICreatedTrackable
     {
         if (displayOrder < 0)
             throw new ValidationException(
-                ProductImageErrorCode.DisplayOrderCannotBeNegative,
+                ProductImageErrorCodes.DisplayOrderCannotBeNegative,
                 "Display order cannot be negative",
                 new Dictionary<string, object?>
                 {
@@ -94,7 +94,7 @@ public class ProductImage : Entity, ICreatedTrackable
 
         if (string.IsNullOrWhiteSpace(description))
             throw new ValidationException(
-                ProductImageErrorCode.DescriptionMustNotBeBlank,
+                ProductImageErrorCodes.DescriptionMustNotBeBlank,
                 "Description is not blank",
                 new Dictionary<string, object?>
                 {
@@ -104,14 +104,14 @@ public class ProductImage : Entity, ICreatedTrackable
 
         var trimmedDescription = description.Trim();
 
-        if (trimmedDescription.Length > ProductImageConstants.DescriptionMaxLength)
+        if (trimmedDescription.Length > ProductImageValidationRules.DescriptionMaxLength)
             throw new ValidationException(
-                ProductImageErrorCode.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {ProductImageConstants.DescriptionMaxLength} characters",
+                ProductImageErrorCodes.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {ProductImageValidationRules.DescriptionMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Description",
-                    ["max"] = ProductImageConstants.DescriptionMaxLength
+                    ["max"] = ProductImageValidationRules.DescriptionMaxLength
                 }
             );
 

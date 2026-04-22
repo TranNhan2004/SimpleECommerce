@@ -12,14 +12,14 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.ToTable("Categories", DbSchemas.Business);
         builder.Property(c => c.Name)
             .IsRequired()
-            .HasMaxLength(CategoryConstants.NameMaxLength);
+            .HasMaxLength(CategoryValidationRules.NameMaxLength);
 
         builder.Property(c => c.Status)
             .IsRequired();
 
         builder.Property(c => c.Description)
             .HasDefaultValue(null)
-            .HasMaxLength(CategoryConstants.DescriptionMaxLength);
+            .HasMaxLength(CategoryValidationRules.DescriptionMaxLength);
 
         builder.HasOne(c => c.Admin)
             .WithMany()

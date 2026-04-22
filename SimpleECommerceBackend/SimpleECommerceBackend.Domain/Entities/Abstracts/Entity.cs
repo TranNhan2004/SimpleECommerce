@@ -11,7 +11,7 @@ public class Entity : IEntity
     {
         if (id == Guid.Empty)
             throw new ValidationException(
-                EntityErrorCode.EmptyId,
+                EntityErrorCodes.EmptyId,
                 "Id cannot be empty.",
                 new Dictionary<string, object?>
                 {

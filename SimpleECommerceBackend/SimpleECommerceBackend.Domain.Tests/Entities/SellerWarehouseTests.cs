@@ -25,7 +25,7 @@ public class SellerWarehouseTests
         var action = () => SellerWarehouse.Create(EntityTestData.CreateAddress(), Guid.Empty);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerWarehouseErrorCode.SellerShopRequired);
+            .Which.ErrorCode.Should().Be(SellerWarehouseErrorCodes.SellerShopRequired);
     }
 
     [Fact]
@@ -47,6 +47,6 @@ public class SellerWarehouseTests
         var action = () => warehouse.SoftDelete();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerWarehouseErrorCode.AlreadyDeleted);
+            .Which.ErrorCode.Should().Be(SellerWarehouseErrorCodes.AlreadyDeleted);
     }
 }

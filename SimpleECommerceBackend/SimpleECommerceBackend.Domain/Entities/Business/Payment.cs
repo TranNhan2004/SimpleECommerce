@@ -54,7 +54,7 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (orderId == Guid.Empty)
             throw new ValidationException(
-                PaymentErrorCode.OrderIdRequired,
+                PaymentErrorCodes.OrderIdRequired,
                 "Order ID is required",
                 new Dictionary<string, object?>
                 {
@@ -85,14 +85,14 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedProvider = provider.Trim();
 
-        if (trimmedProvider.Length > PaymentConstants.ProviderMaxLength)
+        if (trimmedProvider.Length > PaymentValidationRules.ProviderMaxLength)
             throw new ValidationException(
-                PaymentErrorCode.ProviderMaxLengthExceeded,
-                $"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters",
+                PaymentErrorCodes.ProviderMaxLengthExceeded,
+                $"Provider cannot exceed {PaymentValidationRules.ProviderMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Provider",
-                    ["max"] = PaymentConstants.ProviderMaxLength
+                    ["max"] = PaymentValidationRules.ProviderMaxLength
                 }
             );
 
@@ -114,14 +114,14 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedId = externalTransactionId.Trim();
 
-        if (trimmedId.Length > PaymentConstants.ExternalTransactionIdMaxLength)
+        if (trimmedId.Length > PaymentValidationRules.ExternalTransactionIdMaxLength)
             throw new ValidationException(
-                PaymentErrorCode.ExternalTransactionIdMaxLengthExceeded,
-                $"External transaction ID cannot exceed {PaymentConstants.ExternalTransactionIdMaxLength} characters",
+                PaymentErrorCodes.ExternalTransactionIdMaxLengthExceeded,
+                $"External transaction ID cannot exceed {PaymentValidationRules.ExternalTransactionIdMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "ExternalTransactionId",
-                    ["max"] = PaymentConstants.ExternalTransactionIdMaxLength
+                    ["max"] = PaymentValidationRules.ExternalTransactionIdMaxLength
                 }
             );
 
@@ -132,7 +132,7 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != PaymentStatus.Pending)
             throw new ValidationException(
-                PaymentErrorCode.CompleteNotAllowed,
+                PaymentErrorCodes.CompleteNotAllowed,
                 "Only pending payments can be marked as completed",
                 new Dictionary<string, object?>
                 {
@@ -152,7 +152,7 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != PaymentStatus.Pending)
             throw new ValidationException(
-                PaymentErrorCode.FailNotAllowed,
+                PaymentErrorCodes.FailNotAllowed,
                 "Only pending payments can be marked as failed",
                 new Dictionary<string, object?>
                 {
@@ -169,7 +169,7 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != PaymentStatus.Completed)
             throw new ValidationException(
-                PaymentErrorCode.RefundNotAllowed,
+                PaymentErrorCodes.RefundNotAllowed,
                 "Only completed payments can be refunded",
                 new Dictionary<string, object?>
                 {

@@ -6,26 +6,17 @@ using SimpleECommerceBackend.Domain.Utils;
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
 [AutoConstructor]
-public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>
+public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, GetAllCategoriesResult>
 {
     private readonly ICategoryService _categoryService;
 
-    public async Task<IReadOnlyList<GetAllCategoriesResult>> HandleAsync(
+    public async Task<GetAllCategoriesResult> HandleAsync(
         GetAllCategoriesQuery request,
         CancellationToken cancellationToken
     )
     {
         var categories = await _categoryService.GetAllCategoriesAsync();
 
-        return [..categories.Select(c => new GetAllCategoriesResult
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            Status = CategoryStatusUtils.ToName(c.Status),
-            AdminId = c.AdminId,
-            CreatedAt = c.CreatedAt,
-            UpdatedAt = c.UpdatedAt
-        })];
+        return GetAllCategoriesResult.FromEntities(categories);
     }
 }

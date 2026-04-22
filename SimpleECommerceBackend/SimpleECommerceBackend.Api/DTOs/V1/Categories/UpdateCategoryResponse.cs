@@ -1,3 +1,5 @@
+using SimpleECommerceBackend.Domain.Utils;
+
 namespace SimpleECommerceBackend.Application.Models.Categories;
 
 public class UpdateCategoryResponse
@@ -9,4 +11,18 @@ public class UpdateCategoryResponse
     public Guid AdminId { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset? UpdatedAt { get; init; }
+
+    public static UpdateCategoryResponse FromResult(UpdateCategoryResult result)
+    {
+        return new UpdateCategoryResponse
+        {
+            Id = result.Id,
+            Name = result.Name,
+            Description = result.Description,
+            Status = EnumUtils.ToDisplayValue(result.Status),
+            AdminId = result.AdminId,
+            CreatedAt = result.CreatedAt,
+            UpdatedAt = result.UpdatedAt
+        };
+    }
 }

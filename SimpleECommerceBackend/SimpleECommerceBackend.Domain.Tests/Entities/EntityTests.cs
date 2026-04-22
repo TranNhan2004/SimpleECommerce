@@ -25,7 +25,7 @@ public class EntityTests
         var action = () => entity.AssignId(Guid.Empty);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(EntityErrorCode.EmptyId);
+            .Which.ErrorCode.Should().Be(EntityErrorCodes.EmptyId);
     }
 
     private sealed class TestEntity : Entity

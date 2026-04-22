@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Api.DTOs.Errors;
+using SimpleECommerceBackend.Api.DTOs.Common.Errors;
 using SimpleECommerceBackend.Api.Factories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Domain.Exceptions;

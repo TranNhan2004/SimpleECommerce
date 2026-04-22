@@ -34,7 +34,7 @@ public class OrderItemTests
         var act = () => OrderItem.Create(productId, orderId, quantity, currentPrice);
 
         act.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderItemErrorCode.QuantityMustBeGreaterThanZero);
+            .Which.ErrorCode.Should().Be(OrderItemErrorCodes.QuantityMustBeGreaterThanZero);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class OrderItemTests
         var action = () => OrderItem.Create(Guid.NewGuid(), Guid.Empty, 1, new Money(100000, "VND"));
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderItemErrorCode.OrderIdRequired);
+            .Which.ErrorCode.Should().Be(OrderItemErrorCodes.OrderIdRequired);
     }
 
     [Fact]

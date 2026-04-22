@@ -196,6 +196,10 @@
       "PasswordMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
       "PasswordInvalidFormat": "Định dạng của {field} không hợp lệ."
     },
+    "EnumConversion": {
+      "InvalidDisplayValue": "Giá trị được cung cấp không hợp lệ.",
+      "UnsupportedValue": "Giá trị được cung cấp không hợp lệ."
+    },
     "CurrentUser": {
       "Unauthenticated": "Người dùng hiện tại chưa được xác thực.",
       "UserIdMissing": "Thiếu ID người dùng hiện tại.",

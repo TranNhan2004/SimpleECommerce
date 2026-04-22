@@ -43,7 +43,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
         if (IsDeleted)
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.AlreadyDeleted,
+                CustomerShippingAddressErrorCodes.AlreadyDeleted,
                 "Address has beed deleted",
                 new Dictionary<string, object?>
                 {
@@ -61,7 +61,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
         if (string.IsNullOrWhiteSpace(recipientName))
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.RecipientNameRequired,
+                CustomerShippingAddressErrorCodes.RecipientNameRequired,
                 "Recipient name is required",
                 new Dictionary<string, object?>
                 {
@@ -71,14 +71,14 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
 
         var trimmedName = recipientName.Trim();
 
-        if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
+        if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.RecipientNameMaxLengthExceeded,
-                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters",
+                CustomerShippingAddressErrorCodes.RecipientNameMaxLengthExceeded,
+                $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "RecipientName",
-                    ["max"] = ShippingAddressConstants.RecipientNameMaxLength
+                    ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
                 }
             );
 
@@ -89,7 +89,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.RecipientPhoneNumberRequired,
+                CustomerShippingAddressErrorCodes.RecipientPhoneNumberRequired,
                 "Recipient phone number is required",
                 new Dictionary<string, object?>
                 {
@@ -99,14 +99,14 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
-        if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
+        if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.RecipientPhoneNumberMaxLengthExceeded,
-                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                CustomerShippingAddressErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
+                $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "RecipientPhoneNumber",
-                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                    ["max"] = CommonValidationRules.PhoneNumberMaxLength
                 }
             );
 
@@ -127,7 +127,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
         if (IsDefault)
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.AlreadyDefault,
+                CustomerShippingAddressErrorCodes.AlreadyDefault,
                 "Address is default",
                 new Dictionary<string, object?>
                 {
@@ -142,7 +142,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
         if (!IsDefault)
             throw new ValidationException(
-                CustomerShippingAddressErrorCode.NotDefault,
+                CustomerShippingAddressErrorCodes.NotDefault,
                 "Address is not default",
                 new Dictionary<string, object?>
                 {

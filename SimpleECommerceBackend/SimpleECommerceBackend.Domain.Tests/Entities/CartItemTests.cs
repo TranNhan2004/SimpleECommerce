@@ -27,17 +27,17 @@ public class CartItemTests
         var action = () => CartItem.Create(Guid.Empty, Guid.NewGuid(), 1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.ProductIdRequired);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.ProductIdRequired);
     }
 
     [Fact]
     public void SetQuantity_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
         var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
-        var action = () => cartItem.SetQuantity(CartConstants.MaxQuantityPerItem + 1);
+        var action = () => cartItem.SetQuantity(CartValidationRules.MaxQuantityPerItem + 1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.QuantityCannotExceed);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.QuantityCannotExceed);
     }
 
     [Fact]
@@ -57,6 +57,6 @@ public class CartItemTests
         var action = () => cartItem.DecreaseQuantity(2);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.QuantityMustBeGreaterThanZero);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.QuantityMustBeGreaterThanZero);
     }
 }

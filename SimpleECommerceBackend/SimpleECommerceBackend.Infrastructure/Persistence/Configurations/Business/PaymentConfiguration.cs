@@ -33,13 +33,13 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
             .IsRequired();
 
         builder.Property(p => p.Provider)
-            .HasMaxLength(PaymentConstants.ProviderMaxLength);
+            .HasMaxLength(PaymentValidationRules.ProviderMaxLength);
 
         builder.Property(p => p.Status)
             .IsRequired();
 
         builder.Property(p => p.ExternalTransactionId)
-            .HasMaxLength(PaymentConstants.ExternalTransactionIdMaxLength);
+            .HasMaxLength(PaymentValidationRules.ExternalTransactionIdMaxLength);
 
         builder.HasOne(p => p.Order)
             .WithMany()

@@ -39,7 +39,7 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (productId == Guid.Empty)
             throw new ValidationException(
-                CartItemErrorCode.ProductIdRequired,
+                CartItemErrorCodes.ProductIdRequired,
                 "Product ID is required",
                 new Dictionary<string, object?>
                 {
@@ -54,7 +54,7 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (cartId == Guid.Empty)
             throw new ValidationException(
-                CartItemErrorCode.CartIdRequired,
+                CartItemErrorCodes.CartIdRequired,
                 "Cart ID is required",
                 new Dictionary<string, object?>
                 {
@@ -69,7 +69,7 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantity <= 0)
             throw new ValidationException(
-                CartItemErrorCode.QuantityMustBeGreaterThanZero,
+                CartItemErrorCodes.QuantityMustBeGreaterThanZero,
                 "Quantity must be greater than zero",
                 new Dictionary<string, object?>
                 {
@@ -77,14 +77,14 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        if (quantity > CartConstants.MaxQuantityPerItem)
+        if (quantity > CartValidationRules.MaxQuantityPerItem)
             throw new ValidationException(
-                CartItemErrorCode.QuantityCannotExceed,
-                $"Quantity cannot exceed {CartConstants.MaxQuantityPerItem}",
+                CartItemErrorCodes.QuantityCannotExceed,
+                $"Quantity cannot exceed {CartValidationRules.MaxQuantityPerItem}",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Quantity",
-                    ["max"] = CartConstants.MaxQuantityPerItem
+                    ["max"] = CartValidationRules.MaxQuantityPerItem
                 }
             );
 
@@ -95,7 +95,7 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (amount <= 0)
             throw new ValidationException(
-                CartItemErrorCode.AmountMustBePositive,
+                CartItemErrorCodes.AmountMustBePositive,
                 "Amount must be positive",
                 new Dictionary<string, object?>
                 {
@@ -110,7 +110,7 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (amount <= 0)
             throw new ValidationException(
-                CartItemErrorCode.AmountMustBePositive,
+                CartItemErrorCodes.AmountMustBePositive,
                 "Amount must be positive",
                 new Dictionary<string, object?>
                 {

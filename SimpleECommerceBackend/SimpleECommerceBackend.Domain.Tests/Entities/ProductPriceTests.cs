@@ -25,7 +25,7 @@ public class ProductPriceTests
         var action = () => ProductPrice.Create(EntityTestData.CreateMoney(0), DateTimeOffset.UtcNow);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(ProductPriceErrorCode.PriceMustBePositive);
+            .Which.ErrorCode.Should().Be(ProductPriceErrorCodes.PriceMustBePositive);
     }
 
     [Fact]

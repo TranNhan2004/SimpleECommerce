@@ -23,7 +23,7 @@ public static class DbUpdateConflictExceptionExtensions
     {
         var entry = ex.Entries.FirstOrDefault();
         if (entry is null)
-            return new ConflictException(UniqueErrorCode.UnknownError);
+            return new ConflictException(UniqueErrorCodes.UnknownError);
 
         var entityName = entry.Metadata.ClrType.Name;
 
@@ -32,13 +32,13 @@ public static class DbUpdateConflictExceptionExtensions
             .FirstOrDefault(i => i.IsUnique);
 
         if (uniqueIndex is null)
-            return new ConflictException(UniqueErrorCode.HasNoIndex);
+            return new ConflictException(UniqueErrorCodes.HasNoIndex);
 
         var property = uniqueIndex.Properties.First();
         var value = entry.CurrentValues[property.Name]!;
 
         return new ConflictException(
-            UniqueErrorCode.DuplicateValue,
+            UniqueErrorCodes.DuplicateValue,
             "Duplicate value for unique constraint",
             new Dictionary<string, object?>
             {

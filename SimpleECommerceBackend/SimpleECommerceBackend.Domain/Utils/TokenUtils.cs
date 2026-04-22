@@ -22,7 +22,7 @@ public static class TokenUtils
     {
         if (string.IsNullOrWhiteSpace(token))
             throw new ValidationException(
-                TokenErrorCode.VerificationTokenRequired,
+                TokenErrorCodes.VerificationTokenRequired,
                 "Verification token is required",
                 new Dictionary<string, object?>
                 {

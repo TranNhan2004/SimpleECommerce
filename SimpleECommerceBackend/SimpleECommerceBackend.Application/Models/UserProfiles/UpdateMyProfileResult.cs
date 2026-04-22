@@ -1,3 +1,6 @@
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
+
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
 public class UpdateMyProfileResult
@@ -7,7 +10,22 @@ public class UpdateMyProfileResult
     public string FirstName { get; init; } = null!;
     public string LastName { get; init; } = null!;
     public string? NickName { get; init; }
-    public string Sex { get; init; } = null!;
-    public string Status { get; init; } = null!;
+    public Sex Sex { get; init; }
+    public UserStatus Status { get; init; }
     public DateOnly BirthDate { get; init; }
+
+    public static UpdateMyProfileResult FromEntity(UserProfile entity)
+    {
+        return new UpdateMyProfileResult
+        {
+            Id = entity.Id,
+            Email = entity.Email,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            NickName = entity.NickName,
+            Sex = entity.Sex,
+            Status = entity.Status,
+            BirthDate = entity.BirthDate
+        };
+    }
 }

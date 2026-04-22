@@ -198,6 +198,10 @@
       "PasswordMaxLengthExceeded": "{field} cannot exceed {max} characters.",
       "PasswordInvalidFormat": "{field} format is invalid."
     },
+    "EnumConversion": {
+      "InvalidDisplayValue": "The provided value is invalid.",
+      "UnsupportedValue": "The provided value is invalid."
+    },
     "CurrentUser": {
       "Unauthenticated": "Current user is not authenticated.",
       "UserIdMissing": "Current user ID is missing.",

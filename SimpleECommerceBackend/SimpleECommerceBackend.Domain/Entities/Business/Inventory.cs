@@ -45,7 +45,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (productId == Guid.Empty)
             throw new ValidationException(
-                InventoryErrorCode.ProductRequired,
+                InventoryErrorCodes.ProductRequired,
                 "Product is required",
                 new Dictionary<string, object?>
                 {
@@ -60,7 +60,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (sellerWarehouseId == Guid.Empty)
             throw new ValidationException(
-                InventoryErrorCode.SellerWarehouseRequired,
+                InventoryErrorCodes.SellerWarehouseRequired,
                 "Seller warehouse is required",
                 new Dictionary<string, object?>
                 {
@@ -76,7 +76,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantityOnHand < 0)
             throw new ValidationException(
-                InventoryErrorCode.QuantityOnHandCannotBeNegative,
+                InventoryErrorCodes.QuantityOnHandCannotBeNegative,
                 "Quantity on hand cannot be negative",
                 new Dictionary<string, object?>
                 {
@@ -84,14 +84,14 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        if (quantityOnHand > InventoryConstants.MaxQuantity)
+        if (quantityOnHand > InventoryValidationRules.MaxQuantity)
             throw new ValidationException(
-                InventoryErrorCode.QuantityOnHandCannotExceed,
-                $"Quantity on hand cannot exceed {InventoryConstants.MaxQuantity}",
+                InventoryErrorCodes.QuantityOnHandCannotExceed,
+                $"Quantity on hand cannot exceed {InventoryValidationRules.MaxQuantity}",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "QuantityOnHand",
-                    ["max"] = InventoryConstants.MaxQuantity
+                    ["max"] = InventoryValidationRules.MaxQuantity
                 }
             );
 
@@ -102,7 +102,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantityReserved < 0)
             throw new ValidationException(
-                InventoryErrorCode.QuantityReservedCannotBeNegative,
+                InventoryErrorCodes.QuantityReservedCannotBeNegative,
                 "Quantity reserved cannot be negative",
                 new Dictionary<string, object?>
                 {
@@ -112,7 +112,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (quantityReserved > QuantityInStock)
             throw new ValidationException(
-                InventoryErrorCode.QuantityReservedCannotExceedQuantityOnHand,
+                InventoryErrorCodes.QuantityReservedCannotExceedQuantityOnHand,
                 "Quantity reserved cannot exceed quantity on hand",
                 new Dictionary<string, object?>
                 {
@@ -138,7 +138,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantity <= 0)
             throw new ValidationException(
-                InventoryErrorCode.QuantityToAddMustBePositive,
+                InventoryErrorCodes.QuantityToAddMustBePositive,
                 "Quantity to add must be positive",
                 new Dictionary<string, object?>
                 {
@@ -153,7 +153,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantity <= 0)
             throw new ValidationException(
-                InventoryErrorCode.QuantityToReserveMustBePositive,
+                InventoryErrorCodes.QuantityToReserveMustBePositive,
                 "Quantity to reserve must be positive",
                 new Dictionary<string, object?>
                 {
@@ -163,7 +163,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (AvailableQuantity < quantity)
             throw new ValidationException(
-                InventoryErrorCode.InsufficientStock,
+                InventoryErrorCodes.InsufficientStock,
                 "Insufficient available stock",
                 new Dictionary<string, object?>
                 {
@@ -178,7 +178,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (quantity <= 0)
             throw new ValidationException(
-                InventoryErrorCode.QuantityToReleaseMustBePositive,
+                InventoryErrorCodes.QuantityToReleaseMustBePositive,
                 "Quantity to release must be positive",
                 new Dictionary<string, object?>
                 {
@@ -188,7 +188,7 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (QuantityReserved < quantity)
             throw new ValidationException(
-                InventoryErrorCode.QuantityToReleaseCannotExceedReserved,
+                InventoryErrorCodes.QuantityToReleaseCannotExceedReserved,
                 "Cannot release more than reserved quantity",
                 new Dictionary<string, object?>
                 {

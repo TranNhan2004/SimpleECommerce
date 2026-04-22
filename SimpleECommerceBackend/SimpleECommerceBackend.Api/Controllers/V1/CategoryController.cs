@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.Authorization;
-using SimpleECommerceBackend.Api.DTOs.Errors;
-using SimpleECommerceBackend.Api.DTOs.V1.Categories;
+using SimpleECommerceBackend.Api.DTOs.Common.Errors;
+using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 
 namespace SimpleECommerceBackend.Api.Controllers.V1;
@@ -21,7 +21,7 @@ public partial class CategoryController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<GetAllCategoriesResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
@@ -30,15 +30,15 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> GetAllCategoriesAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
     {
-        var query = _mapper.Map<GetAllCategoriesQuery>(request);
-        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query, cancellationToken);
-        var response = _mapper.Map<IReadOnlyList<GetAllCategoriesResponse>>(result);
+        var query = GetAllCategoriesRequest.ToQuery(request);
+        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, GetAllCategoriesResult>(query, cancellationToken);
+        var response = GetAllCategoriesResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpGet("for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<GetAllCategoriesForAdminResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
@@ -47,9 +47,9 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> GetAllCategoriesForAdminAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
     {
-        var query = _mapper.Map<GetAllCategoriesQuery>(request);
-        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, IReadOnlyList<GetAllCategoriesResult>>(query, cancellationToken);
-        var response = _mapper.Map<IReadOnlyList<GetAllCategoriesForAdminResponse>>(result);
+        var query = GetAllCategoriesRequest.ToQuery(request);
+        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, GetAllCategoriesResult>(query, cancellationToken);
+        var response = GetAllCategoriesForAdminResponse.FromResult(result);
         return Ok(response);
     }
 

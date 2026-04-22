@@ -59,7 +59,7 @@ public class OrderTests
             Guid.NewGuid());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderErrorCode.CodeRequired);
+            .Which.ErrorCode.Should().Be(OrderErrorCodes.CodeRequired);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class OrderTests
         var action = () => order.Deliver();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderErrorCode.DeliverNotAllowed);
+            .Which.ErrorCode.Should().Be(OrderErrorCodes.DeliverNotAllowed);
     }
 
     [Fact]

@@ -26,7 +26,7 @@ public partial class CategoryService : ICategoryService
 
     public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
     {
-        var categoryIds = await _cacheService.GetAsync<IReadOnlyList<Guid>>(CategoryCacheKey.GetAllCategory);
+        var categoryIds = await _cacheService.GetAsync<IReadOnlyList<Guid>>(CategoryCacheKeys.GetAllCategory);
 
         if (categoryIds is null || categoryIds.Count == 0)
         {
@@ -50,9 +50,9 @@ public partial class CategoryService : ICategoryService
         if (orderedCategories.Count != categoryIds.Count)
         {
             await _cacheService.SetAsync(
-                CategoryCacheKey.GetAllCategory,
+                CategoryCacheKeys.GetAllCategory,
                 orderedCategories.Select(category => category.Id).ToList(),
-                TimeSpan.FromMinutes(CategoryCacheKey.GetAllCategoryTtlMinutes)
+                TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoryTtlMinutes)
             );
         }
 
@@ -61,7 +61,7 @@ public partial class CategoryService : ICategoryService
 
     public async Task<Category> GetCategoryByIdAsync(Guid id)
     {
-        var cacheKey = CategoryCacheKey.GetCategory.Replace("{id}", id.ToString());
+        var cacheKey = CategoryCacheKeys.GetCategory.Replace("{id}", id.ToString());
         var cachedCategory = await _cacheService.GetAsync<Category>(cacheKey);
 
         if (cachedCategory is not null)
@@ -71,11 +71,11 @@ public partial class CategoryService : ICategoryService
 
         var category = await _categoryRepository.FindByIdAsync(id)
             ?? throw new ResourceNotFoundException(
-                CategoryErrorCode.NotFoundById,
+                CategoryErrorCodes.NotFoundById,
                 $"Category with Id = {id} was not found."
             );
 
-        await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKey.GetCategoryTtlMinutes));
+        await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKeys.GetCategoryTtlMinutes));
         return category;
     }
 
@@ -83,7 +83,7 @@ public partial class CategoryService : ICategoryService
     {
         var category = await _categoryRepository.FindByIdAsync(id)
            ?? throw new ResourceNotFoundException(
-               CategoryErrorCode.NotFoundById,
+               CategoryErrorCodes.NotFoundById,
                $"Category with Id = {id} was not found."
            );
 
@@ -92,7 +92,7 @@ public partial class CategoryService : ICategoryService
 
     public Task InvalidateCacheByIdAsync(Guid id)
     {
-        return _cacheService.RemoveAsync(CategoryCacheKey.GetCategory.Replace("{id}", id.ToString()));
+        return _cacheService.RemoveAsync(CategoryCacheKeys.GetCategory.Replace("{id}", id.ToString()));
     }
 
     public Task InvalidateCacheByKeyAsync(string key)
@@ -110,7 +110,7 @@ public partial class CategoryService : ICategoryService
             categoryIds.Add(category.Id);
         }
 
-        await _cacheService.SetAsync(CategoryCacheKey.GetAllCategory, categoryIds, TimeSpan.FromMinutes(CategoryCacheKey.GetAllCategoryTtlMinutes));
+        await _cacheService.SetAsync(CategoryCacheKeys.GetAllCategory, categoryIds, TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoryTtlMinutes));
 
         return categories;
     }

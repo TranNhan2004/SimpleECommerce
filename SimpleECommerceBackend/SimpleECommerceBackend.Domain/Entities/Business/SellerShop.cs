@@ -44,7 +44,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ValidationException(
-                SellerShopErrorCode.NameRequired,
+                SellerShopErrorCodes.NameRequired,
                 "Seller shop name is required",
                 new Dictionary<string, object?>
                 {
@@ -54,14 +54,14 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedName = name.Trim();
 
-        if (trimmedName.Length > SellerShopConstants.NameMaxLength)
+        if (trimmedName.Length > SellerShopValidationRules.NameMaxLength)
             throw new ValidationException(
-                SellerShopErrorCode.NameMaxLengthExceeded,
-                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters",
+                SellerShopErrorCodes.NameMaxLengthExceeded,
+                $"Seller shop name cannot exceed {SellerShopValidationRules.NameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "SellerShop",
-                    ["max"] = SellerShopConstants.NameMaxLength
+                    ["max"] = SellerShopValidationRules.NameMaxLength
                 }
             );
 
@@ -72,7 +72,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new ValidationException(
-                SellerShopErrorCode.PhoneNumberRequired,
+                SellerShopErrorCodes.PhoneNumberRequired,
                 "Phone number is required",
                 new Dictionary<string, object?>
                 {
@@ -82,14 +82,14 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedPhoneNumber = phoneNumber.Trim();
 
-        if (trimmedPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
+        if (trimmedPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
             throw new ValidationException(
-                SellerShopErrorCode.PhoneNumberMaxLengthExceeded,
-                $"Phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                SellerShopErrorCodes.PhoneNumberMaxLengthExceeded,
+                $"Phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "PhoneNumber",
-                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                    ["max"] = CommonValidationRules.PhoneNumberMaxLength
                 }
             );
 
@@ -105,7 +105,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (sellerId == Guid.Empty)
             throw new ValidationException(
-                SellerShopErrorCode.SellerRequired,
+                SellerShopErrorCodes.SellerRequired,
                 "Seller is required",
                 new Dictionary<string, object?>
                 {
@@ -126,7 +126,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == sellerWarehouse.Id);
         if (existing is null)
             throw new ValidationException(
-                SellerShopErrorCode.WarehouseNotFound,
+                SellerShopErrorCodes.WarehouseNotFound,
                 "Warehouse not found",
                 new Dictionary<string, object?>
                 {
@@ -142,7 +142,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
         var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == id);
         if (existing is null)
             throw new ValidationException(
-                SellerShopErrorCode.WarehouseNotFound,
+                SellerShopErrorCodes.WarehouseNotFound,
                 "Warehouse not found",
                 new Dictionary<string, object?>
                 {

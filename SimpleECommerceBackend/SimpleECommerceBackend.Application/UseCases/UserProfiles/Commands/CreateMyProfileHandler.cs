@@ -28,7 +28,7 @@ public partial class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCom
             request.FirstName,
             request.LastName,
             request.NickName,
-            SexUtils.Parse(request.Sex),
+            request.Sex,
             request.BirthDate,
             null
         );
@@ -36,13 +36,6 @@ public partial class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCom
         var userProfileCreated = _userProfileService.CreateUserProfile(userProfile);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateMyProfileResult
-        {
-            FirstName = userProfileCreated.FirstName,
-            LastName = userProfileCreated.LastName,
-            NickName = userProfileCreated.NickName,
-            Sex = SexUtils.ToName(userProfileCreated.Sex),
-            BirthDate = userProfileCreated.BirthDate,
-        };
+        return CreateMyProfileResult.FromEntity(userProfileCreated);
     }
 }

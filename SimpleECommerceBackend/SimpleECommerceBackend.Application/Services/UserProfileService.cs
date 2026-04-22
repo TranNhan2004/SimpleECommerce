@@ -26,23 +26,23 @@ public partial class UserProfileService : IUserProfileService
     {
         if (id == Guid.Empty)
             throw new ResourceNotFoundException(
-                UserProfileErrorCode.NotFoundById,
+                UserProfileErrorCodes.NotFoundById,
                 $"User profile with Id = {id} not found."
             );
 
-        var cachedProfile = await _cacheService.GetAsync<UserProfile>(UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()));
+        var cachedProfile = await _cacheService.GetAsync<UserProfile>(UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()));
         if (cachedProfile != null) return cachedProfile;
 
         var userProfile = await _userProfileRepository.FindByIdAsync(id)
                           ?? throw new ResourceNotFoundException(
-                              UserProfileErrorCode.NotFoundById,
+                              UserProfileErrorCodes.NotFoundById,
                               $"User profile with Id = {id} not found."
                           );
 
         await _cacheService.SetAsync(
-            UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()),
+            UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()),
             userProfile,
-            TimeSpan.FromMinutes(UserProfileCacheKey.GetProfileTtlMinutes)
+            TimeSpan.FromMinutes(UserProfileCacheKeys.GetProfileTtlMinutes)
         );
         return userProfile;
     }
@@ -51,14 +51,14 @@ public partial class UserProfileService : IUserProfileService
     {
         return await _userProfileRepository.FindByIdAsync(id, true)
                ?? throw new ResourceNotFoundException(
-                   UserProfileErrorCode.NotFoundById,
+                   UserProfileErrorCodes.NotFoundById,
                    $"User profile with Id = {id} not found."
                );
     }
 
     public async Task InvalidateCacheByIdAsync(Guid id)
     {
-        await _cacheService.RemoveAsync(UserProfileCacheKey.GetProfile.Replace("{id}", id.ToString()));
+        await _cacheService.RemoveAsync(UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()));
     }
 
     public async Task InvalidateCacheByKeyAsync(string key)

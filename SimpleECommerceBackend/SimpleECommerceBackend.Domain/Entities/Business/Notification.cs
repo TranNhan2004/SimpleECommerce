@@ -35,7 +35,7 @@ public class Notification : Entity, ICreatedTrackable
     {
         if (userId == Guid.Empty)
             throw new ValidationException(
-                NotificationErrorCode.UserIdRequired,
+                NotificationErrorCodes.UserIdRequired,
                 "User ID is required",
                 new Dictionary<string, object?>
                 {
@@ -50,7 +50,7 @@ public class Notification : Entity, ICreatedTrackable
     {
         if (string.IsNullOrWhiteSpace(message))
             throw new ValidationException(
-                NotificationErrorCode.MessageRequired,
+                NotificationErrorCodes.MessageRequired,
                 "Message is required",
                 new Dictionary<string, object?>
                 {
@@ -60,14 +60,14 @@ public class Notification : Entity, ICreatedTrackable
 
         var trimmedMessage = message.Trim();
 
-        if (trimmedMessage.Length > NotificationConstants.MessageMaxLength)
+        if (trimmedMessage.Length > NotificationValidationRules.MessageMaxLength)
             throw new ValidationException(
-                NotificationErrorCode.MessageMaxLengthExceeded,
-                $"Message cannot exceed {NotificationConstants.MessageMaxLength} characters",
+                NotificationErrorCodes.MessageMaxLengthExceeded,
+                $"Message cannot exceed {NotificationValidationRules.MessageMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Message",
-                    ["max"] = NotificationConstants.MessageMaxLength
+                    ["max"] = NotificationValidationRules.MessageMaxLength
                 }
             );
 
@@ -78,7 +78,7 @@ public class Notification : Entity, ICreatedTrackable
     {
         if (IsRead)
             throw new ValidationException(
-                NotificationErrorCode.AlreadyMarkedAsRead,
+                NotificationErrorCodes.AlreadyMarkedAsRead,
                 "Notification is already marked as read",
                 new Dictionary<string, object?>
                 {

@@ -10,7 +10,7 @@ public readonly record struct Money
     {
         if (amount < 0)
             throw new ValidationException(
-                MoneyErrorCode.AmountCannotBeNegative,
+                MoneyErrorCodes.AmountCannotBeNegative,
                 "Money amount cannot be negative",
                 new Dictionary<string, object?>
                 {
@@ -20,7 +20,7 @@ public readonly record struct Money
 
         if (string.IsNullOrWhiteSpace(currency))
             throw new ValidationException(
-                MoneyErrorCode.CurrencyRequired,
+                MoneyErrorCodes.CurrencyRequired,
                 "Currency is required",
                 new Dictionary<string, object?>
                 {
@@ -38,7 +38,7 @@ public readonly record struct Money
         catch (Exception)
         {
             throw new ValidationException(
-                MoneyErrorCode.CurrencyUnsupported,
+                MoneyErrorCodes.CurrencyUnsupported,
                 $"Currency '{currency}' is not supported",
                 new Dictionary<string, object?>
                 {
@@ -57,7 +57,7 @@ public readonly record struct Money
     {
         if (a.Currency != b.Currency)
             throw new ValidationException(
-                MoneyErrorCode.CurrencyMismatch,
+                MoneyErrorCodes.CurrencyMismatch,
                 $"Currency mismatch: Cannot operate between {a.Currency} and {b.Currency}",
                 new Dictionary<string, object?>
                 {
@@ -88,7 +88,7 @@ public readonly record struct Money
         var result = a.Amount - b.Amount;
         if (result < 0)
             throw new ValidationException(
-                MoneyErrorCode.ResultCannotBeNegative,
+                MoneyErrorCodes.ResultCannotBeNegative,
                 "Result of subtraction cannot be negative",
                 new Dictionary<string, object?>
                 {

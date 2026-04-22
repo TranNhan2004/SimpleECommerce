@@ -28,18 +28,17 @@ public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryComma
         if (category.AdminId != userContext.Id)
         {
             throw new ForbiddenException(
-                CategoryErrorCode.AdminRequired,
+                CategoryErrorCodes.AdminRequired,
                 "Only the admin who created the category can update it."
             );
         }
 
         category.SetName(request.Name);
         category.SetDescription(request.Description);
-        var status = CategoryStatusUtils.Parse(request.Status);
 
-        if (category.Status != status)
+        if (category.Status != request.Status)
         {
-            switch (status)
+            switch (request.Status)
             {
                 case CategoryStatus.Active:
                     category.Activate();
@@ -54,16 +53,7 @@ public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryComma
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new UpdateCategoryResult
-        {
-            Id = category.Id,
-            Name = category.Name,
-            Description = category.Description,
-            Status = CategoryStatusUtils.ToName(category.Status),
-            AdminId = category.AdminId,
-            CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt
-        };
+        return UpdateCategoryResult.FromEntity(category);
 
     }
 }

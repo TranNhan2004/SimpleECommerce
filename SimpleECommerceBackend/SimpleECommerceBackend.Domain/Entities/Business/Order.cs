@@ -102,7 +102,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new ValidationException(
-                OrderErrorCode.CodeRequired,
+                OrderErrorCodes.CodeRequired,
                 "Order code is required",
                 new Dictionary<string, object?>
                 {
@@ -112,14 +112,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedCode = code.Trim();
 
-        if (trimmedCode.Length > OrderConstants.CodeMaxLength)
+        if (trimmedCode.Length > OrderValidationRules.CodeMaxLength)
             throw new ValidationException(
-                OrderErrorCode.CodeMaxLengthExceeded,
-                $"Order code cannot exceed {OrderConstants.CodeMaxLength} characters",
+                OrderErrorCodes.CodeMaxLengthExceeded,
+                $"Order code cannot exceed {OrderValidationRules.CodeMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "OrderCode",
-                    ["max"] = OrderConstants.CodeMaxLength
+                    ["max"] = OrderValidationRules.CodeMaxLength
                 }
             );
 
@@ -136,7 +136,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (string.IsNullOrWhiteSpace(note))
             throw new ValidationException(
-                OrderErrorCode.NoteMustNotBeBlank,
+                OrderErrorCodes.NoteMustNotBeBlank,
                 "Note is not blank",
                 new Dictionary<string, object?>
                 {
@@ -146,14 +146,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedNote = note.Trim();
 
-        if (trimmedNote.Length > OrderConstants.NoteMaxLength)
+        if (trimmedNote.Length > OrderValidationRules.NoteMaxLength)
             throw new ValidationException(
-                OrderErrorCode.NoteMaxLengthExceeded,
-                $"Note cannot exceed {OrderConstants.NoteMaxLength} characters",
+                OrderErrorCodes.NoteMaxLengthExceeded,
+                $"Note cannot exceed {OrderValidationRules.NoteMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Note",
-                    ["max"] = OrderConstants.NoteMaxLength
+                    ["max"] = OrderValidationRules.NoteMaxLength
                 }
             );
 
@@ -179,7 +179,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.PendingPayment)
             throw new ValidationException(
-                OrderErrorCode.PickupNotAllowed,
+                OrderErrorCodes.PickupNotAllowed,
                 "Only pending payment orders can be picked up",
                 new Dictionary<string, object?>
                 {
@@ -196,7 +196,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.ReadyToPickup)
             throw new ValidationException(
-                OrderErrorCode.ShipNotAllowed,
+                OrderErrorCodes.ShipNotAllowed,
                 "Only picked up orders can be shipped",
                 new Dictionary<string, object?>
                 {
@@ -213,7 +213,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.Shipped)
             throw new ValidationException(
-                OrderErrorCode.AwaitConfirmationNotAllowed,
+                OrderErrorCodes.AwaitConfirmationNotAllowed,
                 "Only shipped orders can be awaited confirmation",
                 new Dictionary<string, object?>
                 {
@@ -230,7 +230,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.AwaitingConfirmation)
             throw new ValidationException(
-                OrderErrorCode.DeliverNotAllowed,
+                OrderErrorCodes.DeliverNotAllowed,
                 "Only awaiting confirmation orders can be delivered",
                 new Dictionary<string, object?>
                 {
@@ -247,7 +247,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.PendingPayment && Status != OrderStatus.ReadyToPickup)
             throw new ValidationException(
-                OrderErrorCode.CancelNotAllowed,
+                OrderErrorCodes.CancelNotAllowed,
                 "Only pending payment or picked up orders can be cancelled",
                 new Dictionary<string, object?>
                 {
@@ -264,7 +264,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.AwaitingConfirmation)
             throw new ValidationException(
-                OrderErrorCode.ReturnNotAllowed,
+                OrderErrorCodes.ReturnNotAllowed,
                 "Only awaiting confirmation orders can be returned",
                 new Dictionary<string, object?>
                 {
@@ -281,7 +281,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != OrderStatus.PendingPayment)
             throw new ValidationException(
-                OrderErrorCode.ExpireNotAllowed,
+                OrderErrorCodes.ExpireNotAllowed,
                 "Only pending payment orders can be expired",
                 new Dictionary<string, object?>
                 {
@@ -299,7 +299,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(shopName))
             throw new ValidationException(
-                OrderErrorCode.ShopNameRequired,
+                OrderErrorCodes.ShopNameRequired,
                 "Shop name is required",
                 new Dictionary<string, object?>
                 {
@@ -309,14 +309,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedName = shopName.Trim();
 
-        if (trimmedName.Length > SellerShopConstants.NameMaxLength)
+        if (trimmedName.Length > SellerShopValidationRules.NameMaxLength)
             throw new ValidationException(
-                OrderErrorCode.ShopNameMaxLengthExceeded,
-                $"Seller shop name cannot exceed {SellerShopConstants.NameMaxLength} characters",
+                OrderErrorCodes.ShopNameMaxLengthExceeded,
+                $"Seller shop name cannot exceed {SellerShopValidationRules.NameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "ShopName",
-                    ["max"] = SellerShopConstants.NameMaxLength
+                    ["max"] = SellerShopValidationRules.NameMaxLength
                 }
             );
 
@@ -332,7 +332,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(recipientName))
             throw new ValidationException(
-                OrderErrorCode.RecipientNameRequired,
+                OrderErrorCodes.RecipientNameRequired,
                 "Recipient name is required",
                 new Dictionary<string, object?>
                 {
@@ -342,14 +342,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedName = recipientName.Trim();
 
-        if (trimmedName.Length > ShippingAddressConstants.RecipientNameMaxLength)
+        if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
             throw new ValidationException(
-                OrderErrorCode.RecipientNameMaxLengthExceeded,
-                $"Recipient name cannot exceed {ShippingAddressConstants.RecipientNameMaxLength} characters",
+                OrderErrorCodes.RecipientNameMaxLengthExceeded,
+                $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "RecipientName",
-                    ["max"] = ShippingAddressConstants.RecipientNameMaxLength
+                    ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
                 }
             );
 
@@ -360,7 +360,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
             throw new ValidationException(
-                OrderErrorCode.RecipientPhoneNumberRequired,
+                OrderErrorCodes.RecipientPhoneNumberRequired,
                 "Recipient phone number is required",
                 new Dictionary<string, object?>
                 {
@@ -370,14 +370,14 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
 
-        if (trimmedRecipientPhoneNumber.Length > CommonConstants.PhoneNumberMaxLength)
+        if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
             throw new ValidationException(
-                OrderErrorCode.RecipientPhoneNumberMaxLengthExceeded,
-                $"Recipient phone number cannot exceed {CommonConstants.PhoneNumberMaxLength} characters",
+                OrderErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
+                $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "RecipientPhoneNumber",
-                    ["max"] = CommonConstants.PhoneNumberMaxLength
+                    ["max"] = CommonValidationRules.PhoneNumberMaxLength
                 }
             );
 
@@ -393,7 +393,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (customerId == Guid.Empty)
             throw new ValidationException(
-                OrderErrorCode.CustomerRequired,
+                OrderErrorCodes.CustomerRequired,
                 "Customer is required",
                 new Dictionary<string, object?>
                 {
@@ -408,7 +408,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (sellerId == Guid.Empty)
             throw new ValidationException(
-                OrderErrorCode.SellerRequired,
+                OrderErrorCodes.SellerRequired,
                 "Seller is required",
                 new Dictionary<string, object?>
                 {

@@ -59,7 +59,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new ValidationException(
-                UserProfileErrorCode.FirstNameRequired,
+                UserProfileErrorCodes.FirstNameRequired,
                 "First name is required",
                 new Dictionary<string, object?>
                 {
@@ -69,14 +69,14 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedFirstName = firstName.Trim();
 
-        if (trimmedFirstName.Length > UserProfileConstants.FirstNameMaxLength)
+        if (trimmedFirstName.Length > UserProfileValidationRules.FirstNameMaxLength)
             throw new ValidationException(
-                UserProfileErrorCode.FirstNameMaxLengthExceeded,
-                $"First name cannot exceed {UserProfileConstants.FirstNameMaxLength} characters",
+                UserProfileErrorCodes.FirstNameMaxLengthExceeded,
+                $"First name cannot exceed {UserProfileValidationRules.FirstNameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "FirstName",
-                    ["max"] = UserProfileConstants.FirstNameMaxLength
+                    ["max"] = UserProfileValidationRules.FirstNameMaxLength
                 }
             );
 
@@ -87,7 +87,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(lastName))
             throw new ValidationException(
-                UserProfileErrorCode.LastNameRequired,
+                UserProfileErrorCodes.LastNameRequired,
                 "Last name is required",
                 new Dictionary<string, object?>
                 {
@@ -97,14 +97,14 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedLastName = lastName.Trim();
 
-        if (trimmedLastName.Length > UserProfileConstants.LastNameMaxLength)
+        if (trimmedLastName.Length > UserProfileValidationRules.LastNameMaxLength)
             throw new ValidationException(
-                UserProfileErrorCode.LastNameMaxLengthExceeded,
-                $"Last name cannot exceed {UserProfileConstants.LastNameMaxLength} characters",
+                UserProfileErrorCodes.LastNameMaxLengthExceeded,
+                $"Last name cannot exceed {UserProfileValidationRules.LastNameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "LastName",
-                    ["max"] = UserProfileConstants.LastNameMaxLength
+                    ["max"] = UserProfileValidationRules.LastNameMaxLength
                 }
             );
 
@@ -121,7 +121,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (string.IsNullOrWhiteSpace(nickName))
             throw new ValidationException(
-                UserProfileErrorCode.NickNameMustNotBeBlank,
+                UserProfileErrorCodes.NickNameMustNotBeBlank,
                 "Nick name is not blank",
                 new Dictionary<string, object?>
                 {
@@ -131,14 +131,14 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
         var trimmedNickName = nickName.Trim();
 
-        if (trimmedNickName.Length > UserProfileConstants.NickNameMaxLength)
+        if (trimmedNickName.Length > UserProfileValidationRules.NickNameMaxLength)
             throw new ValidationException(
-                UserProfileErrorCode.NickNameMaxLengthExceeded,
-                $"Nick name cannot exceed {UserProfileConstants.NickNameMaxLength} characters",
+                UserProfileErrorCodes.NickNameMaxLengthExceeded,
+                $"Nick name cannot exceed {UserProfileValidationRules.NickNameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "NickName",
-                    ["max"] = UserProfileConstants.NickNameMaxLength
+                    ["max"] = UserProfileValidationRules.NickNameMaxLength
                 }
             );
 
@@ -161,7 +161,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 
         if (birthDate > today)
             throw new ValidationException(
-                UserProfileErrorCode.BirthDateCannotBeFuture,
+                UserProfileErrorCodes.BirthDateCannotBeFuture,
                 "Birth date cannot be in the future",
                 new Dictionary<string, object?>
                 {
@@ -169,25 +169,25 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        if (AgeUtils.Calculate(birthDate, today) < UserProfileConstants.MinAge)
+        if (AgeUtils.Calculate(birthDate, today) < UserProfileValidationRules.MinAge)
             throw new ValidationException(
-                UserProfileErrorCode.AgeCannotBeLessThan,
-                $"Age cannot be less than {UserProfileConstants.MinAge} years",
+                UserProfileErrorCodes.AgeCannotBeLessThan,
+                $"Age cannot be less than {UserProfileValidationRules.MinAge} years",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Age",
-                    ["min"] = UserProfileConstants.MinAge
+                    ["min"] = UserProfileValidationRules.MinAge
                 }
             );
 
-        if (AgeUtils.Calculate(birthDate, today) > UserProfileConstants.MaxAge)
+        if (AgeUtils.Calculate(birthDate, today) > UserProfileValidationRules.MaxAge)
             throw new ValidationException(
-                UserProfileErrorCode.AgeCannotExceed,
-                $"Age cannot exceed than {UserProfileConstants.MaxAge} years",
+                UserProfileErrorCodes.AgeCannotExceed,
+                $"Age cannot exceed than {UserProfileValidationRules.MaxAge} years",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Age",
-                    ["max"] = UserProfileConstants.MaxAge
+                    ["max"] = UserProfileValidationRules.MaxAge
                 }
             );
 
@@ -205,7 +205,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         if (Status == UserStatus.Archived)
         {
             throw new ValidationException(
-                UserProfileErrorCode.ArchiveNotAllowed,
+                UserProfileErrorCodes.ArchiveNotAllowed,
                 "Cannot archive this user profile",
                 new Dictionary<string, object?>
                 {
@@ -222,7 +222,7 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         if (Status == UserStatus.Active)
         {
             throw new ValidationException(
-                UserProfileErrorCode.ActivateNotAllowed,
+                UserProfileErrorCodes.ActivateNotAllowed,
                 "Cannot activate this user profile",
                 new Dictionary<string, object?>
                 {

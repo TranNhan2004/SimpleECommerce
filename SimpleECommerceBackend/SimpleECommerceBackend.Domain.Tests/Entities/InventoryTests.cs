@@ -25,17 +25,17 @@ public class InventoryTests
         var action = () => Inventory.Create(Guid.Empty, Guid.NewGuid(), 10);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(InventoryErrorCode.ProductRequired);
+            .Which.ErrorCode.Should().Be(InventoryErrorCodes.ProductRequired);
     }
 
     [Fact]
     public void SetQuantityOnHand_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
         var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
-        var action = () => inventory.SetQuantityOnHand(InventoryConstants.MaxQuantity + 1);
+        var action = () => inventory.SetQuantityOnHand(InventoryValidationRules.MaxQuantity + 1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(InventoryErrorCode.QuantityOnHandCannotExceed);
+            .Which.ErrorCode.Should().Be(InventoryErrorCodes.QuantityOnHandCannotExceed);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class InventoryTests
         var action = () => inventory.ReleaseStock(4);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(InventoryErrorCode.QuantityToReleaseCannotExceedReserved);
+            .Which.ErrorCode.Should().Be(InventoryErrorCodes.QuantityToReleaseCannotExceedReserved);
     }
 
     [Fact]

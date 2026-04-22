@@ -24,7 +24,7 @@ public class CartTests
         var action = () => Cart.Create(Guid.Empty);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartErrorCode.CustomerIdRequired);
+            .Which.ErrorCode.Should().Be(CartErrorCodes.CustomerIdRequired);
     }
 
     [Fact]

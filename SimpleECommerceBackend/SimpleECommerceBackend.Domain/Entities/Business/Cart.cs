@@ -33,7 +33,7 @@ public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (customerId == Guid.Empty)
             throw new ValidationException(
-                CartErrorCode.CustomerIdRequired,
+                CartErrorCodes.CustomerIdRequired,
                 "Customer ID is required",
                 new Dictionary<string, object?>
                 {

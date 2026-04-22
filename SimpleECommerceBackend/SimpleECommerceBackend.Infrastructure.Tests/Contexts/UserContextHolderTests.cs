@@ -103,7 +103,7 @@ public class UserContextHolderTests
         var action = () => sut.GetUserContext();
 
         action.Should().Throw<UnauthorizedException>()
-            .Which.ErrorCode.Should().Be(CurrentUserErrorCode.Unauthenticated);
+            .Which.ErrorCode.Should().Be(CurrentUserErrorCodes.Unauthenticated);
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class UserContextHolderTests
         var action = () => sut.GetUserContext();
 
         action.Should().Throw<ForbiddenException>()
-            .Which.ErrorCode.Should().Be(CurrentUserErrorCode.RoleMissing);
+            .Which.ErrorCode.Should().Be(CurrentUserErrorCodes.RoleMissing);
     }
 
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)

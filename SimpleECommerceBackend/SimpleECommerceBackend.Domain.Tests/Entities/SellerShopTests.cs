@@ -24,18 +24,18 @@ public class SellerShopTests
         var action = () => SellerShop.Create(Guid.Empty, "My Shop", "0987654321", "avatar.png");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerShopErrorCode.SellerRequired);
+            .Which.ErrorCode.Should().Be(SellerShopErrorCodes.SellerRequired);
     }
 
     [Fact]
     public void SetPhoneNumber_ShouldThrowValidationException_WhenPhoneNumberExceedsMaxLength()
     {
         var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
-        var phoneNumber = new string('1', CommonConstants.PhoneNumberMaxLength + 1);
+        var phoneNumber = new string('1', CommonValidationRules.PhoneNumberMaxLength + 1);
         var action = () => sellerShop.SetPhoneNumber(phoneNumber);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerShopErrorCode.PhoneNumberMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(SellerShopErrorCodes.PhoneNumberMaxLengthExceeded);
     }
 
     [Fact]

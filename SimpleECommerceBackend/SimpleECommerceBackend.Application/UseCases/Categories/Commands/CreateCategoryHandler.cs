@@ -31,17 +31,8 @@ public partial class CreateCategoryHandler : IUseCaseHandler<CreateCategoryComma
 
         var createdCategory = _categoryService.CreateCategory(category);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _categoryService.InvalidateCacheByKeyAsync(CategoryCacheKey.GetAllCategory);
+        await _categoryService.InvalidateCacheByKeyAsync(CategoryCacheKeys.GetAllCategory);
 
-        return new CreateCategoryResult
-        {
-            Id = createdCategory.Id,
-            Name = createdCategory.Name,
-            Description = createdCategory.Description,
-            Status = CategoryStatusUtils.ToName(createdCategory.Status),
-            AdminId = createdCategory.AdminId,
-            CreatedAt = createdCategory.CreatedAt,
-            UpdatedAt = createdCategory.UpdatedAt
-        };
+        return CreateCategoryResult.FromEntity(createdCategory);
     }
 }

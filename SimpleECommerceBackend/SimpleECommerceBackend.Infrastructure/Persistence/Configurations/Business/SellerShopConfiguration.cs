@@ -16,7 +16,7 @@ public class SellerShopConfiguration : IEntityTypeConfiguration<SellerShop>
 
         builder.Property(ss => ss.PhoneNumber)
             .IsRequired()
-            .HasMaxLength(CommonConstants.PhoneNumberMaxLength);
+            .HasMaxLength(CommonValidationRules.PhoneNumberMaxLength);
 
         builder.Property(ss => ss.AvatarUrl);
 

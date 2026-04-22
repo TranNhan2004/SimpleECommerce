@@ -33,7 +33,7 @@ public class ProductPrice : Entity, ICreatedTrackable
     {
         if (money.Amount <= 0)
             throw new ValidationException(
-                ProductPriceErrorCode.PriceMustBePositive,
+                ProductPriceErrorCodes.PriceMustBePositive,
                 "Price amount must be positive",
                 new Dictionary<string, object?>
                 {

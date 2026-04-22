@@ -2,7 +2,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using SimpleECommerceBackend.Api.DTOs.Errors;
+using SimpleECommerceBackend.Api.DTOs.Common.Errors;
 using SimpleECommerceBackend.Api.DTOs.V1.UserProfiles;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;

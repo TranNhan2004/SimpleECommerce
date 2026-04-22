@@ -57,7 +57,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ValidationException(
-                ProductErrorCode.NameRequired,
+                ProductErrorCodes.NameRequired,
                 "Name is required",
                 new Dictionary<string, object?>
                 {
@@ -66,14 +66,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
             );
 
         var trimmedName = name.Trim();
-        if (trimmedName.Length > ProductConstants.NameMaxLength)
+        if (trimmedName.Length > ProductValidationRules.NameMaxLength)
             throw new ValidationException(
-                ProductErrorCode.NameMaxLengthExceeded,
-                $"Name cannot exceed {ProductConstants.NameMaxLength} characters",
+                ProductErrorCodes.NameMaxLengthExceeded,
+                $"Name cannot exceed {ProductValidationRules.NameMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Name",
-                    ["max"] = ProductConstants.NameMaxLength
+                    ["max"] = ProductValidationRules.NameMaxLength
                 }
             );
 
@@ -84,7 +84,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (string.IsNullOrWhiteSpace(description))
             throw new ValidationException(
-                ProductErrorCode.DescriptionRequired,
+                ProductErrorCodes.DescriptionRequired,
                 "Description is required",
                 new Dictionary<string, object?>
                 {
@@ -93,14 +93,14 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
             );
 
         var trimmedDescription = description.Trim();
-        if (trimmedDescription.Length > ProductConstants.DescriptionMaxLength)
+        if (trimmedDescription.Length > ProductValidationRules.DescriptionMaxLength)
             throw new ValidationException(
-                ProductErrorCode.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {ProductConstants.DescriptionMaxLength} characters",
+                ProductErrorCodes.DescriptionMaxLengthExceeded,
+                $"Description cannot exceed {ProductValidationRules.DescriptionMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Description",
-                    ["max"] = ProductConstants.DescriptionMaxLength
+                    ["max"] = ProductValidationRules.DescriptionMaxLength
                 }
             );
 
@@ -121,7 +121,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Hidden)
             throw new ValidationException(
-                ProductErrorCode.ActivateNotAllowed,
+                ProductErrorCodes.ActivateNotAllowed,
                 "Only draft or hidden product can be activated",
                 new Dictionary<string, object?>
                 {
@@ -138,7 +138,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (Status != ProductStatus.Draft && Status != ProductStatus.Active)
             throw new ValidationException(
-                ProductErrorCode.HideNotAllowed,
+                ProductErrorCodes.HideNotAllowed,
                 "Only draft or active product can be hidden",
                 new Dictionary<string, object?>
                 {
@@ -155,7 +155,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (categoryId == Guid.Empty)
             throw new ValidationException(
-                ProductErrorCode.CategoryRequired,
+                ProductErrorCodes.CategoryRequired,
                 "Category is required",
                 new Dictionary<string, object?>
                 {
@@ -170,7 +170,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
     {
         if (sellerId == Guid.Empty)
             throw new ValidationException(
-                ProductErrorCode.SellerRequired,
+                ProductErrorCodes.SellerRequired,
                 "Seller is required",
                 new Dictionary<string, object?>
                 {
@@ -191,7 +191,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == image.Id);
         if (existingImage is null)
             throw new ValidationException(
-                ProductErrorCode.ImageNotFound,
+                ProductErrorCodes.ImageNotFound,
                 "Image not found",
                 new Dictionary<string, object?>
                 {
@@ -209,7 +209,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
         var existingImage = _productImages.FirstOrDefault(pi => pi.Id == imageId);
         if (existingImage is null)
             throw new ValidationException(
-                ProductErrorCode.ImageNotFound,
+                ProductErrorCodes.ImageNotFound,
                 "Image not found",
                 new Dictionary<string, object?>
                 {

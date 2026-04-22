@@ -27,17 +27,17 @@ public class CustomerShippingAddressTests
         var action = () => CustomerShippingAddress.Create(" ", "0987654321", EntityTestData.CreateAddress());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCode.RecipientNameRequired);
+            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCodes.RecipientNameRequired);
     }
 
     [Fact]
     public void Create_ShouldThrowValidationException_WhenRecipientPhoneNumberExceedsMaxLength()
     {
-        var phoneNumber = new string('1', CommonConstants.PhoneNumberMaxLength + 1);
+        var phoneNumber = new string('1', CommonValidationRules.PhoneNumberMaxLength + 1);
         var action = () => CustomerShippingAddress.Create("Nhan", phoneNumber, EntityTestData.CreateAddress());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCode.RecipientPhoneNumberMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCodes.RecipientPhoneNumberMaxLengthExceeded);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class CustomerShippingAddressTests
         var action = () => address.RemoveDefault();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCode.NotDefault);
+            .Which.ErrorCode.Should().Be(CustomerShippingAddressErrorCodes.NotDefault);
     }
 
     [Fact]

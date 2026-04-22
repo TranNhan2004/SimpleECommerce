@@ -22,7 +22,7 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
             .HasDefaultValue(true);
 
         builder.Property(pi => pi.Description)
-            .HasMaxLength(ProductImageConstants.DescriptionMaxLength);
+            .HasMaxLength(ProductImageValidationRules.DescriptionMaxLength);
 
         builder.HasOne(pi => pi.Product)
             .WithMany(p => p.ProductImages)

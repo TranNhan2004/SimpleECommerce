@@ -13,11 +13,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Name)
             .IsRequired()
-            .HasMaxLength(ProductConstants.NameMaxLength);
+            .HasMaxLength(ProductValidationRules.NameMaxLength);
 
         builder.Property(p => p.Description)
             .IsRequired()
-            .HasMaxLength(ProductConstants.DescriptionMaxLength);
+            .HasMaxLength(ProductValidationRules.DescriptionMaxLength);
 
         builder.ComplexProperty(p => p.CurrentPrice, money =>
         {

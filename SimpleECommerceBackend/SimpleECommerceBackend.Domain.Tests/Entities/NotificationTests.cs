@@ -23,17 +23,17 @@ public class NotificationTests
         var action = () => Notification.Create(Guid.NewGuid(), " ");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(NotificationErrorCode.MessageRequired);
+            .Which.ErrorCode.Should().Be(NotificationErrorCodes.MessageRequired);
     }
 
     [Fact]
     public void Create_ShouldThrowValidationException_WhenMessageExceedsMaxLength()
     {
-        var message = new string('a', NotificationConstants.MessageMaxLength + 1);
+        var message = new string('a', NotificationValidationRules.MessageMaxLength + 1);
         var action = () => Notification.Create(Guid.NewGuid(), message);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(NotificationErrorCode.MessageMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(NotificationErrorCodes.MessageMaxLengthExceeded);
     }
 
     [Fact]
@@ -44,6 +44,6 @@ public class NotificationTests
         var action = () => notification.MarkAsRead();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(NotificationErrorCode.AlreadyMarkedAsRead);
+            .Which.ErrorCode.Should().Be(NotificationErrorCodes.AlreadyMarkedAsRead);
     }
 }

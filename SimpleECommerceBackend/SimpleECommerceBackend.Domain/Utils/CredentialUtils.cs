@@ -11,7 +11,7 @@ public static class CredentialUtils
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ValidationException(
-                CredentialErrorCode.EmailRequired,
+                CredentialErrorCodes.EmailRequired,
                 "Email is required",
                 new Dictionary<string, object?>
                 {
@@ -21,20 +21,20 @@ public static class CredentialUtils
 
         var trimmedEmail = email.Trim();
 
-        if (trimmedEmail.Length > CredentialConstants.EmailMaxLength)
+        if (trimmedEmail.Length > CredentialValidationRules.EmailMaxLength)
             throw new ValidationException(
-                CredentialErrorCode.EmailMaxLengthExceeded,
-                $"Email cannot exceed {CredentialConstants.EmailMaxLength} characters",
+                CredentialErrorCodes.EmailMaxLengthExceeded,
+                $"Email cannot exceed {CredentialValidationRules.EmailMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Email",
-                    ["max"] = CredentialConstants.EmailMaxLength
+                    ["max"] = CredentialValidationRules.EmailMaxLength
                 }
             );
 
         if (!CredentialRegex.EmailPattern().IsMatch(trimmedEmail))
             throw new ValidationException(
-                CredentialErrorCode.EmailInvalidFormat,
+                CredentialErrorCodes.EmailInvalidFormat,
                 "Email format is invalid",
                 new Dictionary<string, object?>
                 {
@@ -49,7 +49,7 @@ public static class CredentialUtils
     {
         if (string.IsNullOrWhiteSpace(password))
             throw new ValidationException(
-                CredentialErrorCode.PasswordRequired,
+                CredentialErrorCodes.PasswordRequired,
                 "Password is required",
                 new Dictionary<string, object?>
                 {
@@ -59,31 +59,31 @@ public static class CredentialUtils
 
         var trimmedPassword = password.Trim();
 
-        if (trimmedPassword.Length < CredentialConstants.PasswordMinLength)
+        if (trimmedPassword.Length < CredentialValidationRules.PasswordMinLength)
             throw new ValidationException(
-                CredentialErrorCode.PasswordMinLengthNotMet,
-                $"Password must be at least {CredentialConstants.PasswordMinLength} characters long",
+                CredentialErrorCodes.PasswordMinLengthNotMet,
+                $"Password must be at least {CredentialValidationRules.PasswordMinLength} characters long",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Password",
-                    ["min"] = CredentialConstants.PasswordMinLength
+                    ["min"] = CredentialValidationRules.PasswordMinLength
                 }
             );
 
-        if (trimmedPassword.Length > CredentialConstants.PasswordMaxLength)
+        if (trimmedPassword.Length > CredentialValidationRules.PasswordMaxLength)
             throw new ValidationException(
-                CredentialErrorCode.PasswordMaxLengthExceeded,
-                $"Password cannot exceed {CredentialConstants.PasswordMaxLength} characters",
+                CredentialErrorCodes.PasswordMaxLengthExceeded,
+                $"Password cannot exceed {CredentialValidationRules.PasswordMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "Password",
-                    ["max"] = CredentialConstants.PasswordMaxLength
+                    ["max"] = CredentialValidationRules.PasswordMaxLength
                 }
             );
 
         if (!CredentialRegex.PasswordPattern().IsMatch(trimmedPassword))
             throw new ValidationException(
-                CredentialErrorCode.PasswordInvalidFormat,
+                CredentialErrorCodes.PasswordInvalidFormat,
                 "Password format is invalid",
                 new Dictionary<string, object?>
                 {

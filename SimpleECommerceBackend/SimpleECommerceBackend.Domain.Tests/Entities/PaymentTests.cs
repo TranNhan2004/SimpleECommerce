@@ -25,18 +25,18 @@ public class PaymentTests
         var action = () => Payment.Create(Guid.Empty, EntityTestData.CreateMoney(), PaymentMethod.Cash);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(PaymentErrorCode.OrderIdRequired);
+            .Which.ErrorCode.Should().Be(PaymentErrorCodes.OrderIdRequired);
     }
 
     [Fact]
     public void SetProvider_ShouldThrowValidationException_WhenProviderExceedsMaxLength()
     {
         var payment = Payment.Create(Guid.NewGuid(), EntityTestData.CreateMoney(), PaymentMethod.Cash);
-        var provider = new string('a', PaymentConstants.ProviderMaxLength + 1);
+        var provider = new string('a', PaymentValidationRules.ProviderMaxLength + 1);
         var action = () => payment.SetProvider(provider);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(PaymentErrorCode.ProviderMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(PaymentErrorCodes.ProviderMaxLengthExceeded);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class PaymentTests
         var action = () => payment.Fail();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(PaymentErrorCode.FailNotAllowed);
+            .Which.ErrorCode.Should().Be(PaymentErrorCodes.FailNotAllowed);
     }
 
     [Fact]

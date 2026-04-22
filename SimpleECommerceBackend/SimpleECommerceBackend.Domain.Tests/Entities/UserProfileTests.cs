@@ -38,7 +38,7 @@ public class UserProfileTests
             null);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.FirstNameRequired);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.FirstNameRequired);
     }
 
     [Theory]
@@ -57,7 +57,7 @@ public class UserProfileTests
             null);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.LastNameRequired);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.LastNameRequired);
     }
 
     [Fact]
@@ -74,11 +74,11 @@ public class UserProfileTests
     public void SetNickName_ShouldThrowValidationException_WhenNickNameExceedsMaxLength()
     {
         var userProfile = CreateUserProfile();
-        var nickName = new string('a', UserProfileConstants.NickNameMaxLength + 1);
+        var nickName = new string('a', UserProfileValidationRules.NickNameMaxLength + 1);
         var action = () => userProfile.SetNickName(nickName);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.NickNameMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.NickNameMaxLengthExceeded);
     }
 
     [Fact]
@@ -88,27 +88,27 @@ public class UserProfileTests
         var action = () => userProfile.SetBirthDate(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1));
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.BirthDateCannotBeFuture);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.BirthDateCannotBeFuture);
     }
 
     [Fact]
     public void SetBirthDate_ShouldThrowValidationException_WhenAgeIsBelowMinimum()
     {
         var userProfile = CreateUserProfile();
-        var action = () => userProfile.SetBirthDate(EntityTestData.CreateBirthDate(UserProfileConstants.MinAge - 1));
+        var action = () => userProfile.SetBirthDate(EntityTestData.CreateBirthDate(UserProfileValidationRules.MinAge - 1));
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.AgeCannotBeLessThan);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotBeLessThan);
     }
 
     [Fact]
     public void SetBirthDate_ShouldThrowValidationException_WhenAgeExceedsMaximum()
     {
         var userProfile = CreateUserProfile();
-        var action = () => userProfile.SetBirthDate(EntityTestData.CreateBirthDate(UserProfileConstants.MaxAge + 1));
+        var action = () => userProfile.SetBirthDate(EntityTestData.CreateBirthDate(UserProfileValidationRules.MaxAge + 1));
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCode.AgeCannotExceed);
+            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotExceed);
     }
 
     private static UserProfile CreateUserProfile()

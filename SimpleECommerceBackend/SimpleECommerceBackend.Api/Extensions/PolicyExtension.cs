@@ -15,14 +15,14 @@ public static class PolicyExtension
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(RoleUtils.RequireCustomerRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Customer)));
+            options.AddPolicy(AuthorizationPolicies.RequireCustomerRole, policy =>
+                policy.RequireRole(EnumUtils.ToDisplayValue(Role.Customer)));
 
-            options.AddPolicy(RoleUtils.RequireSellerRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Seller)));
+            options.AddPolicy(AuthorizationPolicies.RequireSellerRole, policy =>
+                policy.RequireRole(EnumUtils.ToDisplayValue(Role.Seller)));
 
-            options.AddPolicy(RoleUtils.RequireAdminRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Admin)));
+            options.AddPolicy(AuthorizationPolicies.RequireAdminRole, policy =>
+                policy.RequireRole(EnumUtils.ToDisplayValue(Role.Admin)));
         });
 
         return services;

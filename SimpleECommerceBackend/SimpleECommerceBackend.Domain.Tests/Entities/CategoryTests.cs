@@ -38,17 +38,17 @@ public class CategoryTests
         var action = () => Category.Create(name, "desc", Guid.NewGuid());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CategoryErrorCode.NameRequired);
+            .Which.ErrorCode.Should().Be(CategoryErrorCodes.NameRequired);
     }
 
     [Fact]
     public void Create_ShouldThrowValidationException_WhenNameExceedsMaxLength()
     {
-        var name = new string('a', CategoryConstants.NameMaxLength + 1);
+        var name = new string('a', CategoryValidationRules.NameMaxLength + 1);
         var action = () => Category.Create(name, "desc", Guid.NewGuid());
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CategoryErrorCode.NameMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(CategoryErrorCodes.NameMaxLengthExceeded);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class CategoryTests
         var action = () => category.Activate();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CategoryErrorCode.ActivateNotAllowed);
+            .Which.ErrorCode.Should().Be(CategoryErrorCodes.ActivateNotAllowed);
     }
 
     [Fact]
@@ -80,6 +80,6 @@ public class CategoryTests
         var action = () => category.Archive();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CategoryErrorCode.AlreadyArchived);
+            .Which.ErrorCode.Should().Be(CategoryErrorCodes.AlreadyArchived);
     }
 }

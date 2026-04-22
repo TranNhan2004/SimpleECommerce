@@ -36,7 +36,7 @@ public class TranslationEntryTests
             "Book");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(TranslationEntryErrorCode.RowIdRequired);
+            .Which.ErrorCode.Should().Be(TranslationEntryErrorCodes.RowIdRequired);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class TranslationEntryTests
             "Book");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(TranslationEntryErrorCode.LocaleRequired);
+            .Which.ErrorCode.Should().Be(TranslationEntryErrorCodes.LocaleRequired);
     }
 
     [Fact]

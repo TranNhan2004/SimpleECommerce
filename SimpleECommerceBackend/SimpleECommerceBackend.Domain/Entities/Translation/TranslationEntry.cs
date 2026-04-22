@@ -46,7 +46,7 @@ public class TranslationEntry : Entity
     {
         if (string.IsNullOrWhiteSpace(entityName))
             throw new ValidationException(
-                TranslationEntryErrorCode.EntityNameRequired,
+                TranslationEntryErrorCodes.EntityNameRequired,
                 "Translation entity name is required.",
                 new Dictionary<string, object?>
                 {
@@ -61,7 +61,7 @@ public class TranslationEntry : Entity
     {
         if (string.IsNullOrWhiteSpace(fieldName))
             throw new ValidationException(
-                TranslationEntryErrorCode.FieldNameRequired,
+                TranslationEntryErrorCodes.FieldNameRequired,
                 "Translation field name is required.",
                 new Dictionary<string, object?>
                 {
@@ -76,7 +76,7 @@ public class TranslationEntry : Entity
     {
         if (rowId == Guid.Empty)
             throw new ValidationException(
-                TranslationEntryErrorCode.RowIdRequired,
+                TranslationEntryErrorCodes.RowIdRequired,
                 "Translation row id is required.",
                 new Dictionary<string, object?>
                 {
@@ -91,7 +91,7 @@ public class TranslationEntry : Entity
     {
         if (string.IsNullOrWhiteSpace(locale))
             throw new ValidationException(
-                TranslationEntryErrorCode.LocaleRequired,
+                TranslationEntryErrorCodes.LocaleRequired,
                 "Translation locale is required.",
                 new Dictionary<string, object?>
                 {
@@ -106,7 +106,7 @@ public class TranslationEntry : Entity
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ValidationException(
-                TranslationEntryErrorCode.ValueRequired,
+                TranslationEntryErrorCodes.ValueRequired,
                 "Translation value is required.",
                 new Dictionary<string, object?>
                 {

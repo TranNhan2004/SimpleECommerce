@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Application.Models.Common.Sorting;
+namespace SimpleECommerceBackend.Api.Dtos.Common.Sorting;
 
-public class SortField
+public class SortFieldRequest
 {
     public string FieldName { get; init; } = null!;
     public bool IsAscending { get; init; }

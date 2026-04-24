@@ -1,7 +1,7 @@
-using SimpleECommerceBackend.Api.DTOs.Common.Sorting;
-using SimpleECommerceBackend.Api.DTOs.Common.Pagination;
+using SimpleECommerceBackend.Application.Models.Common.Sorting;
+using SimpleECommerceBackend.Application.Models.Common.Pagination;
 
-namespace SimpleECommerceBackend.Api.DTOs.Common.Filter;
+namespace SimpleECommerceBackend.Application.Models.Common.Filter;
 
 public abstract class FilterQuery<TEntity> : PaginationQuery where TEntity : class
 {

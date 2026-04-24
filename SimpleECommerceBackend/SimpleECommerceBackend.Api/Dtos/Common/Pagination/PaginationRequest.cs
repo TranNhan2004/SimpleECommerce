@@ -2,9 +2,9 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
-namespace SimpleECommerceBackend.Application.Models.Common.Pagination;
+namespace SimpleECommerceBackend.Api.Dtos.Common.Pagination;
 
-public class PaginationQuery
+public class PaginationRequest
 {
     private int currentPage = 1;
     private int rowsPerPage = int.MaxValue;

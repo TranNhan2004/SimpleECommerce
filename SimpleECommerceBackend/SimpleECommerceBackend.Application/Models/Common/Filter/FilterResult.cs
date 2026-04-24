@@ -1,6 +1,6 @@
-using SimpleECommerceBackend.Api.DTOs.Common.Pagination;
+using SimpleECommerceBackend.Application.Models.Common.Pagination;
 
-namespace SimpleECommerceBackend.Api.DTOs.Common.Filter;
+namespace SimpleECommerceBackend.Application.Models.Common.Filter;
 
 public class FilterResult<T> : PaginationResult<T> where T : class
 {

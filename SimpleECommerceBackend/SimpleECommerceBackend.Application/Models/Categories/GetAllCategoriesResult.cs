@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Api.DTOs.Common.Filter;
+using SimpleECommerceBackend.Application.Models.Common.Filter;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Enums;
 

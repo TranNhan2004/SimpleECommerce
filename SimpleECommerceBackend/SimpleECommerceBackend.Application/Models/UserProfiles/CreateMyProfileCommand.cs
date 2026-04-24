@@ -1,5 +1,5 @@
 using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Enums.Common;
+using SimpleECommerceBackend.Application.Enums;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 

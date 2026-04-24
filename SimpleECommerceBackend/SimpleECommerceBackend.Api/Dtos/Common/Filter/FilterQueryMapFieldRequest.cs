@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 
-namespace SimpleECommerceBackend.Application.Models.Common.Filter;
+namespace SimpleECommerceBackend.Api.Dtos.Common.Filter;
 
-public sealed record FilterQueryMapField<TEntity>(
+public sealed record FilterQueryMapFieldRequest<TEntity>(
     string FieldName,
     LambdaExpression Selector,
     Type FieldType

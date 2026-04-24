@@ -1,15 +1,14 @@
 using System.Linq.Expressions;
 
-namespace SimpleECommerceBackend.Application.Models.Common.Filter;
+namespace SimpleECommerceBackend.Api.Dtos.Common.Filter;
 
-public sealed class FilterQueryMap<TEntity> where TEntity : class
+public sealed class FilterQueryMapRequest<TEntity> where TEntity : class
 {
-    private readonly Dictionary<string, FilterQueryMapField<TEntity>> fields =
-        new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, FilterQueryMapFieldRequest<TEntity>> fields = new(StringComparer.OrdinalIgnoreCase);
 
-    public IReadOnlyDictionary<string, FilterQueryMapField<TEntity>> Fields => fields;
+    public IReadOnlyDictionary<string, FilterQueryMapFieldRequest<TEntity>> Fields => fields;
 
-    public FilterQueryMap<TEntity> Map<TField>(
+    public FilterQueryMapRequest<TEntity> Map<TField>(
         string fieldName,
         Expression<Func<TEntity, TField>> selector
     )
@@ -20,7 +19,7 @@ public sealed class FilterQueryMap<TEntity> where TEntity : class
         }
 
         var normalizedFieldName = fieldName.Trim();
-        fields[normalizedFieldName] = new FilterQueryMapField<TEntity>(
+        fields[normalizedFieldName] = new FilterQueryMapFieldRequest<TEntity>(
             normalizedFieldName,
             selector,
             typeof(TField)
@@ -28,7 +27,7 @@ public sealed class FilterQueryMap<TEntity> where TEntity : class
         return this;
     }
 
-    public bool TryGetField(string fieldName, out FilterQueryMapField<TEntity> field)
+    public bool TryGetField(string fieldName, out FilterQueryMapFieldRequest<TEntity> field)
     {
         if (string.IsNullOrWhiteSpace(fieldName))
         {

@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.Authorization;
-using SimpleECommerceBackend.Api.DTOs.Common.Errors;
+using SimpleECommerceBackend.Api.Dtos.Common.Errors;
 using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
+using SimpleECommerceBackend.Api.Dtos.V1.Categories;
 
 namespace SimpleECommerceBackend.Api.Controllers.V1;
 
@@ -38,7 +39,7 @@ public partial class CategoryController : ControllerBase
 
     [HttpGet("for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesForAdminResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SimpleECommerceBackend.Api.Dtos.V1.Categories.GetAllCategoriesForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
@@ -49,7 +50,7 @@ public partial class CategoryController : ControllerBase
     {
         var query = GetAllCategoriesRequest.ToQuery(request);
         var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, GetAllCategoriesResult>(query, cancellationToken);
-        var response = GetAllCategoriesForAdminResponse.FromResult(result);
+        var response = SimpleECommerceBackend.Api.Dtos.V1.Categories.GetAllCategoriesForAdminResponse.FromResult(result);
         return Ok(response);
     }
 

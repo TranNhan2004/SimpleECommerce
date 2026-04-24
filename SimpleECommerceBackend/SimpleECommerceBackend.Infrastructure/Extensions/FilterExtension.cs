@@ -1,12 +1,11 @@
 using System.Globalization;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Api.DTOs.Common.Filter;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Enums.Common;
+using SimpleECommerceBackend.Application.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
+using SimpleECommerceBackend.Application.Models.Common.Filter;
 
 namespace SimpleECommerceBackend.Infrastructure.Extensions;
 
@@ -62,91 +61,46 @@ public static class FilterExtension
                 .Select(criterion => BuildCriterionExpression(criterion, filterQueryMap))
                 .ToList();
 
-            // Normalize the group first so every criterion is represented in a single tree.
-            // After this point, the filter evaluator only needs to read FilterGroup semantics.
-            var effectiveFilterGroup = NormalizeFilterGroup(
-                filterQuery.FilterGroup,
-                criterionExpressions.Count
+            var predicate = BuildGroupExpression(
+                GetEffectiveFilterGroup(filterQuery.FilterGroup, criterionExpressions.Count),
+                criterionExpressions
             );
-
-            var predicate = BuildGroupExpression(effectiveFilterGroup, criterionExpressions);
             return query.Where(predicate);
         }
 
-        // Builds a complete group tree so every criterion is glued through FilterGroup only.
-        private static FilterGroup NormalizeFilterGroup(
+        // Uses the tree produced by FilterGroupConverter when present, otherwise falls back to a simple AND group.
+        private static FilterGroup GetEffectiveFilterGroup(
             FilterGroup? filterGroup,
             int criterionCount
         )
         {
             if (filterGroup is null || filterGroup.Children.Count == 0)
             {
-                return CreateAndGroup(Enumerable.Range(0, criterionCount));
+                return CreateAndGroup(criterionCount);
             }
 
-            var referencedCriterionIndexes = new HashSet<int>();
-            CollectReferencedCriterionIndexes(filterGroup, referencedCriterionIndexes);
+            return filterGroup;
+        }
 
-            var missingCriterionIndexes = Enumerable.Range(0, criterionCount)
-                .Where(index => !referencedCriterionIndexes.Contains(index))
-                .ToList();
-
-            if (missingCriterionIndexes.Count == 0)
+        // Creates the fallback AND group used when no normalized tree was attached to the backend query.
+        private static FilterGroup CreateAndGroup(int criterionCount)
+        {
+            var children = new List<FilterGroupNode>(criterionCount);
+            for (var index = 0; index < criterionCount; index++)
             {
-                return filterGroup;
+                children.Add(
+                    new FilterGroupNode
+                    {
+                        CriterionIndex = index
+                    }
+                );
             }
-
-            var children = new List<FilterGroupNode>
-            {
-                new() { Group = filterGroup }
-            };
-
-            children.AddRange(
-                missingCriterionIndexes.Select(index => new FilterGroupNode
-                {
-                    CriterionIndex = index
-                })
-            );
 
             return new FilterGroup
             {
                 Logic = FilterGroupLogic.And,
                 Children = children
             };
-        }
-
-        // Creates the fallback AND group used when the payload does not define one.
-        private static FilterGroup CreateAndGroup(IEnumerable<int> criterionIndexes)
-        {
-            return new FilterGroup
-            {
-                Logic = FilterGroupLogic.And,
-                Children = [..criterionIndexes
-                    .Select(index => new FilterGroupNode
-                    {
-                        CriterionIndex = index
-                    })]
-            };
-        }
-
-        // Collects every criterion index referenced anywhere in the current group tree.
-        private static void CollectReferencedCriterionIndexes(
-            FilterGroup filterGroup,
-            ISet<int> referencedCriterionIndexes
-        )
-        {
-            foreach (var child in filterGroup.Children)
-            {
-                if (child.CriterionIndex.HasValue)
-                {
-                    referencedCriterionIndexes.Add(child.CriterionIndex.Value);
-                }
-
-                if (child.Group is not null)
-                {
-                    CollectReferencedCriterionIndexes(child.Group, referencedCriterionIndexes);
-                }
-            }
         }
 
         // Recursively converts a filter group into one boolean expression tree.
@@ -163,7 +117,7 @@ public static class FilterExtension
                 );
             }
 
-            var logic = ParseGroupLogic(group.Logic);
+            var logic = group.Logic == default ? FilterGroupLogic.And : group.Logic;
             var children = group.Children
                 .Select(child => BuildGroupNodeExpression<TEntity>(child, criterionExpressions))
                 .ToList();
@@ -708,29 +662,6 @@ public static class FilterExtension
                 or FilterOperator.Contains
                 or FilterOperator.StartsWith
                 or FilterOperator.EndsWith;
-        }
-
-        // Normalizes the enum-backed group logic and treats the enum default value as AND.
-        private static FilterGroupLogic ParseGroupLogic(FilterGroupLogic rawLogic)
-        {
-            if (rawLogic == default)
-            {
-                return FilterGroupLogic.And;
-            }
-
-            if (Enum.IsDefined(rawLogic))
-            {
-                return rawLogic;
-            }
-
-            throw new ValidationException(
-                FilterErrorCodes.UnsupportedGroupLogic,
-                $"Unsupported filter group logic '{EnumUtils.ToDisplayValue(rawLogic)}'.",
-                new Dictionary<string, object?>
-                {
-                    ["logic"] = EnumUtils.ToDisplayValue(rawLogic)
-                }
-            );
         }
 
         // Rebinds parameters so separately-built lambdas can be merged into one expression tree.

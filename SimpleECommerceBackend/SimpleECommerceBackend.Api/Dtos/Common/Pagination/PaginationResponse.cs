@@ -1,6 +1,6 @@
-namespace SimpleECommerceBackend.Application.Models.Common.Pagination;
+namespace SimpleECommerceBackend.Api.Dtos.Common.Pagination;
 
-public class PaginationResult<T> where T : class
+public class PaginationResponse<T> where T : class
 {
     public IReadOnlyList<T> Items { get; init; } = [];
     public int CurrentPage { get; init; }

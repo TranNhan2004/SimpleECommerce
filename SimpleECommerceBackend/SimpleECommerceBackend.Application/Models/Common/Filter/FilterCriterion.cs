@@ -1,6 +1,6 @@
-using SimpleECommerceBackend.Domain.Enums.Common;
+using SimpleECommerceBackend.Application.Enums;
 
-namespace SimpleECommerceBackend.Api.DTOs.Common.Filter;
+namespace SimpleECommerceBackend.Application.Models.Common.Filter;
 
 public class FilterCriterion
 {

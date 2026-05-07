@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Application.Models.Common.Pagination;
 public class PaginationQuery
 {
     private int currentPage = 1;
-    private int rowsPerPage = int.MaxValue;
+    private int itemsPerPage = int.MaxValue;
 
     public int CurrentPage
     {
@@ -28,22 +28,22 @@ public class PaginationQuery
         }
     }
 
-    public int RowsPerPage
+    public int ItemsPerPage
     {
-        get => rowsPerPage;
+        get => itemsPerPage;
         init
         {
             if (value < 1)
                 throw new ValidationException(
-                    PaginationErrorCodes.InvalidRowsPerPage,
-                    "Rows per page must be a positive integer.",
+                    PaginationErrorCodes.InvalidItemsPerPage,
+                    "Items per page must be a positive integer.",
                     new Dictionary<string, object?>
                     {
-                        ["field"] = "RowsPerPage"
+                        ["field"] = "ItemsPerPage"
                     }
                 );
 
-            rowsPerPage = value;
+            itemsPerPage = value;
         }
     }
 

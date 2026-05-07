@@ -2,6 +2,7 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
+using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
@@ -17,7 +18,7 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
         CancellationToken cancellationToken
     )
     {
-        var currentUser = _userContextHolder.GetActiveUserContext();
+        var currentUser = _userContextHolder.GetUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
         userProfile.SetNickName(request.NickName);
@@ -32,7 +33,9 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
             userProfile.SetBirthDate(request.BirthDate.Value);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateCacheByIdAsync(userProfile.Id);
+        await _userProfileService.InvalidateCacheAsync(
+            exactKeys: [UserProfileCacheKeys.GetProfileKey(userProfile.Id)]
+        );
         return UpdateMyProfileResult.FromEntity(userProfile);
     }
 }

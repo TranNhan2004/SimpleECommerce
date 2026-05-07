@@ -3,10 +3,10 @@ using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
+using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
@@ -22,7 +22,7 @@ public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryComma
         CancellationToken cancellationToken
     )
     {
-        var userContext = _userContextHolder.GetActiveUserContext();
+        var userContext = _userContextHolder.GetUserContext();
         var category = await _categoryService.GetCategoryByIdForUpdateAsync(request.Id);
 
         if (category.AdminId != userContext.Id)
@@ -53,6 +53,10 @@ public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryComma
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _categoryService.InvalidateCacheAsync(
+            exactKeys: [CategoryCacheKeys.GetCategoryKey(category.Id)],
+            prefixKeys: [CategoryCacheKeys.GetAllCategoriesPrefix, CategoryCacheKeys.GetAllCategoriesForAdminPrefix]
+        );
         return UpdateCategoryResult.FromEntity(category);
 
     }

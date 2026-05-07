@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Moq;
+using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using StackExchange.Redis;
@@ -32,6 +34,53 @@ public class RedisCacheServiceTests
     }
 
     [Fact]
+    public async Task SetAsync_ShouldStoreAndReturnUserProfile()
+    {
+        var sut = CreateSut();
+        var expected = UserProfile.Create(
+            Guid.NewGuid(),
+            "user@example.com",
+            "Nhan",
+            "Tran",
+            "nhan",
+            Sex.Male,
+            new DateOnly(2000, 1, 1),
+            "avatar.png"
+        );
+
+        await sut.SetAsync("cache:user-profile", expected, TimeSpan.FromMinutes(5));
+        var result = await sut.GetAsync<UserProfile>("cache:user-profile");
+
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(expected.Id);
+        result.Email.Should().Be(expected.Email);
+        result.FirstName.Should().Be(expected.FirstName);
+        result.LastName.Should().Be(expected.LastName);
+        result.NickName.Should().Be(expected.NickName);
+        result.Sex.Should().Be(expected.Sex);
+        result.Status.Should().Be(expected.Status);
+        result.BirthDate.Should().Be(expected.BirthDate);
+        result.AvatarUrl.Should().Be(expected.AvatarUrl);
+    }
+
+    [Fact]
+    public async Task SetAsync_ShouldStoreAndReturnCategory()
+    {
+        var sut = CreateSut();
+        var expected = Category.Create("Books", "Fiction books", Guid.NewGuid());
+
+        await sut.SetAsync("cache:category", expected, TimeSpan.FromMinutes(5));
+        var result = await sut.GetAsync<Category>("cache:category");
+
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(expected.Id);
+        result.Name.Should().Be(expected.Name);
+        result.Description.Should().Be(expected.Description);
+        result.Status.Should().Be(expected.Status);
+        result.AdminId.Should().Be(expected.AdminId);
+    }
+
+    [Fact]
     public async Task RemoveAsync_ShouldDeleteExistingValue()
     {
         var sut = CreateSut();
@@ -41,6 +90,70 @@ public class RedisCacheServiceTests
         var result = await sut.GetStringAsync("cache:remove");
 
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SetStringAsync_ShouldRemoveOldestKey_WhenPrefixLimitIsExceeded()
+    {
+        var sut = CreateSut(prefixKeyLimits: new Dictionary<string, int>
+        {
+            ["Category"] = 2
+        });
+
+        await sut.SetStringAsync("Category:first", "1", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("Category:second", "2", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("Category:third", "3", TimeSpan.FromMinutes(5));
+
+        var first = await sut.GetStringAsync("Category:first");
+        var second = await sut.GetStringAsync("Category:second");
+        var third = await sut.GetStringAsync("Category:third");
+
+        first.Should().BeNull();
+        second.Should().Be("2");
+        third.Should().Be("3");
+    }
+
+    [Fact]
+    public async Task SetStringAsync_ShouldTrackEachPrefixSeparately_WhenPrefixLimitIsExceeded()
+    {
+        var sut = CreateSut(prefixKeyLimits: new Dictionary<string, int>
+        {
+            ["Category"] = 1,
+            ["UserProfile"] = 1
+        });
+
+        await sut.SetStringAsync("Category:first", "1", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("UserProfile:first", "2", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("Category:second", "3", TimeSpan.FromMinutes(5));
+
+        var categoryFirst = await sut.GetStringAsync("Category:first");
+        var categorySecond = await sut.GetStringAsync("Category:second");
+        var userProfileFirst = await sut.GetStringAsync("UserProfile:first");
+
+        categoryFirst.Should().BeNull();
+        categorySecond.Should().Be("3");
+        userProfileFirst.Should().Be("2");
+    }
+
+    [Fact]
+    public async Task SetStringAsync_ShouldIgnorePrefixesWithoutConfiguredLimit()
+    {
+        var sut = CreateSut(prefixKeyLimits: new Dictionary<string, int>
+        {
+            ["UserProfile"] = 1
+        });
+
+        await sut.SetStringAsync("Category:first", "1", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("Category:second", "2", TimeSpan.FromMinutes(5));
+        await sut.SetStringAsync("Category:third", "3", TimeSpan.FromMinutes(5));
+
+        var first = await sut.GetStringAsync("Category:first");
+        var second = await sut.GetStringAsync("Category:second");
+        var third = await sut.GetStringAsync("Category:third");
+
+        first.Should().Be("1");
+        second.Should().Be("2");
+        third.Should().Be("3");
     }
 
     [Fact]
@@ -76,7 +189,20 @@ public class RedisCacheServiceTests
         return CreateSut(out _);
     }
 
+    private static RedisCacheService CreateSut(Dictionary<string, int> prefixKeyLimits)
+    {
+        return CreateSut(prefixKeyLimits, out _);
+    }
+
     private static RedisCacheService CreateSut(out Dictionary<string, RedisValue> storage)
+    {
+        return CreateSut([], out storage);
+    }
+
+    private static RedisCacheService CreateSut(
+        Dictionary<string, int> prefixKeyLimits,
+        out Dictionary<string, RedisValue> storage
+    )
     {
         var cacheStorage = new Dictionary<string, RedisValue>();
         storage = cacheStorage;
@@ -107,6 +233,10 @@ public class RedisCacheServiceTests
             });
 
         databaseMock
+            .Setup(x => x.KeyExistsAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+            .ReturnsAsync((RedisKey key, CommandFlags _) => cacheStorage.ContainsKey(key!));
+
+        databaseMock
             .Setup(x => x.KeyDeleteAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync((RedisKey key, CommandFlags _) => cacheStorage.Remove(key!));
 
@@ -121,7 +251,8 @@ public class RedisCacheServiceTests
                 new RedisOptions
                 {
                     ConnectionString = "localhost:6379",
-                    InstanceName = "test:"
+                    InstanceName = "test:",
+                    PrefixKeyLimits = prefixKeyLimits
                 }
             )
         );

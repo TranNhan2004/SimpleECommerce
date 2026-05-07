@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
@@ -15,6 +16,34 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 {
     private UserProfile()
     {
+    }
+
+    [JsonConstructor]
+    private UserProfile(
+        Guid id,
+        string email,
+        string firstName,
+        string lastName,
+        string? nickName,
+        Sex sex,
+        UserStatus status,
+        DateOnly birthDate,
+        string? avatarUrl,
+        DateTimeOffset createdAt,
+        DateTimeOffset? updatedAt
+    )
+    {
+        SetId(id);
+        SetEmail(email);
+        SetFirstName(firstName);
+        SetLastName(lastName);
+        SetNickName(nickName);
+        SetSex(sex);
+        SetStatus(status);
+        SetBirthDate(birthDate);
+        SetAvatarUrl(avatarUrl);
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
     }
 
     private UserProfile(

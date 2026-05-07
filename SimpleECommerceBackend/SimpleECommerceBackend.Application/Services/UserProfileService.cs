@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using Serilog;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
@@ -10,12 +10,25 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
 
-[AutoConstructor]
-public partial class UserProfileService : IUserProfileService
+public partial class UserProfileService : ServiceBase, IUserProfileService
 {
-    private readonly ICacheService _cacheService;
     private readonly IUserProfileRepository _userProfileRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger _logger;
+
+    public UserProfileService(
+        ICacheService cacheService,
+        IUserProfileRepository userProfileRepository,
+        ILogger logger
+    ) : base(cacheService)
+    {
+        _userProfileRepository = userProfileRepository;
+        _logger = logger;
+    }
+
+    protected override string BuildCacheKeyById(Guid id)
+    {
+        return UserProfileCacheKeys.GetProfileKey(id);
+    }
 
     public UserProfile CreateUserProfile(UserProfile userProfile)
     {
@@ -30,8 +43,16 @@ public partial class UserProfileService : IUserProfileService
                 $"User profile with Id = {id} not found."
             );
 
-        var cachedProfile = await _cacheService.GetAsync<UserProfile>(UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()));
-        if (cachedProfile != null) return cachedProfile;
+        var cacheKey = UserProfileCacheKeys.GetProfileKey(id);
+        var cachedProfile = await CacheService.GetAsync<UserProfile>(cacheKey);
+
+        if (cachedProfile is not null)
+        {
+            _logger.Debug("Cache hit for user profile {CacheKey}", cacheKey);
+            return cachedProfile;
+        }
+
+        _logger.Debug("Cache miss for user profile {CacheKey}", cacheKey);
 
         var userProfile = await _userProfileRepository.FindByIdAsync(id)
                           ?? throw new ResourceNotFoundException(
@@ -39,8 +60,8 @@ public partial class UserProfileService : IUserProfileService
                               $"User profile with Id = {id} not found."
                           );
 
-        await _cacheService.SetAsync(
-            UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()),
+        await CacheService.SetAsync(
+            cacheKey,
             userProfile,
             TimeSpan.FromMinutes(UserProfileCacheKeys.GetProfileTtlMinutes)
         );
@@ -54,16 +75,6 @@ public partial class UserProfileService : IUserProfileService
                    UserProfileErrorCodes.NotFoundById,
                    $"User profile with Id = {id} not found."
                );
-    }
-
-    public async Task InvalidateCacheByIdAsync(Guid id)
-    {
-        await _cacheService.RemoveAsync(UserProfileCacheKeys.GetProfile.Replace("{id}", id.ToString()));
-    }
-
-    public async Task InvalidateCacheByKeyAsync(string key)
-    {
-        await _cacheService.RemoveAsync(key);
     }
 
     public async Task<bool> IsActiveUserAsync(Guid id)

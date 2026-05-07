@@ -3,6 +3,7 @@ using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
+using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
@@ -18,12 +19,14 @@ public partial class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCom
         CancellationToken cancellationToken
     )
     {
-        var currentUser = _userContextHolder.GetActiveUserContext();
+        var currentUser = _userContextHolder.GetUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
         userProfile.Archived();
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateCacheByIdAsync(userProfile.Id);
+        await _userProfileService.InvalidateCacheAsync(
+            exactKeys: [UserProfileCacheKeys.GetProfileKey(userProfile.Id)]
+        );
     }
 }

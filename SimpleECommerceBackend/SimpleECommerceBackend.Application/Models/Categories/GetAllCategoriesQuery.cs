@@ -9,11 +9,6 @@ public class GetAllCategoriesQuery : FilterQuery<Category>
     {
         return new FilterQueryMap<Category>()
             .Map("id", category => category.Id)
-            .Map("name", category => category.Name)
-            .Map("description", category => category.Description)
-            .Map("status", category => category.Status)
-            .Map("adminId", category => category.AdminId)
-            .Map("createdAt", category => category.CreatedAt)
-            .Map("updatedAt", category => category.UpdatedAt);
+            .Map("name", category => category.Name);
     }
 }

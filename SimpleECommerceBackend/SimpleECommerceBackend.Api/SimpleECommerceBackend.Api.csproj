@@ -12,23 +12,27 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Mapster.DependencyInjection" Version="10.0.0-pre01"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.OpenApi" Version="2.5.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1"/>
+        <PackageReference Include="Microsoft.OpenApi" Version="2.5.0" />
+        <PackageReference Include="Serilog" Version="4.3.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SimpleECommerceBackend.Application\SimpleECommerceBackend.Application.csproj"/>
-        <ProjectReference Include="..\SimpleECommerceBackend.Domain\SimpleECommerceBackend.Domain.csproj"/>
-        <ProjectReference Include="..\SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj"/>
+        <ProjectReference Include="..\SimpleECommerceBackend.Application\SimpleECommerceBackend.Application.csproj" />
+        <ProjectReference Include="..\SimpleECommerceBackend.Domain\SimpleECommerceBackend.Domain.csproj" />
+        <ProjectReference Include="..\SimpleECommerceBackend.Infrastructure\SimpleECommerceBackend.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

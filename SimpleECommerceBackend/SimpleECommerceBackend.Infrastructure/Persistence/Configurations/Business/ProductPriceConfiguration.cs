@@ -27,7 +27,7 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
         });
 
         builder.HasOne(pp => pp.Product)
-            .WithMany()
+            .WithMany(p => p.ProductPrices)
             .IsRequired()
             .HasForeignKey(pp => pp.ProductId)
             .OnDelete(DeleteBehavior.Cascade);

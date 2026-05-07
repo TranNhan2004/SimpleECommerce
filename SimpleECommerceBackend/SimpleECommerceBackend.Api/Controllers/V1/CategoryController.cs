@@ -1,7 +1,7 @@
-using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using SimpleECommerceBackend.Api.Attributes;
 using SimpleECommerceBackend.Api.Authorization;
 using SimpleECommerceBackend.Api.Dtos.Common.Errors;
 using SimpleECommerceBackend.Application.Models.Categories;
@@ -18,10 +18,10 @@ namespace SimpleECommerceBackend.Api.Controllers.V1;
 public partial class CategoryController : ControllerBase
 {
     private readonly IUseCaseDispatcher _dispatcher;
-    private readonly IMapper _mapper;
 
-    [HttpGet]
+    [HttpPost("get-all")]
     [Authorize]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -29,7 +29,7 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> GetAllCategoriesAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCategoriesAsync([FromBody] GetAllCategoriesRequest request, CancellationToken cancellationToken)
     {
         var query = GetAllCategoriesRequest.ToQuery(request);
         var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, GetAllCategoriesResult>(query, cancellationToken);
@@ -37,25 +37,27 @@ public partial class CategoryController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("for-admin")]
+    [HttpPost("get-all/for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SimpleECommerceBackend.Api.Dtos.V1.Categories.GetAllCategoriesForAdminResponse))]
+    [RequireActiveUser]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-    public async Task<IActionResult> GetAllCategoriesForAdminAsync([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCategoriesForAdminAsync([FromBody] GetAllCategoriesRequestForAdmin request, CancellationToken cancellationToken)
     {
-        var query = GetAllCategoriesRequest.ToQuery(request);
-        var result = await _dispatcher.SendAsync<GetAllCategoriesQuery, GetAllCategoriesResult>(query, cancellationToken);
+        var query = GetAllCategoriesRequestForAdmin.ToQuery(request);
+        var result = await _dispatcher.SendAsync<GetAllCategoriesQueryForAdmin, GetAllCategoriesResultForAdmin>(query, cancellationToken);
         var response = SimpleECommerceBackend.Api.Dtos.V1.Categories.GetAllCategoriesForAdminResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpPost("{id}")]
     [Authorize]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -66,12 +68,13 @@ public partial class CategoryController : ControllerBase
     {
         var query = new GetCategoryQuery { Id = id };
         var result = await _dispatcher.SendAsync<GetCategoryQuery, GetCategoryResult>(query, cancellationToken);
-        var response = _mapper.Map<GetCategoryResponse>(result);
+        var response = GetCategoryResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpGet("{id}/for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCategoryForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -83,12 +86,13 @@ public partial class CategoryController : ControllerBase
     {
         var query = new GetCategoryQuery { Id = id };
         var result = await _dispatcher.SendAsync<GetCategoryQuery, GetCategoryResult>(query, cancellationToken);
-        var response = _mapper.Map<GetCategoryForAdminResponse>(result);
+        var response = GetCategoryForAdminResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpPost("for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -97,14 +101,15 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> CreateCategoryAsync([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
     {
-        var command = _mapper.Map<CreateCategoryCommand>(request);
+        var command = CreateCategoryRequest.ToCommand(request);
         var result = await _dispatcher.SendAsync<CreateCategoryCommand, CreateCategoryResult>(command, cancellationToken);
-        var response = _mapper.Map<CreateCategoryResponse>(result);
+        var response = CreateCategoryResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpPut("for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -113,14 +118,15 @@ public partial class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> UpdateCategoryAsync([FromBody] UpdateCategoryRequest request, CancellationToken cancellationToken)
     {
-        var command = _mapper.Map<UpdateCategoryCommand>(request);
+        var command = UpdateCategoryRequest.ToCommand(request);
         var result = await _dispatcher.SendAsync<UpdateCategoryCommand, UpdateCategoryResult>(command, cancellationToken);
-        var response = _mapper.Map<UpdateCategoryResponse>(result);
+        var response = UpdateCategoryResponse.FromResult(result);
         return Ok(response);
     }
 
     [HttpDelete("{id}/for-admin")]
     [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
+    [RequireActiveUser]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

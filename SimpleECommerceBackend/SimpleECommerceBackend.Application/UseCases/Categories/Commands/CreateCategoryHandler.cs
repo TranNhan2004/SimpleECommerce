@@ -21,7 +21,7 @@ public partial class CreateCategoryHandler : IUseCaseHandler<CreateCategoryComma
         CancellationToken cancellationToken
     )
     {
-        var userContext = _userContextHolder.GetActiveUserContext();
+        var userContext = _userContextHolder.GetUserContext();
 
         var category = Category.Create(
             request.Name,
@@ -31,7 +31,9 @@ public partial class CreateCategoryHandler : IUseCaseHandler<CreateCategoryComma
 
         var createdCategory = _categoryService.CreateCategory(category);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _categoryService.InvalidateCacheByKeyAsync(CategoryCacheKeys.GetAllCategory);
+        await _categoryService.InvalidateCacheAsync(
+            prefixKeys: [CategoryCacheKeys.GetAllCategoriesPrefix, CategoryCacheKeys.GetAllCategoriesForAdminPrefix]
+        );
 
         return CreateCategoryResult.FromEntity(createdCategory);
     }

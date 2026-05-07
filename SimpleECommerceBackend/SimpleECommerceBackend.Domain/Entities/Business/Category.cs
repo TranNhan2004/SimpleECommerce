@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
@@ -10,6 +11,26 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
 {
     private Category()
     {
+    }
+
+    [JsonConstructor]
+    private Category(
+        Guid id,
+        string name,
+        string? description,
+        CategoryStatus status,
+        Guid adminId,
+        DateTimeOffset createdAt,
+        DateTimeOffset? updatedAt
+    )
+    {
+        SetId(id);
+        SetName(name);
+        SetDescription(description);
+        SetStatus(status);
+        SetAdminId(adminId);
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
     }
 
     private Category(string name, string? description, CategoryStatus status, Guid adminId)

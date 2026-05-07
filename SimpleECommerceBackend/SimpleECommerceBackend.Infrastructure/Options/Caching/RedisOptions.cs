@@ -6,4 +6,5 @@ public class RedisOptions
 
     public string ConnectionString { get; init; } = null!;
     public string InstanceName { get; init; } = null!;
+    public Dictionary<string, int> PrefixKeyLimits { get; init; } = [];
 }

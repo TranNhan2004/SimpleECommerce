@@ -5,17 +5,15 @@ using SimpleECommerceBackend.Application.Models.Categories;
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
 [AutoConstructor]
-public partial class GetCategoryHandler : IUseCaseHandler<GetCategoryQuery, GetCategoryResult>
+public partial class GetAllCategoriesForAdminHandler : IUseCaseHandler<GetAllCategoriesQueryForAdmin, GetAllCategoriesResultForAdmin>
 {
     private readonly ICategoryService _categoryService;
 
-    public async Task<GetCategoryResult> HandleAsync(
-        GetCategoryQuery request,
+    public async Task<GetAllCategoriesResultForAdmin> HandleAsync(
+        GetAllCategoriesQueryForAdmin request,
         CancellationToken cancellationToken
     )
     {
-        var category = await _categoryService.GetCategoryByIdAsync(request.Id);
-
-        return GetCategoryResult.FromEntity(category);
+        return await _categoryService.GetAllCategoriesForAdminAsync(request);
     }
 }

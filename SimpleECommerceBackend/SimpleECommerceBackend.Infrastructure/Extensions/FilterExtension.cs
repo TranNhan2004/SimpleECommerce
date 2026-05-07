@@ -213,6 +213,8 @@ public static class FilterExtension
                 );
             }
 
+            ValidateFieldType(criterion, mappedField.FieldType);
+
             var values = (criterion.Values ?? [])
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .Select(value => value.Trim())
@@ -370,6 +372,78 @@ public static class FilterExtension
             };
 
             return nullGuard is null ? body : Expression.AndAlso(nullGuard, body);
+        }
+
+        private static void ValidateFieldType(FilterCriterion criterion, Type mappedFieldType)
+        {
+            var normalizedFieldType = Nullable.GetUnderlyingType(mappedFieldType) ?? mappedFieldType;
+            var expectedFieldType = GetExpectedFieldType(normalizedFieldType);
+
+            if (expectedFieldType is null || criterion.FieldType == expectedFieldType.Value)
+            {
+                return;
+            }
+
+            throw new ValidationException(
+                FilterErrorCodes.InvalidValue,
+                $"Filter field '{criterion.FieldName}' expects field type '{EnumUtils.ToDisplayValue(expectedFieldType.Value)}' but received '{EnumUtils.ToDisplayValue(criterion.FieldType)}'.",
+                new Dictionary<string, object?>
+                {
+                    ["fieldName"] = criterion.FieldName,
+                    ["expectedFieldType"] = EnumUtils.ToDisplayValue(expectedFieldType.Value),
+                    ["receivedFieldType"] = EnumUtils.ToDisplayValue(criterion.FieldType)
+                }
+            );
+        }
+
+        private static FieldType? GetExpectedFieldType(Type fieldType)
+        {
+            if (fieldType == typeof(string) || fieldType == typeof(Guid) || fieldType.IsEnum)
+            {
+                return FieldType.String;
+            }
+
+            if (fieldType == typeof(int))
+            {
+                return FieldType.Int;
+            }
+
+            if (fieldType == typeof(long))
+            {
+                return FieldType.Long;
+            }
+
+            if (fieldType == typeof(decimal))
+            {
+                return FieldType.Decimal;
+            }
+
+            if (fieldType == typeof(float))
+            {
+                return FieldType.Float;
+            }
+
+            if (fieldType == typeof(double))
+            {
+                return FieldType.Double;
+            }
+
+            if (fieldType == typeof(bool))
+            {
+                return FieldType.Bool;
+            }
+
+            if (fieldType == typeof(DateTimeOffset) || fieldType == typeof(DateTime))
+            {
+                return FieldType.DateTimeOffset;
+            }
+
+            if (fieldType == typeof(DateOnly))
+            {
+                return FieldType.DateOnly;
+            }
+
+            return null;
         }
 
         // Applies date/month/year extraction when the request asks for temporal filtering.
@@ -816,11 +890,11 @@ public static class FilterExtension
         {
             var totalItems = await query.CountAsync(cancellationToken);
             var currentPage = filterQuery.CurrentPage;
-            var rowsPerPage = filterQuery.RowsPerPage;
+            var itemsPerPage = filterQuery.ItemsPerPage;
 
             var items = await query
-                .Skip((currentPage - 1) * rowsPerPage)
-                .Take(rowsPerPage)
+                .Skip((currentPage - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
@@ -828,11 +902,11 @@ public static class FilterExtension
             {
                 Items = items,
                 CurrentPage = currentPage,
-                RowsPerPage = rowsPerPage,
+                ItemsPerPage = itemsPerPage,
                 TotalItems = totalItems,
                 TotalPages = totalItems == 0
                     ? 0
-                    : (int)Math.Ceiling(totalItems / (double)rowsPerPage)
+                    : (int)Math.Ceiling(totalItems / (double)itemsPerPage)
             };
         }
     }

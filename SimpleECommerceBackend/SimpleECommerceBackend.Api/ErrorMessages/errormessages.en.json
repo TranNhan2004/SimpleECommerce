@@ -189,6 +189,10 @@
       "NotFoundById": "Category not found.",
       "OwnerRequired": "Just owner can perform this operation."
     },
+    "CategoryStatus": {
+      "InvalidCategroyStatus": "{field} is invalid. Allowed values: {allowedValues}.",
+      "UnsupportedCategoryStatus": "{field} '{value}' is not supported."
+    },
     "Credential": {
       "EmailRequired": "{field} is required.",
       "EmailMaxLengthExceeded": "{field} cannot exceed {max} characters.",
@@ -201,6 +205,14 @@
     "EnumConversion": {
       "InvalidDisplayValue": "The provided value is invalid.",
       "UnsupportedValue": "The provided value is invalid."
+    },
+    "Filter": {
+      "UnknownField": "Filter field '{fieldName}' is not supported.",
+      "InvalidValue": "The value provided for filter field '{fieldName}' is invalid.",
+      "InvalidValueCount": "Filter field '{fieldName}' has an invalid number of values.",
+      "UnsupportedOperator": "Filter operator '{operator}' is not supported for field '{fieldName}'.",
+      "UnsupportedGroupLogic": "Filter group logic '{logic}' is not supported.",
+      "InvalidGroup": "The filter group structure is invalid."
     },
     "CurrentUser": {
       "Unauthenticated": "Current user is not authenticated.",
@@ -273,6 +285,10 @@
       "OrderIdRequired": "{field} is required.",
       "QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
       "AmountCannotBeNegative": "{field} cannot be negative."
+    },
+    "Pagination": {
+      "InvalidCurrentPage": "Current page must be greater than or equal to 1.",
+      "InvalidItemsPerPage": "Items per page must be greater than or equal to 1."
     },
     "Payment": {
       "OrderIdRequired": "{field} is required.",

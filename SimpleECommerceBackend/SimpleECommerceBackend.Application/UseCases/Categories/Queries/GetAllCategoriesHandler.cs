@@ -1,7 +1,6 @@
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
@@ -15,8 +14,6 @@ public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQ
         CancellationToken cancellationToken
     )
     {
-        var categories = await _categoryService.GetAllCategoriesAsync();
-
-        return GetAllCategoriesResult.FromEntities(categories);
+        return await _categoryService.GetAllCategoriesAsync(request);
     }
 }

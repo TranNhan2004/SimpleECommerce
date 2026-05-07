@@ -185,7 +185,13 @@
       "ActivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
       "DeactivateNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
       "AlreadyArchived": "{field} đã được lưu trữ.",
-      "AdminRequired": "{field} là bắt buộc."
+      "AdminRequired": "{field} là bắt buộc.",
+      "NotFoundById": "Không tìm thấy danh mục.",
+      "OwnerRequired": "Chỉ chủ sở hữu mới có thể thực hiện thao tác này."
+    },
+    "CategoryStatus": {
+      "InvalidCategroyStatus": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",
+      "UnsupportedCategoryStatus": "{field} '{value}' không được hỗ trợ."
     },
     "Credential": {
       "EmailRequired": "{field} là bắt buộc.",
@@ -199,6 +205,14 @@
     "EnumConversion": {
       "InvalidDisplayValue": "Giá trị được cung cấp không hợp lệ.",
       "UnsupportedValue": "Giá trị được cung cấp không hợp lệ."
+    },
+    "Filter": {
+      "UnknownField": "Trường '{fieldName}' không được hỗ trợ.",
+      "InvalidValue": "Giá trị được cung cấp cho trường '{fieldName}' không hợp lệ.",
+      "InvalidValueCount": "Số lượng giá trị của trường '{fieldName}' không hợp lệ.",
+      "UnsupportedOperator": "Toán tử '{operator}' không được hỗ trợ cho trường '{fieldName}'.",
+      "UnsupportedGroupLogic": "Logic nhóm '{logic}' không được hỗ trợ.",
+      "InvalidGroup": "Cấu trúc nhóm không hợp lệ."
     },
     "CurrentUser": {
       "Unauthenticated": "Người dùng hiện tại chưa được xác thực.",
@@ -271,6 +285,10 @@
       "OrderIdRequired": "{field} là bắt buộc.",
       "QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
       "AmountCannotBeNegative": "{field} không được âm."
+    },
+    "Pagination": {
+      "InvalidCurrentPage": "Trang hiện tại phải lớn hơn hoặc bằng 1.",
+      "InvalidItemsPerPage": "Số lượng mục trên mỗi trang phải lớn hơn hoặc bằng 1."
     },
     "Payment": {
       "OrderIdRequired": "{field} là bắt buộc.",
@@ -345,12 +363,19 @@
       "BirthDateCannotBeFuture": "{field} không được ở tương lai.",
       "AgeCannotBeLessThan": "{field} không được nhỏ hơn {min}.",
       "AgeCannotExceed": "{field} không được vượt quá {max}.",
+      "ArchiveNotAllowed": "Không thể lưu trữ hồ sơ người dùng này.",
+      "ActivateNotAllowed": "Không thể kích hoạt hồ sơ người dùng này.",
+      "InactiveUser": "Người dùng hiện không hoạt động.",
       "NotFoundById": "Không tìm thấy thông tin người dùng."
     },
     "VnAddress": {
       "AddressInvalid": "{field} không hợp lệ.",
       "WardInvalid": "{field} không hợp lệ.",
       "ProvinceInvalid": "{field} không hợp lệ."
+    },
+    "UserStatus": {
+      "InvalidUserStatus": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",
+      "UnsupportedUserStatus": "{field} '{value}' không được hỗ trợ."
     }
   }
 }

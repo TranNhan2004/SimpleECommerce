@@ -1,6 +1,7 @@
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
+using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Business;
@@ -8,11 +9,20 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
 
-[AutoConstructor]
-public partial class CategoryService : ICategoryService
+public partial class CategoryService : ServiceBase, ICategoryService
 {
-    private readonly ICacheService _cacheService;
     private readonly ICategoryRepository _categoryRepository;
+
+    public CategoryService(ICacheService cacheService, ICategoryRepository categoryRepository)
+        : base(cacheService)
+    {
+        _categoryRepository = categoryRepository;
+    }
+
+    protected override string BuildCacheKeyById(Guid id)
+    {
+        return CategoryCacheKeys.GetCategoryKey(id);
+    }
 
     public Category CreateCategory(Category category)
     {
@@ -24,45 +34,54 @@ public partial class CategoryService : ICategoryService
         return _categoryRepository.Delete(category);
     }
 
-    public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
+    public async Task<GetAllCategoriesResult> GetAllCategoriesAsync(GetAllCategoriesQuery query)
     {
-        var categoryIds = await _cacheService.GetAsync<IReadOnlyList<Guid>>(CategoryCacheKeys.GetAllCategory);
+        var cacheKey = CategoryCacheKeys.GetAllCategoriesKey(query.GetContentHash());
+        var cachedResult = await CacheService.GetAsync<GetAllCategoriesResult>(cacheKey);
 
-        if (categoryIds is null || categoryIds.Count == 0)
+        if (cachedResult is not null)
         {
-            return await LoadAllCategoriesFromDatabaseAndCacheIdsAsync();
+            return cachedResult;
         }
 
-        var categories = await _categoryRepository.FindAllByConditionAsync(
-            query => query.Where(category => categoryIds.Contains(category.Id)),
-            false
+        var categories = await _categoryRepository.FindAllWithFilterAsync(query);
+        var result = GetAllCategoriesResult.FromFilterResult(categories);
+
+        await CacheService.SetAsync(
+            cacheKey,
+            result,
+            TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoriesTtlMinutes)
         );
 
-        if (categories.Count == 0)
-            return await LoadAllCategoriesFromDatabaseAndCacheIdsAsync();
+        return result;
+    }
 
-        var categoriesById = categories.ToDictionary(category => category.Id);
-        var orderedCategories = categoryIds
-            .Where(categoriesById.ContainsKey)
-            .Select(id => categoriesById[id])
-            .ToList();
+    public async Task<GetAllCategoriesResultForAdmin> GetAllCategoriesForAdminAsync(GetAllCategoriesQueryForAdmin query)
+    {
+        var cacheKey = CategoryCacheKeys.GetAllCategoriesForAdminKey(query.GetContentHash());
+        var cachedResult = await CacheService.GetAsync<GetAllCategoriesResultForAdmin>(cacheKey);
 
-        if (orderedCategories.Count != categoryIds.Count)
+        if (cachedResult is not null)
         {
-            await _cacheService.SetAsync(
-                CategoryCacheKeys.GetAllCategory,
-                orderedCategories.Select(category => category.Id).ToList(),
-                TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoryTtlMinutes)
-            );
+            return cachedResult;
         }
 
-        return orderedCategories;
+        var categories = await _categoryRepository.FindAllForAdminWithFilterAsync(query);
+        var result = GetAllCategoriesResultForAdmin.FromFilterResult(categories);
+
+        await CacheService.SetAsync(
+            cacheKey,
+            result,
+            TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoriesForAdminTtlMinutes)
+        );
+
+        return result;
     }
 
     public async Task<Category> GetCategoryByIdAsync(Guid id)
     {
-        var cacheKey = CategoryCacheKeys.GetCategory.Replace("{id}", id.ToString());
-        var cachedCategory = await _cacheService.GetAsync<Category>(cacheKey);
+        var cacheKey = CategoryCacheKeys.GetCategoryKey(id);
+        var cachedCategory = await CacheService.GetAsync<Category>(cacheKey);
 
         if (cachedCategory is not null)
         {
@@ -75,7 +94,7 @@ public partial class CategoryService : ICategoryService
                 $"Category with Id = {id} was not found."
             );
 
-        await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKeys.GetCategoryTtlMinutes));
+        await CacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKeys.GetCategoryTtlMinutes));
         return category;
     }
 
@@ -88,30 +107,5 @@ public partial class CategoryService : ICategoryService
            );
 
         return category;
-    }
-
-    public Task InvalidateCacheByIdAsync(Guid id)
-    {
-        return _cacheService.RemoveAsync(CategoryCacheKeys.GetCategory.Replace("{id}", id.ToString()));
-    }
-
-    public Task InvalidateCacheByKeyAsync(string key)
-    {
-        return _cacheService.RemoveAsync(key);
-    }
-
-    private async Task<IReadOnlyList<Category>> LoadAllCategoriesFromDatabaseAndCacheIdsAsync()
-    {
-        var categories = await _categoryRepository.FindAllAsync();
-
-        var categoryIds = new List<Guid>(categories.Count);
-        foreach (var category in categories)
-        {
-            categoryIds.Add(category.Id);
-        }
-
-        await _cacheService.SetAsync(CategoryCacheKeys.GetAllCategory, categoryIds, TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoryTtlMinutes));
-
-        return categories;
     }
 }

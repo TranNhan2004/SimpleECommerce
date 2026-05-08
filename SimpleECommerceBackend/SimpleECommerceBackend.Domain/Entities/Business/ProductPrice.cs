@@ -7,45 +7,67 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class ProductPrice : Entity, ICreatedTrackable
 {
-    private ProductPrice()
+    public ProductPrice()
     {
     }
 
-    private ProductPrice(Money money, DateTimeOffset effectiveFrom)
+    private ProductPrice(Guid productId, Money money, DateTimeOffset effectiveFrom)
     {
-        SetId(Guid.NewGuid());
-        SetMoney(money);
-        SetEffectiveFrom(effectiveFrom);
-    }
-
-    public Guid ProductId { get; private set; }
-    public Product? Product { get; private set; }
-    public Money Money { get; private set; }
-    public DateTimeOffset EffectiveFrom { get; private set; }
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public static ProductPrice Create(Money money, DateTimeOffset effectiveFrom)
-    {
-        return new ProductPrice(money, effectiveFrom);
-    }
-
-    private void SetMoney(Money money)
-    {
-        if (money.Amount <= 0)
-            throw new ValidationException(
-                ProductPriceErrorCodes.PriceMustBePositive,
-                "Price amount must be positive",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Price"
-                }
-            );
-
+        Id = Guid.NewGuid();
+        ProductId = productId;
         Money = money;
-    }
-
-    private void SetEffectiveFrom(DateTimeOffset effectiveFrom)
-    {
         EffectiveFrom = effectiveFrom;
     }
+
+    private Guid _productId;
+    private Money _money;
+    private DateTimeOffset _effectiveFrom;
+
+    public Guid ProductId
+    {
+        get => _productId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    ProductPriceErrorCodes.ProductIdRequired,
+                    "ProductId is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ProductId"
+                    }
+                );
+
+            _productId = value;
+        }
+    }
+
+    public Product? Product { get; private set; }
+    public Money Money
+    {
+        get => _money;
+        set
+        {
+            if (value.Amount <= 0)
+                throw new ValidationException(
+                    ProductPriceErrorCodes.PriceMustBePositive,
+                    "Price amount must be positive",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Price"
+                    }
+                );
+
+            _money = value;
+        }
+    }
+
+    public DateTimeOffset EffectiveFrom
+    {
+        get => _effectiveFrom;
+        set => _effectiveFrom = value;
+    }
+
+    public DateTimeOffset CreatedAt { get; private set; }
+
 }

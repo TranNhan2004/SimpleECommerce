@@ -11,6 +11,35 @@ namespace SimpleECommerceBackend.Infrastructure.Extensions;
 
 public static class FilterExtension
 {
+    public static IQueryable<TEntity> ApplyFiltering<TEntity>(
+        this IQueryable<TEntity> query,
+        FilterQuery<TEntity> filterQuery
+    ) where TEntity : class
+    {
+        return FilterExpression.ApplyFiltering(query, filterQuery);
+    }
+
+    public static IQueryable<TEntity> ApplySorting<TEntity>(
+        this IQueryable<TEntity> query,
+        FilterQuery<TEntity> filterQuery
+    ) where TEntity : class
+    {
+        return SortingExpression.ApplySorting(query, filterQuery);
+    }
+
+    public static IQueryable<TEntity> ApplyPaging<TEntity>(
+        this IQueryable<TEntity> query,
+        FilterQuery<TEntity> filterQuery
+    ) where TEntity : class
+    {
+        var currentPage = filterQuery.CurrentPage;
+        var itemsPerPage = filterQuery.ItemsPerPage;
+
+        return query
+            .Skip((currentPage - 1) * itemsPerPage)
+            .Take(itemsPerPage);
+    }
+
     // Runs the pipeline without projection and returns the original entity type.
     public static Task<FilterResult<TEntity>> ToFilterResultAsync<TEntity>(
         this IQueryable<TEntity> query,
@@ -31,8 +60,8 @@ public static class FilterExtension
         where TEntity : class
         where TResult : class
     {
-        var mappedQuery = FilterExpression.ApplyFiltering(query, filterQuery);
-        mappedQuery = SortingExpression.ApplySorting(mappedQuery, filterQuery);
+        var mappedQuery = query.ApplyFiltering(filterQuery);
+        mappedQuery = mappedQuery.ApplySorting(filterQuery);
 
         return await PaginationExpression.ToFilterResultAsync(
             mappedQuery,
@@ -213,8 +242,6 @@ public static class FilterExtension
                 );
             }
 
-            ValidateFieldType(criterion, mappedField.FieldType);
-
             var values = (criterion.Values ?? [])
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .Select(value => value.Trim())
@@ -372,78 +399,6 @@ public static class FilterExtension
             };
 
             return nullGuard is null ? body : Expression.AndAlso(nullGuard, body);
-        }
-
-        private static void ValidateFieldType(FilterCriterion criterion, Type mappedFieldType)
-        {
-            var normalizedFieldType = Nullable.GetUnderlyingType(mappedFieldType) ?? mappedFieldType;
-            var expectedFieldType = GetExpectedFieldType(normalizedFieldType);
-
-            if (expectedFieldType is null || criterion.FieldType == expectedFieldType.Value)
-            {
-                return;
-            }
-
-            throw new ValidationException(
-                FilterErrorCodes.InvalidValue,
-                $"Filter field '{criterion.FieldName}' expects field type '{EnumUtils.ToDisplayValue(expectedFieldType.Value)}' but received '{EnumUtils.ToDisplayValue(criterion.FieldType)}'.",
-                new Dictionary<string, object?>
-                {
-                    ["fieldName"] = criterion.FieldName,
-                    ["expectedFieldType"] = EnumUtils.ToDisplayValue(expectedFieldType.Value),
-                    ["receivedFieldType"] = EnumUtils.ToDisplayValue(criterion.FieldType)
-                }
-            );
-        }
-
-        private static FieldType? GetExpectedFieldType(Type fieldType)
-        {
-            if (fieldType == typeof(string) || fieldType == typeof(Guid) || fieldType.IsEnum)
-            {
-                return FieldType.String;
-            }
-
-            if (fieldType == typeof(int))
-            {
-                return FieldType.Int;
-            }
-
-            if (fieldType == typeof(long))
-            {
-                return FieldType.Long;
-            }
-
-            if (fieldType == typeof(decimal))
-            {
-                return FieldType.Decimal;
-            }
-
-            if (fieldType == typeof(float))
-            {
-                return FieldType.Float;
-            }
-
-            if (fieldType == typeof(double))
-            {
-                return FieldType.Double;
-            }
-
-            if (fieldType == typeof(bool))
-            {
-                return FieldType.Bool;
-            }
-
-            if (fieldType == typeof(DateTimeOffset) || fieldType == typeof(DateTime))
-            {
-                return FieldType.DateTimeOffset;
-            }
-
-            if (fieldType == typeof(DateOnly))
-            {
-                return FieldType.DateOnly;
-            }
-
-            return null;
         }
 
         // Applies date/month/year extraction when the request asks for temporal filtering.
@@ -889,24 +844,20 @@ public static class FilterExtension
             where TResult : class
         {
             var totalItems = await query.CountAsync(cancellationToken);
-            var currentPage = filterQuery.CurrentPage;
-            var itemsPerPage = filterQuery.ItemsPerPage;
-
             var items = await query
-                .Skip((currentPage - 1) * itemsPerPage)
-                .Take(itemsPerPage)
+                .ApplyPaging(filterQuery)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
             return new FilterResult<TResult>
             {
                 Items = items,
-                CurrentPage = currentPage,
-                ItemsPerPage = itemsPerPage,
+                CurrentPage = filterQuery.CurrentPage,
+                ItemsPerPage = filterQuery.ItemsPerPage,
                 TotalItems = totalItems,
                 TotalPages = totalItems == 0
                     ? 0
-                    : (int)Math.Ceiling(totalItems / (double)itemsPerPage)
+                    : (int)Math.Ceiling(totalItems / (double)filterQuery.ItemsPerPage)
             };
         }
     }

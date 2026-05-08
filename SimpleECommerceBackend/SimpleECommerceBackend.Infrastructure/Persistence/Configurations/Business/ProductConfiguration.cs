@@ -32,6 +32,15 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .IsRequired();
         });
 
+        builder.Property(p => p.AverageRating)
+            .HasColumnType("decimal(3,2)")
+            .IsRequired();
+
+        builder.Property(p => p.TotalRatings)
+            .IsRequired();
+
+        builder.Property(p => p.DefaultImageUrl);
+
         builder.Property(p => p.Status)
             .IsRequired();
 

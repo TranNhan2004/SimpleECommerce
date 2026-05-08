@@ -33,7 +33,7 @@ public class PaymentTests
     {
         var payment = Payment.Create(Guid.NewGuid(), EntityTestData.CreateMoney(), PaymentMethod.Cash);
         var provider = new string('a', PaymentValidationRules.ProviderMaxLength + 1);
-        var action = () => payment.SetProvider(provider);
+        var action = () => payment.Provider = provider;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(PaymentErrorCodes.ProviderMaxLengthExceeded);

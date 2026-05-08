@@ -10,12 +10,22 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
-[AutoConstructor]
-public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, UpdateCategoryResult>
+public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, UpdateCategoryResult>
 {
     private readonly IUserContextHolder _userContextHolder;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
+
+    public UpdateCategoryHandler(
+        IUserContextHolder userContextHolder,
+        ICategoryService categoryService,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _userContextHolder = userContextHolder;
+        _categoryService = categoryService;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<UpdateCategoryResult> HandleAsync(
         UpdateCategoryCommand request,
@@ -33,8 +43,8 @@ public partial class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryComma
             );
         }
 
-        category.SetName(request.Name);
-        category.SetDescription(request.Description);
+        category.Name = request.Name;
+        category.Description = request.Description;
 
         if (category.Status != request.Status)
         {

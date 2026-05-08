@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
-    private SellerWarehouse()
+    public SellerWarehouse()
     {
     }
 
@@ -16,14 +16,39 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
         Guid sellerShopId
     )
     {
-        SetId(Guid.NewGuid());
-        SetFullAddress(fullAddress);
-        SetSellerShopId(sellerShopId);
+        Id = Guid.NewGuid();
+        FullAddress = fullAddress;
+        SellerShopId = sellerShopId;
     }
 
-    public Address FullAddress { get; private set; }
+    private Address _fullAddress;
+    private Guid _sellerShopId;
 
-    public Guid SellerShopId { get; private set; }
+    public Address FullAddress
+    {
+        get => _fullAddress;
+        set => _fullAddress = value;
+    }
+
+    public Guid SellerShopId
+    {
+        get => _sellerShopId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    SellerWarehouseErrorCodes.SellerShopRequired,
+                    "Seller shop is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "SellerShop"
+                    }
+                );
+
+            _sellerShopId = value;
+        }
+    }
+
     public SellerShop? SellerShop { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -49,34 +74,4 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public static SellerWarehouse Create(
-        Address fullAddress,
-        Guid sellerShopId
-    )
-    {
-        return new SellerWarehouse(
-            fullAddress,
-            sellerShopId
-        );
-    }
-
-    public void SetFullAddress(Address fullAddress)
-    {
-        FullAddress = fullAddress;
-    }
-
-    private void SetSellerShopId(Guid sellerShopId)
-    {
-        if (sellerShopId == Guid.Empty)
-            throw new ValidationException(
-                SellerWarehouseErrorCodes.SellerShopRequired,
-                "Seller shop is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "SellerShop"
-                }
-            );
-
-        SellerShopId = sellerShopId;
-    }
 }

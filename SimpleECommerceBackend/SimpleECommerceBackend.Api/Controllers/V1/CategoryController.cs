@@ -14,10 +14,14 @@ namespace SimpleECommerceBackend.Api.Controllers.V1;
 [Route("api/v{version:apiVersion}/categories")]
 [ApiVersion("1.0")]
 [ApiController]
-[AutoConstructor]
-public partial class CategoryController : ControllerBase
+public class CategoryController : ControllerBase
 {
     private readonly IUseCaseDispatcher _dispatcher;
+
+    public CategoryController(IUseCaseDispatcher dispatcher)
+    {
+        _dispatcher = dispatcher;
+    }
 
     [HttpPost("get-all")]
     [Authorize]

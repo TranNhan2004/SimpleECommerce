@@ -7,12 +7,22 @@ using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
-[AutoConstructor]
-public partial class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCommand>
+public class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCommand>
 {
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserProfileService _userProfileService;
     private readonly IUnitOfWork _unitOfWork;
+
+    public DeleteMyProfileHandler(
+        IUserContextHolder userContextHolder,
+        IUserProfileService userProfileService,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _userContextHolder = userContextHolder;
+        _userProfileService = userProfileService;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task HandleAsync(
         DeleteMyProfileCommand request,

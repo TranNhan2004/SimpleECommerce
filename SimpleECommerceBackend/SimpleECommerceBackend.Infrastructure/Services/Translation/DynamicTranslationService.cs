@@ -10,7 +10,6 @@ using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-[AutoConstructor]
 public partial class DynamicTranslationService : IDynamicTranslationService
 {
     private readonly ICacheService _cache;
@@ -19,6 +18,23 @@ public partial class DynamicTranslationService : IDynamicTranslationService
     private readonly IEnumerable<ITranslationProvider> _providers;
     private readonly ITranslationEntryRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
+
+    public DynamicTranslationService(
+        ICacheService cache,
+        ILogger<DynamicTranslationService> logger,
+        IOptions<TranslationOptions> options,
+        IEnumerable<ITranslationProvider> providers,
+        ITranslationEntryRepository repository,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _cache = cache;
+        _logger = logger;
+        _options = options;
+        _providers = providers;
+        _repository = repository;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<string> TranslateAsync(
         DynamicTranslationRequest request,

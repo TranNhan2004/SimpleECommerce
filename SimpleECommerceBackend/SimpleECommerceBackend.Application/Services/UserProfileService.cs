@@ -10,7 +10,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
 
-public partial class UserProfileService : ServiceBase, IUserProfileService
+public class UserProfileService : ServiceBase, IUserProfileService
 {
     private readonly IUserProfileRepository _userProfileRepository;
     private readonly ILogger _logger;
@@ -23,11 +23,6 @@ public partial class UserProfileService : ServiceBase, IUserProfileService
     {
         _userProfileRepository = userProfileRepository;
         _logger = logger;
-    }
-
-    protected override string BuildCacheKeyById(Guid id)
-    {
-        return UserProfileCacheKeys.GetProfileKey(id);
     }
 
     public UserProfile CreateUserProfile(UserProfile userProfile)

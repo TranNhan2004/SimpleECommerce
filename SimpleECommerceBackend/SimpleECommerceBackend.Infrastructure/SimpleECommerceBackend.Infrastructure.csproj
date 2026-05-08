@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoConstructor" Version="5.5.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Google.GenAI" Version="1.6.1" />

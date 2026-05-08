@@ -13,10 +13,14 @@ namespace SimpleECommerceBackend.Api.Controllers.V1;
 [Route("api/v{version:apiVersion}/user-profiles")]
 [ApiVersion("1.0")]
 [ApiController]
-[AutoConstructor]
-public partial class UserProfileController : ControllerBase
+public class UserProfileController : ControllerBase
 {
     private readonly IUseCaseDispatcher _dispatcher;
+
+    public UserProfileController(IUseCaseDispatcher dispatcher)
+    {
+        _dispatcher = dispatcher;
+    }
 
     [HttpPost("me/info")]
     [Authorize]

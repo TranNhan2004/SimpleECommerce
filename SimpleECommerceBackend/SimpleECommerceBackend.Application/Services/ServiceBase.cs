@@ -55,5 +55,4 @@ public abstract class ServiceBase : ICacheConsumingService
         }
     }
 
-    protected abstract string BuildCacheKeyById(Guid id);
 }

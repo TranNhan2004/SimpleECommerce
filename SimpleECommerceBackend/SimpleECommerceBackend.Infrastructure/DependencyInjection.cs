@@ -14,6 +14,7 @@ using SimpleECommerceBackend.Infrastructure.Extensions;
 using SimpleECommerceBackend.Infrastructure.Options.Authentication;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
 using SimpleECommerceBackend.Infrastructure.Options.Email;
+using SimpleECommerceBackend.Infrastructure.Options.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Options.RateLimiter;
 using SimpleECommerceBackend.Infrastructure.Options.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence;
@@ -24,6 +25,7 @@ using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
+using SimpleECommerceBackend.Infrastructure.Services.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
 using StackExchange.Redis;
 
@@ -46,6 +48,9 @@ public static class DependencyInjection
         services.Configure<GlobalRateLimiterOptions>(configuration.GetSection(GlobalRateLimiterOptions.SectionName));
         services.Configure<IpRateLimiterOptions>(configuration.GetSection(IpRateLimiterOptions.SectionName));
 
+        // Maintenance
+        services.Configure<HardDeleteOptions>(configuration.GetSection(HardDeleteOptions.SectionName));
+
         // Translation
         services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
         services.Configure<OpenAITranslationOptions>(configuration.GetSection(OpenAITranslationOptions.SectionName));
@@ -62,6 +67,11 @@ public static class DependencyInjection
         services.AddSingleton<IEmailService, SmtpEmailService>();
         services.AddSingleton<IEmailSender, SmtpEmailSender>();
         services.AddHostedService<EmailBackgroundWorker>();
+
+        // Hard delete
+        services.AddScoped<HardDeleteCleanupService>();
+        services.AddHostedService<HardDeleteBackgroundWorker>();
+        services.AddSingleton(TimeProvider.System);
 
         // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
@@ -112,6 +122,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
         services.AddScoped<ISellerShopRepository, SellerShopRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 

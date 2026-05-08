@@ -8,7 +8,7 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
-    private CustomerShippingAddress()
+    public CustomerShippingAddress()
     {
     }
 
@@ -19,18 +19,93 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
         bool isDefault
     )
     {
-        SetId(Guid.NewGuid());
-        SetRecipientName(recipientName);
-        SetRecipientPhoneNumber(recipientPhoneNumber);
-        SetRecipientAddress(recipientAddress);
-        SetIsDefault(isDefault);
+        Id = Guid.NewGuid();
+        RecipientName = recipientName;
+        RecipientPhoneNumber = recipientPhoneNumber;
+        RecipientAddress = recipientAddress;
+        IsDefault = isDefault;
     }
 
-    public string RecipientName { get; private set; } = null!;
-    public string RecipientPhoneNumber { get; private set; } = null!;
-    public Address RecipientAddress { get; private set; }
+    private string _recipientName = null!;
+    private string _recipientPhoneNumber = null!;
+    private Address _recipientAddress;
+    private bool _isDefault;
 
-    public bool IsDefault { get; private set; }
+    public string RecipientName
+    {
+        get => _recipientName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    CustomerShippingAddressErrorCodes.RecipientNameRequired,
+                    "Recipient name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientName"
+                    }
+                );
+
+            var trimmedName = value.Trim();
+
+            if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
+                throw new ValidationException(
+                    CustomerShippingAddressErrorCodes.RecipientNameMaxLengthExceeded,
+                    $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientName",
+                        ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
+                    }
+                );
+
+            _recipientName = trimmedName;
+        }
+    }
+
+    public string RecipientPhoneNumber
+    {
+        get => _recipientPhoneNumber;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    CustomerShippingAddressErrorCodes.RecipientPhoneNumberRequired,
+                    "Recipient phone number is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientPhoneNumber"
+                    }
+                );
+
+            var trimmedRecipientPhoneNumber = value.Trim();
+
+            if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
+                throw new ValidationException(
+                    CustomerShippingAddressErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
+                    $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientPhoneNumber",
+                        ["max"] = CommonValidationRules.PhoneNumberMaxLength
+                    }
+                );
+
+            _recipientPhoneNumber = trimmedRecipientPhoneNumber;
+        }
+    }
+
+    public Address RecipientAddress
+    {
+        get => _recipientAddress;
+        set => _recipientAddress = value;
+    }
+
+    public bool IsDefault
+    {
+        get => _isDefault;
+        set => _isDefault = value;
+    }
 
     public Guid CustomerId { get; private set; }
     public UserProfile? Customer { get; private set; }
@@ -57,72 +132,6 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public void SetRecipientName(string recipientName)
-    {
-        if (string.IsNullOrWhiteSpace(recipientName))
-            throw new ValidationException(
-                CustomerShippingAddressErrorCodes.RecipientNameRequired,
-                "Recipient name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientName"
-                }
-            );
-
-        var trimmedName = recipientName.Trim();
-
-        if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
-            throw new ValidationException(
-                CustomerShippingAddressErrorCodes.RecipientNameMaxLengthExceeded,
-                $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientName",
-                    ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
-                }
-            );
-
-        RecipientName = trimmedName;
-    }
-
-    public void SetRecipientPhoneNumber(string recipientPhoneNumber)
-    {
-        if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new ValidationException(
-                CustomerShippingAddressErrorCodes.RecipientPhoneNumberRequired,
-                "Recipient phone number is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientPhoneNumber"
-                }
-            );
-
-        var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
-
-        if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
-            throw new ValidationException(
-                CustomerShippingAddressErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
-                $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientPhoneNumber",
-                    ["max"] = CommonValidationRules.PhoneNumberMaxLength
-                }
-            );
-
-        RecipientPhoneNumber = trimmedRecipientPhoneNumber;
-    }
-
-    public void SetRecipientAddress(Address recipientAddress)
-    {
-        RecipientAddress = recipientAddress;
-    }
-
-    private void SetIsDefault(bool isDefault)
-    {
-        IsDefault = isDefault;
-    }
-
     public void MarkAsDefault()
     {
         if (IsDefault)
@@ -135,7 +144,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
                 }
             );
 
-        SetIsDefault(true);
+        IsDefault = true;
     }
 
     public void RemoveDefault()
@@ -150,15 +159,6 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
                 }
             );
 
-        SetIsDefault(false);
-    }
-
-    public static CustomerShippingAddress Create(
-        string recipientName,
-        string recipientPhoneNumber,
-        Address recipientAddress
-    )
-    {
-        return new CustomerShippingAddress(recipientName, recipientPhoneNumber, recipientAddress, false);
+        IsDefault = false;
     }
 }

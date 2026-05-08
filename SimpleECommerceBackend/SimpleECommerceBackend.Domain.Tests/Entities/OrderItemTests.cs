@@ -50,7 +50,7 @@ public class OrderItemTests
     public void SetCurrentPrice_ShouldThrowValidationException_WhenAmountIsNegative()
     {
         var orderItem = OrderItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1, new Money(100000, "VND"));
-        var action = () => orderItem.SetCurrentPrice(new Money(-1, "VND"));
+        var action = () => orderItem.CurrentPrice = new Money(-1, "VND");
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be("Money_AmountCannotBeNegative");

@@ -9,12 +9,22 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
-[AutoConstructor]
-public partial class DeleteCategoryHandler : IUseCaseHandler<DeleteCategoryCommand>
+public class DeleteCategoryHandler : IUseCaseHandler<DeleteCategoryCommand>
 {
     private readonly IUserContextHolder _userContextHolder;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
+
+    public DeleteCategoryHandler(
+        IUserContextHolder userContextHolder,
+        ICategoryService categoryService,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _userContextHolder = userContextHolder;
+        _categoryService = categoryService;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task HandleAsync(
         DeleteCategoryCommand request,

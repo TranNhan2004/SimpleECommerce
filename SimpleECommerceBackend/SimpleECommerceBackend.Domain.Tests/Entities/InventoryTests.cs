@@ -32,7 +32,7 @@ public class InventoryTests
     public void SetQuantityOnHand_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
         var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
-        var action = () => inventory.SetQuantityOnHand(InventoryValidationRules.MaxQuantity + 1);
+        var action = () => inventory.QuantityInStock = InventoryValidationRules.MaxQuantity + 1;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(InventoryErrorCodes.QuantityOnHandCannotExceed);

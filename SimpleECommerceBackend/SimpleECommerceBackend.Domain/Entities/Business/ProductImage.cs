@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 
 public class ProductImage : Entity, ICreatedTrackable
 {
-    private ProductImage()
+    public ProductImage()
     {
     }
 
@@ -18,103 +18,101 @@ public class ProductImage : Entity, ICreatedTrackable
         string? description
     )
     {
-        SetId(Guid.NewGuid());
-        SetImageUrl(imageUrl);
-        SetDisplayOrder(displayOrder);
-        SetIsDisplayed(isDisplayed);
-        SetDescription(description);
+        Id = Guid.NewGuid();
+        ImageUrl = imageUrl;
+        DisplayOrder = displayOrder;
+        IsDisplayed = isDisplayed;
+        Description = description;
     }
 
     public Guid ProductId { get; private set; }
     public Product? Product { get; private set; }
-    public string ImageUrl { get; private set; } = null!;
-    public int DisplayOrder { get; private set; }
-    public bool IsDisplayed { get; private set; }
-    public string? Description { get; private set; }
+    private string _imageUrl = null!;
+    private int _displayOrder;
+    private bool _isDisplayed;
+    private string? _description;
+
+    public string ImageUrl
+    {
+        get => _imageUrl;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    ProductImageErrorCodes.ImageUrlRequired,
+                    "Image URL is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ImageUrl"
+                    }
+                );
+
+            _imageUrl = value.Trim();
+        }
+    }
+
+    public int DisplayOrder
+    {
+        get => _displayOrder;
+        set
+        {
+            if (value < 0)
+                throw new ValidationException(
+                    ProductImageErrorCodes.DisplayOrderCannotBeNegative,
+                    "Display order cannot be negative",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "DisplayOrder"
+                    }
+                );
+
+            _displayOrder = value;
+        }
+    }
+
+    public bool IsDisplayed
+    {
+        get => _isDisplayed;
+        set => _isDisplayed = value;
+    }
+
+    public string? Description
+    {
+        get => _description;
+        set
+        {
+            if (value is null)
+            {
+                _description = null;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    ProductImageErrorCodes.DescriptionMustNotBeBlank,
+                    "Description is not blank",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Description"
+                    }
+                );
+
+            var trimmedDescription = value.Trim();
+
+            if (trimmedDescription.Length > ProductImageValidationRules.DescriptionMaxLength)
+                throw new ValidationException(
+                    ProductImageErrorCodes.DescriptionMaxLengthExceeded,
+                    $"Description cannot exceed {ProductImageValidationRules.DescriptionMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Description",
+                        ["max"] = ProductImageValidationRules.DescriptionMaxLength
+                    }
+                );
+
+            _description = trimmedDescription;
+        }
+    }
 
     public DateTimeOffset CreatedAt { get; private set; }
-
-    public static ProductImage Create(
-        string imageUrl,
-        int displayOrder,
-        bool isDisplayed = true,
-        string? description = null
-    )
-    {
-        return new ProductImage(
-            imageUrl,
-            displayOrder,
-            isDisplayed,
-            description
-        );
-    }
-
-    public void SetImageUrl(string imageUrl)
-    {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new ValidationException(
-                ProductImageErrorCodes.ImageUrlRequired,
-                "Image URL is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "ImageUrl"
-                }
-            );
-
-        ImageUrl = imageUrl.Trim();
-    }
-
-    public void SetDisplayOrder(int displayOrder)
-    {
-        if (displayOrder < 0)
-            throw new ValidationException(
-                ProductImageErrorCodes.DisplayOrderCannotBeNegative,
-                "Display order cannot be negative",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "DisplayOrder"
-                }
-            );
-
-        DisplayOrder = displayOrder;
-    }
-
-    public void SetIsDisplayed(bool isDisplayed)
-    {
-        IsDisplayed = isDisplayed;
-    }
-
-    public void SetDescription(string? description)
-    {
-        if (description is null)
-        {
-            Description = null;
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ValidationException(
-                ProductImageErrorCodes.DescriptionMustNotBeBlank,
-                "Description is not blank",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Description"
-                }
-            );
-
-        var trimmedDescription = description.Trim();
-
-        if (trimmedDescription.Length > ProductImageValidationRules.DescriptionMaxLength)
-            throw new ValidationException(
-                ProductImageErrorCodes.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {ProductImageValidationRules.DescriptionMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Description",
-                    ["max"] = ProductImageValidationRules.DescriptionMaxLength
-                }
-            );
-
-        Description = trimmedDescription;
-    }
 }

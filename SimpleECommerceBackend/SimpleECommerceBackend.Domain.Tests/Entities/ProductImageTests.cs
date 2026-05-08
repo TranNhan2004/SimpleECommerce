@@ -32,7 +32,7 @@ public class ProductImageTests
     public void SetDisplayOrder_ShouldThrowValidationException_WhenDisplayOrderIsNegative()
     {
         var image = ProductImage.Create("https://example.com/image.jpg", 1);
-        var action = () => image.SetDisplayOrder(-1);
+        var action = () => image.DisplayOrder = -1;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(ProductImageErrorCodes.DisplayOrderCannotBeNegative);
@@ -43,7 +43,7 @@ public class ProductImageTests
     {
         var image = ProductImage.Create("https://example.com/image.jpg", 1);
         var description = new string('a', ProductImageValidationRules.DescriptionMaxLength + 1);
-        var action = () => image.SetDescription(description);
+        var action = () => image.Description = description;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(ProductImageErrorCodes.DescriptionMaxLengthExceeded);
@@ -54,7 +54,7 @@ public class ProductImageTests
     {
         var image = ProductImage.Create("https://example.com/image.jpg", 1, description: "Front view");
 
-        image.SetDescription(null);
+        image.Description = null;
 
         image.Description.Should().BeNull();
     }

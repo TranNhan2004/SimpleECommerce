@@ -34,7 +34,7 @@ public class CartItemTests
     public void SetQuantity_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
         var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
-        var action = () => cartItem.SetQuantity(CartValidationRules.MaxQuantityPerItem + 1);
+        var action = () => cartItem.Quantity = CartValidationRules.MaxQuantityPerItem + 1;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(CartItemErrorCodes.QuantityCannotExceed);

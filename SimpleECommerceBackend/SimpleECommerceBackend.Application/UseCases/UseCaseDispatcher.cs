@@ -3,10 +3,14 @@ using SimpleECommerceBackend.Application.Interfaces.UseCases;
 
 namespace SimpleECommerceBackend.Application.UseCases;
 
-[AutoConstructor]
 public partial class UseCaseDispatcher : IUseCaseDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
+
+    public UseCaseDispatcher(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
 
     public async Task<TResult> SendAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken = default)
         where TRequest : class

@@ -6,13 +6,22 @@ using SimpleECommerceBackend.Application.Models.UserProfiles;
 
 namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
-[AutoConstructor]
-public partial class ActivateMyProfileHandler : IUseCaseHandler<ActivateMyProfileCommand>
+public class ActivateMyProfileHandler : IUseCaseHandler<ActivateMyProfileCommand>
 {
-
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserProfileService _userProfileService;
     private readonly IUnitOfWork _unitOfWork;
+
+    public ActivateMyProfileHandler(
+        IUserContextHolder userContextHolder,
+        IUserProfileService userProfileService,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _userContextHolder = userContextHolder;
+        _userProfileService = userProfileService;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task HandleAsync(
         ActivateMyProfileCommand request,

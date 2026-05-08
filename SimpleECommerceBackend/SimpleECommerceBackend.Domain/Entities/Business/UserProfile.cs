@@ -14,220 +14,218 @@ namespace SimpleECommerceBackend.Domain.Entities.Business;
 /// </summary>
 public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
 {
-    private UserProfile()
+    public UserProfile()
     {
     }
 
-    [JsonConstructor]
-    private UserProfile(
-        Guid id,
-        string email,
-        string firstName,
-        string lastName,
-        string? nickName,
-        Sex sex,
-        UserStatus status,
-        DateOnly birthDate,
-        string? avatarUrl,
-        DateTimeOffset createdAt,
-        DateTimeOffset? updatedAt
-    )
+    // [JsonConstructor]
+    // private UserProfile(
+    //     Guid id,
+    //     string email,
+    //     string firstName,
+    //     string lastName,
+    //     string? nickName,
+    //     Sex sex,
+    //     UserStatus status,
+    //     DateOnly birthDate,
+    //     string? avatarUrl,
+    //     DateTimeOffset createdAt,
+    //     DateTimeOffset? updatedAt
+    // )
+    // {
+    //     Id = id;
+    //     Email = email;
+    //     FirstName = firstName;
+    //     LastName = lastName;
+    //     NickName = nickName;
+    //     Sex = sex;
+    //     Status = status;
+    //     BirthDate = birthDate;
+    //     AvatarUrl = avatarUrl;
+    //     CreatedAt = createdAt;
+    //     UpdatedAt = updatedAt;
+    // }
+
+    private string _email = null!;
+    private string _firstName = null!;
+    private string _lastName = null!;
+    private string? _nickName;
+    private Sex _sex;
+    private UserStatus _status;
+    private DateOnly _birthDate;
+    private string? _avatarUrl;
+
+    public string Email
     {
-        SetId(id);
-        SetEmail(email);
-        SetFirstName(firstName);
-        SetLastName(lastName);
-        SetNickName(nickName);
-        SetSex(sex);
-        SetStatus(status);
-        SetBirthDate(birthDate);
-        SetAvatarUrl(avatarUrl);
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
+        get => _email;
+        set => _email = CredentialUtils.ValidateEmail(value);
     }
 
-    private UserProfile(
-        Guid keycloakUserId,
-        string email,
-        string firstName,
-        string lastName,
-        string? nickName,
-        Sex sex,
-        DateOnly birthDate,
-        string? avatarUrl
-    )
+    public string FirstName
     {
-        SetId(keycloakUserId);
-        SetEmail(email);
-        SetFirstName(firstName);
-        SetLastName(lastName);
-        SetNickName(nickName);
-        SetSex(sex);
-        SetStatus(UserStatus.Active);
-        SetBirthDate(birthDate);
-        SetAvatarUrl(avatarUrl);
+        get => _firstName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    UserProfileErrorCodes.FirstNameRequired,
+                    "First name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "FirstName"
+                    }
+                );
+
+            var trimmedFirstName = value.Trim();
+
+            if (trimmedFirstName.Length > UserProfileValidationRules.FirstNameMaxLength)
+                throw new ValidationException(
+                    UserProfileErrorCodes.FirstNameMaxLengthExceeded,
+                    $"First name cannot exceed {UserProfileValidationRules.FirstNameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "FirstName",
+                        ["max"] = UserProfileValidationRules.FirstNameMaxLength
+                    }
+                );
+
+            _firstName = trimmedFirstName;
+        }
     }
 
-    public string Email { get; private set; } = null!;
-    public string FirstName { get; private set; } = null!;
-    public string LastName { get; private set; } = null!;
-    public string? NickName { get; private set; }
-    public Sex Sex { get; private set; }
-    public UserStatus Status { get; private set; }
-    public DateOnly BirthDate { get; private set; }
-    public string? AvatarUrl { get; private set; }
+    public string LastName
+    {
+        get => _lastName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    UserProfileErrorCodes.LastNameRequired,
+                    "Last name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "LastName"
+                    }
+                );
+
+            var trimmedLastName = value.Trim();
+
+            if (trimmedLastName.Length > UserProfileValidationRules.LastNameMaxLength)
+                throw new ValidationException(
+                    UserProfileErrorCodes.LastNameMaxLengthExceeded,
+                    $"Last name cannot exceed {UserProfileValidationRules.LastNameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "LastName",
+                        ["max"] = UserProfileValidationRules.LastNameMaxLength
+                    }
+                );
+
+            _lastName = trimmedLastName;
+        }
+    }
+
+    public string? NickName
+    {
+        get => _nickName;
+        set
+        {
+            if (value is null)
+            {
+                _nickName = null;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    UserProfileErrorCodes.NickNameMustNotBeBlank,
+                    "Nick name is not blank",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "NickName"
+                    }
+                );
+
+            var trimmedNickName = value.Trim();
+
+            if (trimmedNickName.Length > UserProfileValidationRules.NickNameMaxLength)
+                throw new ValidationException(
+                    UserProfileErrorCodes.NickNameMaxLengthExceeded,
+                    $"Nick name cannot exceed {UserProfileValidationRules.NickNameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "NickName",
+                        ["max"] = UserProfileValidationRules.NickNameMaxLength
+                    }
+                );
+
+            _nickName = trimmedNickName;
+        }
+    }
+
+    public Sex Sex
+    {
+        get => _sex;
+        set => _sex = value;
+    }
+
+    public UserStatus Status
+    {
+        get => _status;
+        set => _status = value;
+    }
+
+    public DateOnly BirthDate
+    {
+        get => _birthDate;
+        set
+        {
+            var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
+
+            if (value > today)
+                throw new ValidationException(
+                    UserProfileErrorCodes.BirthDateCannotBeFuture,
+                    "Birth date cannot be in the future",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "BirthDate"
+                    }
+                );
+
+            if (AgeUtils.Calculate(value, today) < UserProfileValidationRules.MinAge)
+                throw new ValidationException(
+                    UserProfileErrorCodes.AgeCannotBeLessThan,
+                    $"Age cannot be less than {UserProfileValidationRules.MinAge} years",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Age",
+                        ["min"] = UserProfileValidationRules.MinAge
+                    }
+                );
+
+            if (AgeUtils.Calculate(value, today) > UserProfileValidationRules.MaxAge)
+                throw new ValidationException(
+                    UserProfileErrorCodes.AgeCannotExceed,
+                    $"Age cannot exceed than {UserProfileValidationRules.MaxAge} years",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Age",
+                        ["max"] = UserProfileValidationRules.MaxAge
+                    }
+                );
+
+            _birthDate = value;
+        }
+    }
+
+    public string? AvatarUrl
+    {
+        get => _avatarUrl;
+        set => _avatarUrl = value;
+    }
+
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
-
-    public void SetEmail(string email)
-    {
-        Email = CredentialUtils.ValidateEmail(email);
-    }
-
-    public void SetFirstName(string firstName)
-    {
-        if (string.IsNullOrWhiteSpace(firstName))
-            throw new ValidationException(
-                UserProfileErrorCodes.FirstNameRequired,
-                "First name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "FirstName"
-                }
-            );
-
-        var trimmedFirstName = firstName.Trim();
-
-        if (trimmedFirstName.Length > UserProfileValidationRules.FirstNameMaxLength)
-            throw new ValidationException(
-                UserProfileErrorCodes.FirstNameMaxLengthExceeded,
-                $"First name cannot exceed {UserProfileValidationRules.FirstNameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "FirstName",
-                    ["max"] = UserProfileValidationRules.FirstNameMaxLength
-                }
-            );
-
-        FirstName = trimmedFirstName;
-    }
-
-    public void SetLastName(string lastName)
-    {
-        if (string.IsNullOrWhiteSpace(lastName))
-            throw new ValidationException(
-                UserProfileErrorCodes.LastNameRequired,
-                "Last name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "LastName"
-                }
-            );
-
-        var trimmedLastName = lastName.Trim();
-
-        if (trimmedLastName.Length > UserProfileValidationRules.LastNameMaxLength)
-            throw new ValidationException(
-                UserProfileErrorCodes.LastNameMaxLengthExceeded,
-                $"Last name cannot exceed {UserProfileValidationRules.LastNameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "LastName",
-                    ["max"] = UserProfileValidationRules.LastNameMaxLength
-                }
-            );
-
-        LastName = trimmedLastName;
-    }
-
-    public void SetNickName(string? nickName)
-    {
-        if (nickName is null)
-        {
-            NickName = null;
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(nickName))
-            throw new ValidationException(
-                UserProfileErrorCodes.NickNameMustNotBeBlank,
-                "Nick name is not blank",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "NickName"
-                }
-            );
-
-        var trimmedNickName = nickName.Trim();
-
-        if (trimmedNickName.Length > UserProfileValidationRules.NickNameMaxLength)
-            throw new ValidationException(
-                UserProfileErrorCodes.NickNameMaxLengthExceeded,
-                $"Nick name cannot exceed {UserProfileValidationRules.NickNameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "NickName",
-                    ["max"] = UserProfileValidationRules.NickNameMaxLength
-                }
-            );
-
-        NickName = trimmedNickName;
-    }
-
-    public void SetSex(Sex sex)
-    {
-        Sex = sex;
-    }
-
-    private void SetStatus(UserStatus status)
-    {
-        Status = status;
-    }
-
-    public void SetBirthDate(DateOnly birthDate)
-    {
-        var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.UtcDateTime);
-
-        if (birthDate > today)
-            throw new ValidationException(
-                UserProfileErrorCodes.BirthDateCannotBeFuture,
-                "Birth date cannot be in the future",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "BirthDate"
-                }
-            );
-
-        if (AgeUtils.Calculate(birthDate, today) < UserProfileValidationRules.MinAge)
-            throw new ValidationException(
-                UserProfileErrorCodes.AgeCannotBeLessThan,
-                $"Age cannot be less than {UserProfileValidationRules.MinAge} years",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Age",
-                    ["min"] = UserProfileValidationRules.MinAge
-                }
-            );
-
-        if (AgeUtils.Calculate(birthDate, today) > UserProfileValidationRules.MaxAge)
-            throw new ValidationException(
-                UserProfileErrorCodes.AgeCannotExceed,
-                $"Age cannot exceed than {UserProfileValidationRules.MaxAge} years",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Age",
-                    ["max"] = UserProfileValidationRules.MaxAge
-                }
-            );
-
-        BirthDate = birthDate;
-    }
-
-
-    public void SetAvatarUrl(string? avatarUrl)
-    {
-        AvatarUrl = avatarUrl;
-    }
 
     public void Archived()
     {
@@ -261,28 +259,5 @@ public class UserProfile : Entity, ICreatedTrackable, IUpdatedTrackable
         }
 
         Status = UserStatus.Active;
-    }
-
-    public static UserProfile Create(
-        Guid keycloakUserId,
-        string email,
-        string firstName,
-        string lastName,
-        string? nickName,
-        Sex sex,
-        DateOnly birthDate,
-        string? avatarUrl
-    )
-    {
-        return new UserProfile(
-            keycloakUserId,
-            email,
-            firstName,
-            lastName,
-            nickName,
-            sex,
-            birthDate,
-            avatarUrl
-        );
     }
 }

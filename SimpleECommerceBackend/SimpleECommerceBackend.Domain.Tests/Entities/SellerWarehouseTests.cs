@@ -34,7 +34,7 @@ public class SellerWarehouseTests
         var warehouse = SellerWarehouse.Create(EntityTestData.CreateAddress(), Guid.NewGuid());
         var address = EntityTestData.CreateAddress("99 Tran Hung Dao", "Ward 3", "Can Tho");
 
-        warehouse.SetFullAddress(address);
+        warehouse.FullAddress = address;
 
         warehouse.FullAddress.Should().Be(address);
     }

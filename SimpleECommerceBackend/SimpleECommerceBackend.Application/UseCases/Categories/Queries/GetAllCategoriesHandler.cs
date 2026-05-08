@@ -4,10 +4,14 @@ using SimpleECommerceBackend.Application.Models.Categories;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
-[AutoConstructor]
-public partial class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, GetAllCategoriesResult>
+public class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, GetAllCategoriesResult>
 {
     private readonly ICategoryService _categoryService;
+
+    public GetAllCategoriesHandler(ICategoryService categoryService)
+    {
+        _categoryService = categoryService;
+    }
 
     public async Task<GetAllCategoriesResult> HandleAsync(
         GetAllCategoriesQuery request,

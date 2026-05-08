@@ -1,18 +1,18 @@
 using FluentAssertions;
 using SimpleECommerceBackend.Application.Enums;
-using SimpleECommerceBackend.Application.Extensions;
 using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Application.Models.Common.Filter;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
-namespace SimpleECommerceBackend.Application.Tests.Extensions;
+namespace SimpleECommerceBackend.Infrastructure.Tests.Extensions;
 
 public class FilterExtensionTests
 {
     [Fact]
-    public void ToFilterResult_ShouldThrowValidationException_WhenCriterionFieldTypeDoesNotMatchMappedField()
+    public void ApplyFiltering_ShouldThrowValidationException_WhenCriterionValueCannotBeParsed()
     {
         var categories = CreateCategories();
         var query = new GetAllCategoriesQueryForAdmin
@@ -23,15 +23,14 @@ public class FilterExtensionTests
             [
                 new FilterCriterion
                 {
-                    FieldName = "name",
+                    FieldName = "createdAt",
                     Operator = FilterOperator.Equal,
-                    FieldType = FieldType.Int,
-                    Values = ["2"]
+                    Values = ["not-a-date"]
                 }
             ]
         };
 
-        var action = () => categories.ToFilterResult(query);
+        var action = () => categories.ApplyFiltering(query).ToList();
 
         action.Should()
             .Throw<ValidationException>()
@@ -40,7 +39,7 @@ public class FilterExtensionTests
     }
 
     [Fact]
-    public void ToFilterResult_ShouldFilterSuccessfully_WhenCriterionFieldTypeMatchesMappedField()
+    public void ApplyFiltering_ShouldFilterSuccessfully_WhenCriterionValueMatchesMappedFieldType()
     {
         var categories = CreateCategories();
         var query = new GetAllCategoriesQueryForAdmin
@@ -53,16 +52,14 @@ public class FilterExtensionTests
                 {
                     FieldName = "name",
                     Operator = FilterOperator.Equal,
-                    FieldType = FieldType.String,
                     Values = ["2"]
                 }
             ]
         };
 
-        var result = categories.ToFilterResult(query);
+        var result = categories.ApplyFiltering(query).ToList();
 
-        result.TotalItems.Should().Be(1);
-        result.Items.Should().ContainSingle(category => category.Name == "2");
+        result.Should().ContainSingle(category => category.Name == "2");
     }
 
     private static IQueryable<Category> CreateCategories()
@@ -71,8 +68,18 @@ public class FilterExtensionTests
 
         return new[]
         {
-            Category.Create("2", "Matches the filter", adminId),
-            Category.Create("Other", "Does not match", adminId)
+            new Category
+            {
+                Name = "2",
+                Description = "Matches the filter",
+                AdminId = adminId
+            },
+            new Category
+            {
+                Name = "Other",
+                Description = "Does not match",
+                AdminId = adminId
+            }
         }.AsQueryable();
     }
 }

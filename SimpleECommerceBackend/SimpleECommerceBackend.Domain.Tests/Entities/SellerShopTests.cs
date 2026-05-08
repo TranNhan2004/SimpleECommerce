@@ -32,7 +32,7 @@ public class SellerShopTests
     {
         var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
         var phoneNumber = new string('1', CommonValidationRules.PhoneNumberMaxLength + 1);
-        var action = () => sellerShop.SetPhoneNumber(phoneNumber);
+        var action = () => sellerShop.PhoneNumber = phoneNumber;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(SellerShopErrorCodes.PhoneNumberMaxLengthExceeded);

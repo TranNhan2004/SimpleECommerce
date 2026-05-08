@@ -23,6 +23,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
         return services;
     }
 

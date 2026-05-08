@@ -6,12 +6,22 @@ using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
 
-[AutoConstructor]
-public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
+public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserProfileService _userProfileService;
+
+    public UpdateMyProfileHandler(
+        IUnitOfWork unitOfWork,
+        IUserContextHolder userContextHolder,
+        IUserProfileService userProfileService
+    )
+    {
+        _unitOfWork = unitOfWork;
+        _userContextHolder = userContextHolder;
+        _userProfileService = userProfileService;
+    }
 
     public async Task<UpdateMyProfileResult> HandleAsync(
         UpdateMyProfileCommand request,
@@ -21,16 +31,16 @@ public partial class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCom
         var currentUser = _userContextHolder.GetUserContext();
         var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
 
-        userProfile.SetNickName(request.NickName);
+        userProfile.NickName = request.NickName;
 
         if (request.FirstName is not null)
-            userProfile.SetFirstName(request.FirstName);
+            userProfile.FirstName = request.FirstName;
         if (request.LastName is not null)
-            userProfile.SetLastName(request.LastName);
+            userProfile.LastName = request.LastName;
         if (request.Sex.HasValue)
-            userProfile.SetSex(request.Sex.Value);
+            userProfile.Sex = request.Sex.Value;
         if (request.BirthDate.HasValue)
-            userProfile.SetBirthDate(request.BirthDate.Value);
+            userProfile.BirthDate = request.BirthDate.Value;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userProfileService.InvalidateCacheAsync(

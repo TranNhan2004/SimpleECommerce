@@ -11,7 +11,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<OrderItem> _orderItems = [];
 
-    private Order()
+    public Order()
     {
     }
 
@@ -29,151 +29,276 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
         Guid sellerId
     )
     {
-        SetId(Guid.NewGuid());
-        SetCode(code);
-        SetNote(note);
-        SetShoppingFee(shippingFee);
-        SetTotalPrice(shippingFee);
-        SetStatus(status);
-        SetShopName(shopName);
-        SetWarehouseAddress(warehouseAddress);
-        SetRecipientName(recipientName);
-        SetRecipientPhoneNumber(recipientPhoneNumber);
-        SetRecipientAddress(recipientAddress);
-        SetCustomerId(customerId);
-        SetSellerId(sellerId);
+        Id = Guid.NewGuid();
+        Code = code;
+        Note = note;
+        ShippingFee = shippingFee;
+        TotalPrice = shippingFee;
+        Status = status;
+        ShopName = shopName;
+        WarehouseAddress = warehouseAddress;
+        RecipientName = recipientName;
+        RecipientPhoneNumber = recipientPhoneNumber;
+        RecipientAddress = recipientAddress;
+        CustomerId = customerId;
+        SellerId = sellerId;
     }
 
-    public string Code { get; private set; } = null!;
-    public string? Note { get; private set; }
-    public Money ShippingFee { get; private set; }
-    public Money TotalPrice { get; private set; }
-    public OrderStatus Status { get; private set; }
+    private string _code = null!;
+    private string? _note;
+    private Money _shippingFee;
+    private Money _totalPrice;
+    private OrderStatus _status;
+    private Guid _customerId;
+    private Guid _sellerId;
+    private string _shopName = null!;
+    private Address _warehouseAddress;
+    private string _recipientName = null!;
+    private string _recipientPhoneNumber = null!;
+    private Address _recipientAddress;
 
-    public Guid CustomerId { get; private set; }
+    public string Code
+    {
+        get => _code;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    OrderErrorCodes.CodeRequired,
+                    "Order code is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "OrderCode"
+                    }
+                );
+
+            var trimmedCode = value.Trim();
+
+            if (trimmedCode.Length > OrderValidationRules.CodeMaxLength)
+                throw new ValidationException(
+                    OrderErrorCodes.CodeMaxLengthExceeded,
+                    $"Order code cannot exceed {OrderValidationRules.CodeMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "OrderCode",
+                        ["max"] = OrderValidationRules.CodeMaxLength
+                    }
+                );
+
+            _code = trimmedCode;
+        }
+    }
+
+    public string? Note
+    {
+        get => _note;
+        set
+        {
+            if (value is null)
+            {
+                _note = null;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    OrderErrorCodes.NoteMustNotBeBlank,
+                    "Note is not blank",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Note"
+                    }
+                );
+
+            var trimmedNote = value.Trim();
+
+            if (trimmedNote.Length > OrderValidationRules.NoteMaxLength)
+                throw new ValidationException(
+                    OrderErrorCodes.NoteMaxLengthExceeded,
+                    $"Note cannot exceed {OrderValidationRules.NoteMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Note",
+                        ["max"] = OrderValidationRules.NoteMaxLength
+                    }
+                );
+
+            _note = trimmedNote;
+        }
+    }
+
+    public Money ShippingFee
+    {
+        get => _shippingFee;
+        set => _shippingFee = value;
+    }
+
+    public Money TotalPrice
+    {
+        get => _totalPrice;
+        set => _totalPrice = value;
+    }
+
+    public OrderStatus Status
+    {
+        get => _status;
+        set => _status = value;
+    }
+
+    public Guid CustomerId
+    {
+        get => _customerId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    OrderErrorCodes.CustomerRequired,
+                    "Customer is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Customer"
+                    }
+                );
+
+            _customerId = value;
+        }
+    }
+
     public UserProfile? Customer { get; private set; }
-    public Guid SellerId { get; private set; }
+    public Guid SellerId
+    {
+        get => _sellerId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    OrderErrorCodes.SellerRequired,
+                    "Seller is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Seller"
+                    }
+                );
+
+            _sellerId = value;
+        }
+    }
+
     public UserProfile? Seller { get; private set; }
 
-    public string ShopName { get; private set; } = null!;
-    public Address WarehouseAddress { get; private set; }
+    public string ShopName
+    {
+        get => _shopName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    OrderErrorCodes.ShopNameRequired,
+                    "Shop name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ShopName"
+                    }
+                );
 
-    public string RecipientName { get; private set; } = null!;
-    public string RecipientPhoneNumber { get; private set; } = null!;
-    public Address RecipientAddress { get; private set; }
+            var trimmedName = value.Trim();
+
+            if (trimmedName.Length > SellerShopValidationRules.NameMaxLength)
+                throw new ValidationException(
+                    OrderErrorCodes.ShopNameMaxLengthExceeded,
+                    $"Seller shop name cannot exceed {SellerShopValidationRules.NameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ShopName",
+                        ["max"] = SellerShopValidationRules.NameMaxLength
+                    }
+                );
+
+            _shopName = trimmedName;
+        }
+    }
+
+    public Address WarehouseAddress
+    {
+        get => _warehouseAddress;
+        set => _warehouseAddress = value;
+    }
+
+    public string RecipientName
+    {
+        get => _recipientName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    OrderErrorCodes.RecipientNameRequired,
+                    "Recipient name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientName"
+                    }
+                );
+
+            var trimmedName = value.Trim();
+
+            if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
+                throw new ValidationException(
+                    OrderErrorCodes.RecipientNameMaxLengthExceeded,
+                    $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientName",
+                        ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
+                    }
+                );
+
+            _recipientName = trimmedName;
+        }
+    }
+
+    public string RecipientPhoneNumber
+    {
+        get => _recipientPhoneNumber;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    OrderErrorCodes.RecipientPhoneNumberRequired,
+                    "Recipient phone number is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientPhoneNumber"
+                    }
+                );
+
+            var trimmedRecipientPhoneNumber = value.Trim();
+
+            if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
+                throw new ValidationException(
+                    OrderErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
+                    $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RecipientPhoneNumber",
+                        ["max"] = CommonValidationRules.PhoneNumberMaxLength
+                    }
+                );
+
+            _recipientPhoneNumber = trimmedRecipientPhoneNumber;
+        }
+    }
+
+    public Address RecipientAddress
+    {
+        get => _recipientAddress;
+        set => _recipientAddress = value;
+    }
 
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
     public DateTimeOffset? ExpiredAt { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
-
-
-    public static Order Create(
-        string code,
-        string? note,
-        Money shippingFee,
-        OrderStatus status,
-        string shopName,
-        Address warehouseAddress,
-        string recipientName,
-        string recipientPhoneNumber,
-        Address recipientAddress,
-        Guid customerId,
-        Guid sellerId
-    )
-    {
-        return new Order(
-            code,
-            note,
-            shippingFee,
-            status,
-            shopName,
-            warehouseAddress,
-            recipientName,
-            recipientPhoneNumber,
-            recipientAddress,
-            customerId,
-            sellerId
-        );
-    }
-
-    public void SetCode(string code)
-    {
-        if (string.IsNullOrWhiteSpace(code))
-            throw new ValidationException(
-                OrderErrorCodes.CodeRequired,
-                "Order code is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "OrderCode"
-                }
-            );
-
-        var trimmedCode = code.Trim();
-
-        if (trimmedCode.Length > OrderValidationRules.CodeMaxLength)
-            throw new ValidationException(
-                OrderErrorCodes.CodeMaxLengthExceeded,
-                $"Order code cannot exceed {OrderValidationRules.CodeMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "OrderCode",
-                    ["max"] = OrderValidationRules.CodeMaxLength
-                }
-            );
-
-        Code = trimmedCode;
-    }
-
-    public void SetNote(string? note)
-    {
-        if (note is null)
-        {
-            Note = null;
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(note))
-            throw new ValidationException(
-                OrderErrorCodes.NoteMustNotBeBlank,
-                "Note is not blank",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Note"
-                }
-            );
-
-        var trimmedNote = note.Trim();
-
-        if (trimmedNote.Length > OrderValidationRules.NoteMaxLength)
-            throw new ValidationException(
-                OrderErrorCodes.NoteMaxLengthExceeded,
-                $"Note cannot exceed {OrderValidationRules.NoteMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Note",
-                    ["max"] = OrderValidationRules.NoteMaxLength
-                }
-            );
-
-        Note = trimmedNote;
-    }
-
-    public void SetShoppingFee(Money shippingFee)
-    {
-        ShippingFee = shippingFee;
-    }
-
-    private void SetTotalPrice(Money totalPrice)
-    {
-        TotalPrice = totalPrice;
-    }
-
-    private void SetStatus(OrderStatus status)
-    {
-        Status = status;
-    }
 
     public void Pickup()
     {
@@ -189,7 +314,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.ReadyToPickup);
+        Status = OrderStatus.ReadyToPickup;
     }
 
     public void Ship()
@@ -206,7 +331,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.Shipped);
+        Status = OrderStatus.Shipped;
     }
 
     public void AwaitConfirmation()
@@ -223,7 +348,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.AwaitingConfirmation);
+        Status = OrderStatus.AwaitingConfirmation;
     }
 
     public void Deliver()
@@ -240,7 +365,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.Delivered);
+        Status = OrderStatus.Delivered;
     }
 
     public void Cancel()
@@ -257,7 +382,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.Cancelled);
+        Status = OrderStatus.Cancelled;
     }
 
     public void Return()
@@ -274,7 +399,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.Returned);
+        Status = OrderStatus.Returned;
     }
 
     public void Expire()
@@ -291,132 +416,8 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(OrderStatus.Expired);
+        Status = OrderStatus.Expired;
         ExpiredAt = DateTimeOffset.UtcNow.AddDays(1);
-    }
-
-    public void SetShopName(string shopName)
-    {
-        if (string.IsNullOrWhiteSpace(shopName))
-            throw new ValidationException(
-                OrderErrorCodes.ShopNameRequired,
-                "Shop name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "ShopName"
-                }
-            );
-
-        var trimmedName = shopName.Trim();
-
-        if (trimmedName.Length > SellerShopValidationRules.NameMaxLength)
-            throw new ValidationException(
-                OrderErrorCodes.ShopNameMaxLengthExceeded,
-                $"Seller shop name cannot exceed {SellerShopValidationRules.NameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "ShopName",
-                    ["max"] = SellerShopValidationRules.NameMaxLength
-                }
-            );
-
-        ShopName = trimmedName;
-    }
-
-    public void SetWarehouseAddress(Address warehouseAddress)
-    {
-        WarehouseAddress = warehouseAddress;
-    }
-
-    public void SetRecipientName(string recipientName)
-    {
-        if (string.IsNullOrWhiteSpace(recipientName))
-            throw new ValidationException(
-                OrderErrorCodes.RecipientNameRequired,
-                "Recipient name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientName"
-                }
-            );
-
-        var trimmedName = recipientName.Trim();
-
-        if (trimmedName.Length > ShippingAddressValidationRules.RecipientNameMaxLength)
-            throw new ValidationException(
-                OrderErrorCodes.RecipientNameMaxLengthExceeded,
-                $"Recipient name cannot exceed {ShippingAddressValidationRules.RecipientNameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientName",
-                    ["max"] = ShippingAddressValidationRules.RecipientNameMaxLength
-                }
-            );
-
-        RecipientName = trimmedName;
-    }
-
-    public void SetRecipientPhoneNumber(string recipientPhoneNumber)
-    {
-        if (string.IsNullOrWhiteSpace(recipientPhoneNumber))
-            throw new ValidationException(
-                OrderErrorCodes.RecipientPhoneNumberRequired,
-                "Recipient phone number is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientPhoneNumber"
-                }
-            );
-
-        var trimmedRecipientPhoneNumber = recipientPhoneNumber.Trim();
-
-        if (trimmedRecipientPhoneNumber.Length > CommonValidationRules.PhoneNumberMaxLength)
-            throw new ValidationException(
-                OrderErrorCodes.RecipientPhoneNumberMaxLengthExceeded,
-                $"Recipient phone number cannot exceed {CommonValidationRules.PhoneNumberMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RecipientPhoneNumber",
-                    ["max"] = CommonValidationRules.PhoneNumberMaxLength
-                }
-            );
-
-        RecipientPhoneNumber = trimmedRecipientPhoneNumber;
-    }
-
-    public void SetRecipientAddress(Address recipientAddress)
-    {
-        RecipientAddress = recipientAddress;
-    }
-
-    public void SetCustomerId(Guid customerId)
-    {
-        if (customerId == Guid.Empty)
-            throw new ValidationException(
-                OrderErrorCodes.CustomerRequired,
-                "Customer is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Customer"
-                }
-            );
-
-        CustomerId = customerId;
-    }
-
-    public void SetSellerId(Guid sellerId)
-    {
-        if (sellerId == Guid.Empty)
-            throw new ValidationException(
-                OrderErrorCodes.SellerRequired,
-                "Seller is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Seller"
-                }
-            );
-
-        SellerId = sellerId;
     }
 
     public void CalculateTotalPrice(OrderItem item)

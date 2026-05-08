@@ -6,7 +6,6 @@ using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-[AutoConstructor]
 public partial class OpenAITranslationProvider : ITranslationProvider
 {
     private readonly OpenAITranslationOptions _options;

@@ -9,7 +9,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services;
 
-public partial class CategoryService : ServiceBase, ICategoryService
+public class CategoryService : ServiceBase, ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -17,11 +17,6 @@ public partial class CategoryService : ServiceBase, ICategoryService
         : base(cacheService)
     {
         _categoryRepository = categoryRepository;
-    }
-
-    protected override string BuildCacheKeyById(Guid id)
-    {
-        return CategoryCacheKeys.GetCategoryKey(id);
     }
 
     public Category CreateCategory(Category category)

@@ -9,10 +9,14 @@ using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
-[AutoConstructor]
 public partial class UserContextHolder : IUserContextHolder
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserContextHolder(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
 
     public IUserContext GetUserContext()
     {

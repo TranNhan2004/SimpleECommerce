@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Domain.Entities.Translation;
 
 public class TranslationEntry : Entity
 {
-    private TranslationEntry()
+    public TranslationEntry()
     {
         EntityName = string.Empty;
         FieldName = string.Empty;
@@ -23,97 +23,117 @@ public class TranslationEntry : Entity
         string value
     )
     {
-        SetId(id);
-        SetEntityName(entityName);
-        SetFieldName(fieldName);
-        SetRowId(rowId);
-        SetLocale(locale);
-        SetValue(value);
+        Id = id;
+        EntityName = entityName;
+        FieldName = fieldName;
+        RowId = rowId;
+        Locale = locale;
+        Value = value;
     }
 
-    public string EntityName { get; private set; } = string.Empty;
-    public string FieldName { get; private set; } = string.Empty;
-    public Guid RowId { get; private set; }
-    public string Locale { get; private set; } = string.Empty;
-    public string Value { get; private set; } = string.Empty;
+    private string _entityName = string.Empty;
+    private string _fieldName = string.Empty;
+    private Guid _rowId;
+    private string _locale = string.Empty;
+    private string _value = string.Empty;
+
+    public string EntityName
+    {
+        get => _entityName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    TranslationEntryErrorCodes.EntityNameRequired,
+                    "Translation entity name is required.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "TranslationEntityName"
+                    }
+                );
+
+            _entityName = value.Trim();
+        }
+    }
+
+    public string FieldName
+    {
+        get => _fieldName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    TranslationEntryErrorCodes.FieldNameRequired,
+                    "Translation field name is required.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "TranslationFieldName"
+                    }
+                );
+
+            _fieldName = value.Trim();
+        }
+    }
+
+    public Guid RowId
+    {
+        get => _rowId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    TranslationEntryErrorCodes.RowIdRequired,
+                    "Translation row id is required.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "RowId"
+                    }
+                );
+
+            _rowId = value;
+        }
+    }
+
+    public string Locale
+    {
+        get => _locale;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    TranslationEntryErrorCodes.LocaleRequired,
+                    "Translation locale is required.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "TranslationLocale"
+                    }
+                );
+
+            _locale = value.Trim().ToLowerInvariant();
+        }
+    }
+
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    TranslationEntryErrorCodes.ValueRequired,
+                    "Translation value is required.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "TranslationValue"
+                    }
+                );
+
+            _value = value.Trim();
+        }
+    }
 
     public void UpdateValue(string value)
     {
-        SetValue(value);
-    }
-
-    private void SetEntityName(string entityName)
-    {
-        if (string.IsNullOrWhiteSpace(entityName))
-            throw new ValidationException(
-                TranslationEntryErrorCodes.EntityNameRequired,
-                "Translation entity name is required.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "TranslationEntityName"
-                }
-            );
-
-        EntityName = entityName.Trim();
-    }
-
-    private void SetFieldName(string fieldName)
-    {
-        if (string.IsNullOrWhiteSpace(fieldName))
-            throw new ValidationException(
-                TranslationEntryErrorCodes.FieldNameRequired,
-                "Translation field name is required.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "TranslationFieldName"
-                }
-            );
-
-        FieldName = fieldName.Trim();
-    }
-
-    private void SetRowId(Guid rowId)
-    {
-        if (rowId == Guid.Empty)
-            throw new ValidationException(
-                TranslationEntryErrorCodes.RowIdRequired,
-                "Translation row id is required.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "RowId"
-                }
-            );
-
-        RowId = rowId;
-    }
-
-    private void SetLocale(string locale)
-    {
-        if (string.IsNullOrWhiteSpace(locale))
-            throw new ValidationException(
-                TranslationEntryErrorCodes.LocaleRequired,
-                "Translation locale is required.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "TranslationLocale"
-                }
-            );
-
-        Locale = locale.Trim().ToLowerInvariant();
-    }
-
-    private void SetValue(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ValidationException(
-                TranslationEntryErrorCodes.ValueRequired,
-                "Translation value is required.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "TranslationValue"
-                }
-            );
-
-        Value = value.Trim();
+        Value = value;
     }
 }

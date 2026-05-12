@@ -4,6 +4,7 @@ using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
+using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
@@ -13,29 +14,29 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    [JsonConstructor]
-    private Category(
-        Guid id,
-        string name,
-        string? description,
-        CategoryStatus status,
-        Guid adminId,
-        DateTimeOffset createdAt,
-        DateTimeOffset? updatedAt
-    )
-    {
-        Id = id;
-        Name = name;
-        Description = description;
-        Status = status;
-        AdminId = adminId;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-    }
+    // [JsonConstructor]
+    // private Category(
+    //     Guid id,
+    //     string name,
+    //     string? description,
+    //     CategoryStatus status,
+    //     Guid adminId,
+    //     DateTimeOffset createdAt,
+    //     DateTimeOffset? updatedAt
+    // )
+    // {
+    //     Id = id;
+    //     Name = name;
+    //     Description = description;
+    //     Status = status;
+    //     AdminId = adminId;
+    //     CreatedAt = createdAt;
+    //     UpdatedAt = updatedAt;
+    // }
 
     private Category(string name, string? description, CategoryStatus status, Guid adminId)
     {
-        Id = Guid.NewGuid();
+        Id = UuidUtils.CreateV7();
         Name = name;
         Description = description;
         Status = status;

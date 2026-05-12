@@ -12,19 +12,19 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     {
     }
 
-    private CustomerShippingAddress(
-        string recipientName,
-        string recipientPhoneNumber,
-        Address recipientAddress,
-        bool isDefault
-    )
-    {
-        Id = Guid.NewGuid();
-        RecipientName = recipientName;
-        RecipientPhoneNumber = recipientPhoneNumber;
-        RecipientAddress = recipientAddress;
-        IsDefault = isDefault;
-    }
+    // private CustomerShippingAddress(
+    //     string recipientName,
+    //     string recipientPhoneNumber,
+    //     Address recipientAddress,
+    //     bool isDefault
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     RecipientName = recipientName;
+    //     RecipientPhoneNumber = recipientPhoneNumber;
+    //     RecipientAddress = recipientAddress;
+    //     IsDefault = isDefault;
+    // }
 
     private string _recipientName = null!;
     private string _recipientPhoneNumber = null!;

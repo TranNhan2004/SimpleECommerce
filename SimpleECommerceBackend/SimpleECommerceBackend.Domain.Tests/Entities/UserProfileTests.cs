@@ -27,15 +27,18 @@ public class UserProfileTests
     [InlineData("   ")]
     public void Create_ShouldThrowValidationException_WhenFirstNameIsBlank(string firstName)
     {
-        var action = () => UserProfile.Create(
-            Guid.NewGuid(),
-            "nhan@example.com",
-            firstName,
-            "Nguyen",
-            "nhan",
-            Sex.Male,
-            EntityTestData.CreateBirthDate(),
-            null);
+        var action = () => new UserProfile
+        {
+            Id = Guid.NewGuid(),
+            Email = "nhan@example.com",
+            FirstName = firstName,
+            LastName = "Nguyen",
+            NickName = "nhan",
+            Sex = Sex.Male,
+            Status = UserStatus.Active,
+            BirthDate = EntityTestData.CreateBirthDate(),
+            AvatarUrl = null
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.FirstNameRequired);
@@ -46,15 +49,18 @@ public class UserProfileTests
     [InlineData("   ")]
     public void Create_ShouldThrowValidationException_WhenLastNameIsBlank(string lastName)
     {
-        var action = () => UserProfile.Create(
-            Guid.NewGuid(),
-            "nhan@example.com",
-            "Nhan",
-            lastName,
-            "nhan",
-            Sex.Male,
-            EntityTestData.CreateBirthDate(),
-            null);
+        var action = () => new UserProfile
+        {
+            Id = Guid.NewGuid(),
+            Email = "nhan@example.com",
+            FirstName = "Nhan",
+            LastName = lastName,
+            NickName = "nhan",
+            Sex = Sex.Male,
+            Status = UserStatus.Active,
+            BirthDate = EntityTestData.CreateBirthDate(),
+            AvatarUrl = null
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.LastNameRequired);
@@ -113,14 +119,17 @@ public class UserProfileTests
 
     private static UserProfile CreateUserProfile()
     {
-        return UserProfile.Create(
-            Guid.NewGuid(),
-            "nhan@example.com",
-            "  Nhan  ",
-            "  Nguyen  ",
-            "  nhan  ",
-            Sex.Male,
-            EntityTestData.CreateBirthDate(),
-            "avatar.png");
+        return new UserProfile
+        {
+            Id = Guid.NewGuid(),
+            Email = "nhan@example.com",
+            FirstName = "  Nhan  ",
+            LastName = "  Nguyen  ",
+            NickName = "  nhan  ",
+            Sex = Sex.Male,
+            Status = UserStatus.Active,
+            BirthDate = EntityTestData.CreateBirthDate(),
+            AvatarUrl = "avatar.png"
+        };
     }
 }

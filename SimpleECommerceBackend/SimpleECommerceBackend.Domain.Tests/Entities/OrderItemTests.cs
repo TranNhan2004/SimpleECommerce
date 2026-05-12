@@ -11,13 +11,19 @@ public class OrderItemTests
     [Fact]
     public void Create_ShouldCreateOrderItem_WhenInputIsValid()
     {
-        var productId = Guid.NewGuid();
-        var orderId = Guid.NewGuid();
+        var productVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+        var orderId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var quantity = 5;
         var currentPrice = new Money(100000, "VND");
-        var orderItem = OrderItem.Create(productId, orderId, quantity, currentPrice);
+        var orderItem = new OrderItem
+        {
+            ProductVariantId = productVariantId,
+            OrderId = orderId,
+            Quantity = quantity,
+            CurrentPrice = currentPrice
+        };
 
-        orderItem.ProductId.Should().Be(productId);
+        orderItem.ProductVariantId.Should().Be(productVariantId);
         orderItem.OrderId.Should().Be(orderId);
         orderItem.Quantity.Should().Be(quantity);
         orderItem.CurrentPrice.Should().Be(currentPrice);
@@ -28,10 +34,16 @@ public class OrderItemTests
     [InlineData(-1)]
     public void Create_ShouldThrow_WhenQuantityIsNotPositive(int quantity)
     {
-        var productId = Guid.NewGuid();
-        var orderId = Guid.NewGuid();
+        var productVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+        var orderId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var currentPrice = new Money(100000, "VND");
-        var act = () => OrderItem.Create(productId, orderId, quantity, currentPrice);
+        var act = () => new OrderItem
+        {
+            ProductVariantId = productVariantId,
+            OrderId = orderId,
+            Quantity = quantity,
+            CurrentPrice = currentPrice
+        };
 
         act.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(OrderItemErrorCodes.QuantityMustBeGreaterThanZero);
@@ -40,7 +52,13 @@ public class OrderItemTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenOrderIdIsEmpty()
     {
-        var action = () => OrderItem.Create(Guid.NewGuid(), Guid.Empty, 1, new Money(100000, "VND"));
+        var action = () => new OrderItem
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            OrderId = Guid.Empty,
+            Quantity = 1,
+            CurrentPrice = new Money(100000, "VND")
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(OrderItemErrorCodes.OrderIdRequired);
@@ -49,7 +67,13 @@ public class OrderItemTests
     [Fact]
     public void SetCurrentPrice_ShouldThrowValidationException_WhenAmountIsNegative()
     {
-        var orderItem = OrderItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1, new Money(100000, "VND"));
+        var orderItem = new OrderItem
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            OrderId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Quantity = 1,
+            CurrentPrice = new Money(100000, "VND")
+        };
         var action = () => orderItem.CurrentPrice = new Money(-1, "VND");
 
         action.Should().Throw<ValidationException>()
@@ -59,11 +83,17 @@ public class OrderItemTests
     [Fact]
     public void GetLineTotal_ShouldCalculateCorrectly()
     {
-        var productId = Guid.NewGuid();
-        var orderId = Guid.NewGuid();
+        var productVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+        var orderId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var quantity = 5;
         var currentPrice = new Money(100000, "VND");
-        var orderItem = OrderItem.Create(productId, orderId, quantity, currentPrice);
+        var orderItem = new OrderItem
+        {
+            ProductVariantId = productVariantId,
+            OrderId = orderId,
+            Quantity = quantity,
+            CurrentPrice = currentPrice
+        };
         var lineTotal = orderItem.GetLineTotal();
 
         lineTotal.Amount.Should().Be(500000);

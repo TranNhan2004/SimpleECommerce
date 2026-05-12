@@ -5,44 +5,37 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductPrice : Entity, ICreatedTrackable
+public class ProductVariantPrice : Entity, ICreatedTrackable
 {
-    public ProductPrice()
+    public ProductVariantPrice()
     {
     }
 
-    private ProductPrice(Guid productId, Money money, DateTimeOffset effectiveFrom)
-    {
-        Id = Guid.NewGuid();
-        ProductId = productId;
-        Money = money;
-        EffectiveFrom = effectiveFrom;
-    }
-
-    private Guid _productId;
+    private Guid _productVariantId;
     private Money _money;
     private DateTimeOffset _effectiveFrom;
 
-    public Guid ProductId
+    public Guid ProductVariantId
     {
-        get => _productId;
+        get => _productVariantId;
         set
         {
             if (value == Guid.Empty)
                 throw new ValidationException(
-                    ProductPriceErrorCodes.ProductIdRequired,
-                    "ProductId is required",
+                    ProductVariantPriceErrorCodes.ProductVariantIdRequired,
+                    "Product variant is required",
                     new Dictionary<string, object?>
                     {
-                        ["field"] = "ProductId"
+                        ["field"] = "ProductVariantId"
                     }
                 );
 
-            _productId = value;
+            _productVariantId = value;
         }
     }
 
-    public Product? Product { get; private set; }
+    public ProductVariant? ProductVariant { get; private set; }
+
     public Money Money
     {
         get => _money;
@@ -50,7 +43,7 @@ public class ProductPrice : Entity, ICreatedTrackable
         {
             if (value.Amount <= 0)
                 throw new ValidationException(
-                    ProductPriceErrorCodes.PriceMustBePositive,
+                    ProductVariantPriceErrorCodes.PriceMustBePositive,
                     "Price amount must be positive",
                     new Dictionary<string, object?>
                     {
@@ -69,5 +62,4 @@ public class ProductPrice : Entity, ICreatedTrackable
     }
 
     public DateTimeOffset CreatedAt { get; private set; }
-
 }

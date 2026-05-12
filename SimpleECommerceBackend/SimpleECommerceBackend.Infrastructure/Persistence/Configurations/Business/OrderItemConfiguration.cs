@@ -26,10 +26,10 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
                 .IsRequired();
         });
 
-        builder.HasOne(oi => oi.Product)
+        builder.HasOne(oi => oi.ProductVariant)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(oi => oi.ProductId)
+            .HasForeignKey(oi => oi.ProductVariantId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(oi => oi.Order)
@@ -38,7 +38,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(oi => new { oi.OrderId, oi.ProductId })
+        builder.HasIndex(oi => new { oi.OrderId, oi.ProductVariantId })
             .IsUnique();
     }
 }

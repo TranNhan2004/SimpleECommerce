@@ -106,13 +106,44 @@
       "Seller": "Người bán",
       "Image": "Hình ảnh"
     },
+    "ProductVariant": {
+      "ProductVariant": "Biến thể sản phẩm",
+      "ProductId": "Sản phẩm",
+      "Name": "Tên",
+      "Description": "Mô tả",
+      "CurrentPrice": "Giá hiện tại",
+      "TotalInStock": "Tồn kho",
+      "Image": "Hình ảnh"
+    },
     "ProductImage": {
+      "ImageUrl": "URL hình ảnh",
+      "DisplayOrder": "Thứ tự hiển thị",
+      "Description": "Mô tả"
+    },
+    "ProductVariantImage": {
+      "ProductVariantId": "Biến thể sản phẩm",
       "ImageUrl": "URL hình ảnh",
       "DisplayOrder": "Thứ tự hiển thị",
       "Description": "Mô tả"
     },
     "ProductPrice": {
       "Price": "Giá"
+    },
+    "ProductVariantPrice": {
+      "ProductVariantId": "Biến thể sản phẩm",
+      "Price": "Giá"
+    },
+    "Review": {
+      "ProductId": "Sản phẩm",
+      "CustomerId": "Khách hàng",
+      "Rating": "Đánh giá",
+      "Comment": "Bình luận"
+    },
+    "ReviewResponse": {
+      "ReviewId": "Đánh giá",
+      "FromUserId": "Người gửi",
+      "ToUserId": "Người nhận",
+      "Comment": "Bình luận"
     },
     "Role": {
       "Role": "Vai trò"
@@ -172,6 +203,7 @@
     },
     "CartItem": {
       "ProductIdRequired": "{field} là bắt buộc.",
+      "ProductVariantIdRequired": "{field} là bắt buộc.",
       "CartIdRequired": "{field} là bắt buộc.",
       "QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
       "QuantityCannotExceed": "{field} không được vượt quá {max}.",
@@ -235,6 +267,7 @@
     },
     "Inventory": {
       "ProductRequired": "{field} là bắt buộc.",
+      "ProductVariantRequired": "{field} là bắt buộc.",
       "SellerWarehouseRequired": "{field} là bắt buộc.",
       "QuantityOnHandCannotBeNegative": "{field} không được âm.",
       "QuantityOnHandCannotExceed": "{field} không được vượt quá {max}.",
@@ -282,6 +315,7 @@
     },
     "OrderItem": {
       "ProductIdRequired": "{field} là bắt buộc.",
+      "ProductVariantIdRequired": "{field} là bắt buộc.",
       "OrderIdRequired": "{field} là bắt buộc.",
       "QuantityMustBeGreaterThanZero": "{field} phải lớn hơn 0.",
       "AmountCannotBeNegative": "{field} không được âm."
@@ -307,6 +341,18 @@
       "HideNotAllowed": "{operation} chỉ được phép khi {field} là {allowedStates}.",
       "CategoryRequired": "{field} là bắt buộc.",
       "SellerRequired": "{field} là bắt buộc.",
+      "ImageNotFound": "Không tìm thấy {field}.",
+      "AverageRatingOutOfRange": "{field} phải nằm trong khoảng từ {min} đến {max}.",
+      "TotalRatingsCannotBeNegative": "{field} không được âm."
+    },
+    "ProductVariant": {
+      "ProductRequired": "{field} là bắt buộc.",
+      "NameRequired": "{field} là bắt buộc.",
+      "NameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "DescriptionRequired": "{field} là bắt buộc.",
+      "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
+      "CurrentPriceMustBePositive": "{field} phải là số dương.",
+      "TotalInStockCannotBeNegative": "{field} không được âm.",
       "ImageNotFound": "Không tìm thấy {field}."
     },
     "ProductImage": {
@@ -315,8 +361,33 @@
       "DescriptionMustNotBeBlank": "{field} không được để trắng.",
       "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự."
     },
+    "ProductVariantImage": {
+      "ProductVariantIdRequired": "{field} là bắt buộc.",
+      "ImageUrlRequired": "{field} là bắt buộc.",
+      "DisplayOrderCannotBeNegative": "{field} không được âm.",
+      "DescriptionMustNotBeBlank": "{field} không được để trắng.",
+      "DescriptionMaxLengthExceeded": "{field} không được vượt quá {max} ký tự."
+    },
     "ProductPrice": {
       "PriceMustBePositive": "{field} phải là số dương."
+    },
+    "ProductVariantPrice": {
+      "ProductVariantIdRequired": "{field} là bắt buộc.",
+      "PriceMustBePositive": "{field} phải là số dương."
+    },
+    "Review": {
+      "ProductIdRequired": "{field} là bắt buộc.",
+      "CustomerIdRequired": "{field} là bắt buộc.",
+      "RatingOutOfRange": "{field} phải nằm trong khoảng từ {min} đến {max}.",
+      "CommentRequired": "{field} là bắt buộc.",
+      "CommentMaxLengthExceeded": "{field} không được vượt quá {max} ký tự."
+    },
+    "ReviewResponse": {
+      "ReviewIdRequired": "{field} là bắt buộc.",
+      "FromUserIdRequired": "{field} là bắt buộc.",
+      "ToUserIdRequired": "{field} là bắt buộc.",
+      "CommentRequired": "{field} là bắt buộc.",
+      "CommentMaxLengthExceeded": "{field} không được vượt quá {max} ký tự."
     },
     "Role": {
       "InvalidRole": "{field} không hợp lệ. Giá trị cho phép: {allowedValues}.",

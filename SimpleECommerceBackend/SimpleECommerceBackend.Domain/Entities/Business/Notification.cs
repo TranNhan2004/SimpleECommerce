@@ -11,12 +11,12 @@ public class Notification : Entity, ICreatedTrackable
     {
     }
 
-    private Notification(Guid userId, string message)
-    {
-        Id = Guid.NewGuid();
-        UserId = userId;
-        Message = message;
-    }
+    // private Notification(Guid userId, string message)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     UserId = userId;
+    //     Message = message;
+    // }
 
     private Guid _userId;
     private string _message = null!;

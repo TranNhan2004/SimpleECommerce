@@ -2,7 +2,7 @@ namespace SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 
 public static class InventoryErrorCodes
 {
-    public const string ProductRequired = "Inventory_ProductRequired";
+    public const string ProductVariantRequired = "Inventory_ProductVariantRequired";
     public const string SellerWarehouseRequired = "Inventory_SellerWarehouseRequired";
     public const string QuantityOnHandCannotBeNegative = "Inventory_QuantityOnHandCannotBeNegative";
     public const string QuantityOnHandCannotExceed = "Inventory_QuantityOnHandCannotExceed";

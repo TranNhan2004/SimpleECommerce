@@ -4,16 +4,16 @@ using SimpleECommerceBackend.Domain.Entities.Business;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
-public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
+public class ProductVariantPriceConfiguration : IEntityTypeConfiguration<ProductVariantPrice>
 {
-    public void Configure(EntityTypeBuilder<ProductPrice> builder)
+    public void Configure(EntityTypeBuilder<ProductVariantPrice> builder)
     {
-        builder.ToTable("ProductPrices", DbSchemas.Business);
+        builder.ToTable("ProductVariantPrices", DbSchemas.Business);
 
-        builder.Property(pp => pp.EffectiveFrom)
+        builder.Property(pvp => pvp.EffectiveFrom)
             .IsRequired();
 
-        builder.ComplexProperty(pp => pp.Money, money =>
+        builder.ComplexProperty(pvp => pvp.Money, money =>
         {
             money.Property(m => m.Amount)
                 .HasColumnName("Amount")
@@ -26,12 +26,12 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
                 .IsRequired();
         });
 
-        builder.HasOne(pp => pp.Product)
-            .WithMany(p => p.ProductPrices)
+        builder.HasOne(pvp => pvp.ProductVariant)
+            .WithMany(pv => pv.ProductVariantPrices)
             .IsRequired()
-            .HasForeignKey(pp => pp.ProductId)
+            .HasForeignKey(pvp => pvp.ProductVariantId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(pp => pp.ProductId);
+        builder.HasIndex(pvp => pvp.ProductVariantId);
     }
 }

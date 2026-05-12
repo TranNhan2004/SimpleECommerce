@@ -14,7 +14,13 @@ public class CategoryTests
     {
         var adminId = Guid.NewGuid();
 
-        var category = Category.Create("  Books  ", "  All kinds of books  ", adminId);
+        var category = new Category
+        {
+            Name = "  Books  ",
+            Description = "  All kinds of books  ",
+            AdminId = adminId,
+            Status = CategoryStatus.Active
+        };
 
         category.Name.Should().Be("Books");
         category.Description.Should().Be("All kinds of books");
@@ -25,7 +31,13 @@ public class CategoryTests
     [Fact]
     public void Create_ShouldAllowNullDescription()
     {
-        var category = Category.Create("Books", null, Guid.NewGuid());
+        var category = new Category
+        {
+            Name = "Books",
+            Description = null,
+            AdminId = Guid.NewGuid(),
+            Status = CategoryStatus.Active
+        };
 
         category.Description.Should().BeNull();
     }
@@ -35,7 +47,13 @@ public class CategoryTests
     [InlineData("   ")]
     public void Create_ShouldThrowValidationException_WhenNameIsEmptyOrWhitespace(string name)
     {
-        var action = () => Category.Create(name, "desc", Guid.NewGuid());
+        var action = () => new Category
+        {
+            Name = name,
+            Description = "desc",
+            AdminId = Guid.NewGuid(),
+            Status = CategoryStatus.Active
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(CategoryErrorCodes.NameRequired);
@@ -45,7 +63,13 @@ public class CategoryTests
     public void Create_ShouldThrowValidationException_WhenNameExceedsMaxLength()
     {
         var name = new string('a', CategoryValidationRules.NameMaxLength + 1);
-        var action = () => Category.Create(name, "desc", Guid.NewGuid());
+        var action = () => new Category
+        {
+            Name = name,
+            Description = "desc",
+            AdminId = Guid.NewGuid(),
+            Status = CategoryStatus.Active
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(CategoryErrorCodes.NameMaxLengthExceeded);
@@ -54,7 +78,7 @@ public class CategoryTests
     [Fact]
     public void Deactivate_ShouldChangeStatus_WhenCategoryIsActive()
     {
-        var category = Category.Create("Books", "Description", Guid.NewGuid());
+        var category = CreateCategory();
 
         category.Deactivate();
 
@@ -64,7 +88,7 @@ public class CategoryTests
     [Fact]
     public void Activate_ShouldThrowValidationException_WhenCategoryIsArchived()
     {
-        var category = Category.Create("Books", "Description", Guid.NewGuid());
+        var category = CreateCategory();
         category.Archive();
         var action = () => category.Activate();
 
@@ -75,11 +99,22 @@ public class CategoryTests
     [Fact]
     public void Archive_ShouldThrowValidationException_WhenCategoryIsAlreadyArchived()
     {
-        var category = Category.Create("Books", "Description", Guid.NewGuid());
+        var category = CreateCategory();
         category.Archive();
         var action = () => category.Archive();
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(CategoryErrorCodes.AlreadyArchived);
+    }
+
+    private static Category CreateCategory()
+    {
+        return new Category
+        {
+            Name = "Books",
+            Description = "Description",
+            AdminId = Guid.NewGuid(),
+            Status = CategoryStatus.Active
+        };
     }
 }

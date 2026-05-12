@@ -14,8 +14,8 @@ public class GetAllProductsRequestForCustomer : FilterRequest<Product>
             .Map("description", product => product.Description)
             .Map("categoryId", product => product.CategoryId)
             .Map("sellerId", product => product.SellerId)
-            .Map("currentPriceAmount", product => product.CurrentPrice.Amount)
-            .Map("currentPriceCurrency", product => product.CurrentPrice.Currency);
+            .Map("averageRating", product => product.AverageRating)
+            .Map("totalRatings", product => product.TotalRatings);
     }
 
     public static GetAllProductsQueryForCustomer ToQuery(GetAllProductsRequestForCustomer request)

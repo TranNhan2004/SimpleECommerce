@@ -11,42 +11,42 @@ public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private Inventory(Guid productId, Guid sellerWarehouseId, int quantityOnHand, int quantityReserved)
-    {
-        Id = Guid.NewGuid();
-        ProductId = productId;
-        SellerWarehouseId = sellerWarehouseId;
-        QuantityInStock = quantityOnHand;
-        QuantityReserved = quantityReserved;
-        Version = 1;
-    }
+    // private Inventory(Guid productId, Guid sellerWarehouseId, int quantityOnHand, int quantityReserved)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     ProductId = productId;
+    //     SellerWarehouseId = sellerWarehouseId;
+    //     QuantityInStock = quantityOnHand;
+    //     QuantityReserved = quantityReserved;
+    //     Version = 1;
+    // }
 
-    private Guid _productId;
+    private Guid _productVariantId;
     private Guid _sellerWarehouseId;
     private int _quantityInStock;
     private int _quantityReserved;
     private int _version;
 
-    public Guid ProductId
+    public Guid ProductVariantId
     {
-        get => _productId;
+        get => _productVariantId;
         set
         {
             if (value == Guid.Empty)
                 throw new ValidationException(
-                    InventoryErrorCodes.ProductRequired,
-                    "Product is required",
+                    InventoryErrorCodes.ProductVariantRequired,
+                    "Product variant is required",
                     new Dictionary<string, object?>
                     {
-                        ["field"] = "Product"
+                        ["field"] = "ProductVariant"
                     }
                 );
 
-            _productId = value;
+            _productVariantId = value;
         }
     }
 
-    public Product? Product { get; private set; }
+    public ProductVariant? ProductVariant { get; private set; }
 
     public Guid SellerWarehouseId
     {

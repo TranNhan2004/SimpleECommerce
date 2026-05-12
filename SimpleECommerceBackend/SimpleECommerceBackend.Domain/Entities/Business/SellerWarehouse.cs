@@ -11,15 +11,15 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     {
     }
 
-    private SellerWarehouse(
-        Address fullAddress,
-        Guid sellerShopId
-    )
-    {
-        Id = Guid.NewGuid();
-        FullAddress = fullAddress;
-        SellerShopId = sellerShopId;
-    }
+    // private SellerWarehouse(
+    //     Address fullAddress,
+    //     Guid sellerShopId
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     FullAddress = fullAddress;
+    //     SellerShopId = sellerShopId;
+    // }
 
     private Address _fullAddress;
     private Guid _sellerShopId;

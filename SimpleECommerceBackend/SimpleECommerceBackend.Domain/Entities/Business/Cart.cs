@@ -10,11 +10,11 @@ public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private Cart(Guid customerId)
-    {
-        Id = Guid.NewGuid();
-        CustomerId = customerId;
-    }
+    // private Cart(Guid customerId)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     CustomerId = customerId;
+    // }
 
     private Guid _customerId;
 

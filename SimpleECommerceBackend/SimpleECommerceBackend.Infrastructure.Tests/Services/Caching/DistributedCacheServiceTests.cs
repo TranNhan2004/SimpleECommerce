@@ -38,7 +38,7 @@ public class RedisCacheServiceTests
     {
         var sut = CreateSut();
         var expected = UserProfile.Create(
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "user@example.com",
             "Nhan",
             "Tran",
@@ -67,7 +67,7 @@ public class RedisCacheServiceTests
     public async Task SetAsync_ShouldStoreAndReturnCategory()
     {
         var sut = CreateSut();
-        var expected = Category.Create("Books", "Fiction books", Guid.NewGuid());
+        var expected = Category.Create("Books", "Fiction books", SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7());
 
         await sut.SetAsync("cache:category", expected, TimeSpan.FromMinutes(5));
         var result = await sut.GetAsync<Category>("cache:category");

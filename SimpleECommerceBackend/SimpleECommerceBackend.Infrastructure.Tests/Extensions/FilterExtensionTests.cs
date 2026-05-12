@@ -64,7 +64,7 @@ public class FilterExtensionTests
 
     private static IQueryable<Category> CreateCategories()
     {
-        var adminId = Guid.NewGuid();
+        var adminId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
 
         return new[]
         {

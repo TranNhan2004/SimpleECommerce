@@ -6,6 +6,7 @@ using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
@@ -35,6 +36,7 @@ public class CreateCategoryHandler : IUseCaseHandler<CreateCategoryCommand, Crea
 
         var category = new Category
         {
+            Id = UuidUtils.CreateV7(),
             Name = request.Name,
             Description = request.Description,
             Status = CategoryStatus.Active,

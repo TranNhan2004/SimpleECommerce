@@ -13,19 +13,19 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private SellerShop(
-        Guid sellerId,
-        string name,
-        string phoneNumber,
-        string? avatarUrl
-    )
-    {
-        Id = Guid.NewGuid();
-        SellerId = sellerId;
-        Name = name;
-        PhoneNumber = phoneNumber;
-        AvatarUrl = avatarUrl;
-    }
+    // private SellerShop(
+    //     Guid sellerId,
+    //     string name,
+    //     string phoneNumber,
+    //     string? avatarUrl
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     SellerId = sellerId;
+    //     Name = name;
+    //     PhoneNumber = phoneNumber;
+    //     AvatarUrl = avatarUrl;
+    // }
 
     private Guid _sellerId;
     private string _name = null!;

@@ -11,7 +11,11 @@ public class NotificationTests
     [Fact]
     public void Create_ShouldCreateNotification_WhenInputIsValid()
     {
-        var notification = Notification.Create(Guid.NewGuid(), "  Order updated  ");
+        var notification = new Notification
+        {
+            UserId = Guid.NewGuid(),
+            Message = "  Order updated  "
+        };
 
         notification.Message.Should().Be("Order updated");
         notification.IsRead.Should().BeFalse();
@@ -20,7 +24,11 @@ public class NotificationTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenMessageIsBlank()
     {
-        var action = () => Notification.Create(Guid.NewGuid(), " ");
+        var action = () => new Notification
+        {
+            UserId = Guid.NewGuid(),
+            Message = " "
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(NotificationErrorCodes.MessageRequired);
@@ -30,7 +38,11 @@ public class NotificationTests
     public void Create_ShouldThrowValidationException_WhenMessageExceedsMaxLength()
     {
         var message = new string('a', NotificationValidationRules.MessageMaxLength + 1);
-        var action = () => Notification.Create(Guid.NewGuid(), message);
+        var action = () => new Notification
+        {
+            UserId = Guid.NewGuid(),
+            Message = message
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(NotificationErrorCodes.MessageMaxLengthExceeded);
@@ -39,7 +51,11 @@ public class NotificationTests
     [Fact]
     public void MarkAsRead_ShouldThrowValidationException_WhenNotificationIsAlreadyRead()
     {
-        var notification = Notification.Create(Guid.NewGuid(), "Order updated");
+        var notification = new Notification
+        {
+            UserId = Guid.NewGuid(),
+            Message = "Order updated"
+        };
         notification.MarkAsRead();
         var action = () => notification.MarkAsRead();
 

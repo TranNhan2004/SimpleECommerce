@@ -11,38 +11,30 @@ public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private CartItem(Guid productId, Guid cartId, int quantity)
-    {
-        Id = Guid.NewGuid();
-        ProductId = productId;
-        CartId = cartId;
-        Quantity = quantity;
-    }
-
-    private Guid _productId;
+    private Guid _productVariantId;
     private Guid _cartId;
     private int _quantity;
 
-    public Guid ProductId
+    public Guid ProductVariantId
     {
-        get => _productId;
+        get => _productVariantId;
         set
         {
             if (value == Guid.Empty)
                 throw new ValidationException(
-                    CartItemErrorCodes.ProductIdRequired,
-                    "Product ID is required",
+                    CartItemErrorCodes.ProductVariantIdRequired,
+                    "Product variant ID is required",
                     new Dictionary<string, object?>
                     {
-                        ["field"] = "ProductId"
+                        ["field"] = "ProductVariantId"
                     }
                 );
 
-            _productId = value;
+            _productVariantId = value;
         }
     }
 
-    public Product? Product { get; private set; }
+    public ProductVariant? ProductVariant { get; private set; }
 
     public Guid CartId
     {

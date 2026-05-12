@@ -13,7 +13,11 @@ public class SellerWarehouseTests
         var address = EntityTestData.CreateAddress();
         var sellerShopId = Guid.NewGuid();
 
-        var warehouse = SellerWarehouse.Create(address, sellerShopId);
+        var warehouse = new SellerWarehouse
+        {
+            FullAddress = address,
+            SellerShopId = sellerShopId
+        };
 
         warehouse.FullAddress.Should().Be(address);
         warehouse.SellerShopId.Should().Be(sellerShopId);
@@ -22,7 +26,11 @@ public class SellerWarehouseTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenSellerShopIdIsEmpty()
     {
-        var action = () => SellerWarehouse.Create(EntityTestData.CreateAddress(), Guid.Empty);
+        var action = () => new SellerWarehouse
+        {
+            FullAddress = EntityTestData.CreateAddress(),
+            SellerShopId = Guid.Empty
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(SellerWarehouseErrorCodes.SellerShopRequired);
@@ -31,7 +39,11 @@ public class SellerWarehouseTests
     [Fact]
     public void SetFullAddress_ShouldUpdateAddress()
     {
-        var warehouse = SellerWarehouse.Create(EntityTestData.CreateAddress(), Guid.NewGuid());
+        var warehouse = new SellerWarehouse
+        {
+            FullAddress = EntityTestData.CreateAddress(),
+            SellerShopId = Guid.NewGuid()
+        };
         var address = EntityTestData.CreateAddress("99 Tran Hung Dao", "Ward 3", "Can Tho");
 
         warehouse.FullAddress = address;
@@ -42,7 +54,11 @@ public class SellerWarehouseTests
     [Fact]
     public void SoftDelete_ShouldThrowValidationException_WhenWarehouseIsAlreadyDeleted()
     {
-        var warehouse = SellerWarehouse.Create(EntityTestData.CreateAddress(), Guid.NewGuid());
+        var warehouse = new SellerWarehouse
+        {
+            FullAddress = EntityTestData.CreateAddress(),
+            SellerShopId = Guid.NewGuid()
+        };
         warehouse.SoftDelete();
         var action = () => warehouse.SoftDelete();
 

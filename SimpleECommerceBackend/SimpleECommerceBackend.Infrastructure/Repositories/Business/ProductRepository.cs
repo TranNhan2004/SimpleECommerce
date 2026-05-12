@@ -19,49 +19,47 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 
     public async Task<FilterResult<ProductItemForCustomer>> FindAllWithFilterForCustomerAsync(FilterQuery<Product> query)
     {
-        var baseQuery = QueryAllByCondition(q => q.Where(product => product.Status != ProductStatus.Hidden));
+        var baseQuery = QueryAllByCondition(q => q.Where(product =>
+            product.Status == ProductStatus.Active
+            && product.ProductVariants.Any()));
         var filteredQuery = baseQuery.ApplyFiltering(query);
         var sortedQuery = filteredQuery.ApplySorting(query);
         var totalItems = await sortedQuery.CountAsync();
         var pagedProducts = sortedQuery.ApplyPaging(query);
 
-        var inventorySummary =
-            from inventory in DbContext.Set<Inventory>()
-            group inventory by inventory.ProductId into g
-            select new
+        var queryable = pagedProducts.Select(product => new ProductItemForCustomer
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            AverageRating = product.AverageRating,
+            TotalRatings = product.TotalRatings,
+            Category = new NavigationResult
             {
-                ProductId = g.Key,
-                TotalInStock = g.Sum(x => x.QuantityInStock)
-            };
-
-        var queryable =
-            from product in pagedProducts
-            join inventory in inventorySummary
-                on product.Id equals inventory.ProductId into inventories
-            from inventory in inventories.DefaultIfEmpty()
-            select new ProductItemForCustomer
+                Id = product.CategoryId,
+                DisplayName = product.Category != null ? product.Category.Name : string.Empty
+            },
+            Seller = new NavigationResult
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                CurrentPrice = product.CurrentPrice,
-                DefaultImageUrl = product.DefaultImageUrl ?? null,
-                TotalInStock = inventory != null ? inventory.TotalInStock : 0,
-                Category = new NavigationResult
-                {
-                    Id = product.CategoryId,
-                    DisplayName = product.Category != null ? product.Category.Name : string.Empty
-                },
-                Seller = new NavigationResult
-                {
-                    Id = product.SellerId,
-                    DisplayName = product.Seller != null
-                        ? product.Seller.FirstName + " " + product.Seller.LastName
-                        : string.Empty
-                },
-                CreatedAt = product.CreatedAt,
-                UpdatedAt = product.UpdatedAt
-            };
+                Id = product.SellerId,
+                DisplayName = product.Seller != null
+                    ? product.Seller.FirstName + " " + product.Seller.LastName
+                    : string.Empty
+            },
+            DefaultImageUrl = product.ProductVariants
+                .OrderBy(variant => variant.CurrentPrice.Amount)
+                .ThenBy(variant => variant.Id)
+                .Select(variant => variant.DefaultImageUrl)
+                .First(),
+            TotalInStock = product.ProductVariants.Sum(variant => variant.TotalInStock),
+            Price = product.ProductVariants
+                .OrderBy(variant => variant.CurrentPrice.Amount)
+                .ThenBy(variant => variant.Id)
+                .Select(variant => variant.CurrentPrice)
+                .First(),
+            CreatedAt = product.CreatedAt,
+            UpdatedAt = product.UpdatedAt
+        });
 
         return new FilterResult<ProductItemForCustomer>
         {
@@ -82,8 +80,12 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
                 .Where(p => p.Id == id)
                 .Include(p => p.Category)
                 .Include(p => p.Seller)
-                .Include(p => p.ProductImages)
-                .Include(p => p.ProductPrices),
+                .Include(p => p.ProductVariants)
+                    .ThenInclude(pv => pv.ProductVariantImages)
+                .Include(p => p.ProductVariants)
+                    .ThenInclude(pv => pv.ProductVariantPrices)
+                .Include(p => p.Reviews)
+                    .ThenInclude(review => review.Responses),
             trackChanges
         );
     }

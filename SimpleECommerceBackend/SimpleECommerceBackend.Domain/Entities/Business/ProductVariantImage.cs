@@ -5,32 +5,37 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductImage : Entity, ICreatedTrackable
+public class ProductVariantImage : Entity, ICreatedTrackable
 {
-    public ProductImage()
+    public ProductVariantImage()
     {
     }
 
-    private ProductImage(
-        string imageUrl,
-        int displayOrder,
-        bool isDisplayed,
-        string? description
-    )
-    {
-        Id = Guid.NewGuid();
-        ImageUrl = imageUrl;
-        DisplayOrder = displayOrder;
-        IsDisplayed = isDisplayed;
-        Description = description;
-    }
-
-    public Guid ProductId { get; private set; }
-    public Product? Product { get; private set; }
+    private Guid _productVariantId;
     private string _imageUrl = null!;
     private int _displayOrder;
-    private bool _isDisplayed;
     private string? _description;
+
+    public Guid ProductVariantId
+    {
+        get => _productVariantId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    ProductVariantImageErrorCodes.ProductVariantIdRequired,
+                    "Product variant is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ProductVariantId"
+                    }
+                );
+
+            _productVariantId = value;
+        }
+    }
+
+    public ProductVariant? ProductVariant { get; private set; }
 
     public string ImageUrl
     {
@@ -39,7 +44,7 @@ public class ProductImage : Entity, ICreatedTrackable
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ValidationException(
-                    ProductImageErrorCodes.ImageUrlRequired,
+                    ProductVariantImageErrorCodes.ImageUrlRequired,
                     "Image URL is required",
                     new Dictionary<string, object?>
                     {
@@ -58,7 +63,7 @@ public class ProductImage : Entity, ICreatedTrackable
         {
             if (value < 0)
                 throw new ValidationException(
-                    ProductImageErrorCodes.DisplayOrderCannotBeNegative,
+                    ProductVariantImageErrorCodes.DisplayOrderCannotBeNegative,
                     "Display order cannot be negative",
                     new Dictionary<string, object?>
                     {
@@ -70,11 +75,7 @@ public class ProductImage : Entity, ICreatedTrackable
         }
     }
 
-    public bool IsDisplayed
-    {
-        get => _isDisplayed;
-        set => _isDisplayed = value;
-    }
+    public bool IsDisplayed { get; set; }
 
     public string? Description
     {
@@ -89,8 +90,8 @@ public class ProductImage : Entity, ICreatedTrackable
 
             if (string.IsNullOrWhiteSpace(value))
                 throw new ValidationException(
-                    ProductImageErrorCodes.DescriptionMustNotBeBlank,
-                    "Description is not blank",
+                    ProductVariantImageErrorCodes.DescriptionMustNotBeBlank,
+                    "Description must not be blank",
                     new Dictionary<string, object?>
                     {
                         ["field"] = "Description"
@@ -98,15 +99,14 @@ public class ProductImage : Entity, ICreatedTrackable
                 );
 
             var trimmedDescription = value.Trim();
-
-            if (trimmedDescription.Length > ProductImageValidationRules.DescriptionMaxLength)
+            if (trimmedDescription.Length > ProductVariantImageValidationRules.DescriptionMaxLength)
                 throw new ValidationException(
-                    ProductImageErrorCodes.DescriptionMaxLengthExceeded,
-                    $"Description cannot exceed {ProductImageValidationRules.DescriptionMaxLength} characters",
+                    ProductVariantImageErrorCodes.DescriptionMaxLengthExceeded,
+                    $"Description cannot exceed {ProductVariantImageValidationRules.DescriptionMaxLength} characters",
                     new Dictionary<string, object?>
                     {
                         ["field"] = "Description",
-                        ["max"] = ProductImageValidationRules.DescriptionMaxLength
+                        ["max"] = ProductVariantImageValidationRules.DescriptionMaxLength
                     }
                 );
 

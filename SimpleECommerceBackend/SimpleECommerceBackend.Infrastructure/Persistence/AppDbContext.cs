@@ -24,8 +24,11 @@ public class AppDbContext : DbContext
     public DbSet<CustomerShippingAddress> CustomerShippingAddresses => Set<CustomerShippingAddress>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
-    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<ProductVariantImage> ProductVariantImages => Set<ProductVariantImage>();
+    public DbSet<ProductVariantPrice> ProductVariantPrices => Set<ProductVariantPrice>();
+    public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<ReviewResponse> ReviewResponses => Set<ReviewResponse>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();

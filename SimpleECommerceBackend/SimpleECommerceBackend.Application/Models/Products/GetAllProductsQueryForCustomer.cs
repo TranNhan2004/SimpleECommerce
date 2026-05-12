@@ -13,7 +13,7 @@ public class GetAllProductsQueryForCustomer : FilterQuery<Product>
             .Map("description", product => product.Description)
             .Map("categoryId", product => product.CategoryId)
             .Map("sellerId", product => product.SellerId)
-            .Map("currentPriceAmount", product => product.CurrentPrice.Amount)
-            .Map("currentPriceCurrency", product => product.CurrentPrice.Currency);
+            .Map("averageRating", product => product.AverageRating)
+            .Map("totalRatings", product => product.TotalRatings);
     }
 }

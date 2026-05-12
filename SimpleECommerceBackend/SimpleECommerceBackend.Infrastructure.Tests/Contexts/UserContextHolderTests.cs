@@ -13,7 +13,7 @@ public class UserContextHolderTests
     [Fact]
     public void GetRequired_ShouldReturnCurrentUserContext_WhenClaimsAreValid()
     {
-        var userId = Guid.NewGuid();
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -38,7 +38,7 @@ public class UserContextHolderTests
     [Fact]
     public void GetRequired_ShouldReturnCurrentUserContext_WhenUserIdClaimIsMapped()
     {
-        var userId = Guid.NewGuid();
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -63,7 +63,7 @@ public class UserContextHolderTests
     [Fact]
     public void GetRequired_ShouldReturnCurrentUserContext_WhenRoleIsInRealmAccessClaim()
     {
-        var userId = Guid.NewGuid();
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -111,7 +111,7 @@ public class UserContextHolderTests
         {
             HttpContext = new DefaultHttpContext
             {
-                User = CreatePrincipal(new Claim("sub", Guid.NewGuid().ToString()))
+                User = CreatePrincipal(new Claim("sub", SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7().ToString()))
             }
         };
 

@@ -11,7 +11,14 @@ public class InventoryTests
     [Fact]
     public void Create_ShouldCreateInventory_WhenInputIsValid()
     {
-        var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
+        var inventory = new Inventory
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
 
         inventory.QuantityInStock.Should().Be(10);
         inventory.QuantityReserved.Should().Be(0);
@@ -20,18 +27,32 @@ public class InventoryTests
     }
 
     [Fact]
-    public void Create_ShouldThrowValidationException_WhenProductIdIsEmpty()
+    public void Create_ShouldThrowValidationException_WhenProductVariantIdIsEmpty()
     {
-        var action = () => Inventory.Create(Guid.Empty, Guid.NewGuid(), 10);
+        var action = () => new Inventory
+        {
+            ProductVariantId = Guid.Empty,
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(InventoryErrorCodes.ProductRequired);
+            .Which.ErrorCode.Should().Be(InventoryErrorCodes.ProductVariantRequired);
     }
 
     [Fact]
     public void SetQuantityOnHand_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
-        var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
+        var inventory = new Inventory
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
         var action = () => inventory.QuantityInStock = InventoryValidationRules.MaxQuantity + 1;
 
         action.Should().Throw<ValidationException>()
@@ -41,7 +62,14 @@ public class InventoryTests
     [Fact]
     public void ReserveStock_ShouldIncreaseReservedQuantity_WhenAvailableStockIsSufficient()
     {
-        var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
+        var inventory = new Inventory
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
 
         inventory.ReserveStock(4);
 
@@ -52,7 +80,14 @@ public class InventoryTests
     [Fact]
     public void ReleaseStock_ShouldThrowValidationException_WhenQuantityExceedsReserved()
     {
-        var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
+        var inventory = new Inventory
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
         inventory.ReserveStock(3);
         var action = () => inventory.ReleaseStock(4);
 
@@ -63,7 +98,14 @@ public class InventoryTests
     [Fact]
     public void IncreaseVersion_ShouldIncrementVersion()
     {
-        var inventory = Inventory.Create(Guid.NewGuid(), Guid.NewGuid(), 10);
+        var inventory = new Inventory
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            SellerWarehouseId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            QuantityInStock = 10,
+            QuantityReserved = 0,
+            Version = 1
+        };
 
         inventory.IncreaseVersion();
 

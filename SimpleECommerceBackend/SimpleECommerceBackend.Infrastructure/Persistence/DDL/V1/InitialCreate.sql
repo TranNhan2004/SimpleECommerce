@@ -95,10 +95,8 @@ CREATE TABLE [business].[Products]
     [Id] uniqueidentifier NOT NULL,
     [Name] nvarchar(512) NOT NULL,
     [Description] nvarchar(2048) NOT NULL,
-    [CurrentAmount] decimal(18,2) NOT NULL,
-    [Currency] nvarchar(3) NOT NULL,
-    [TotalInStock] int NOT NULL,
-    [Status] int NOT NULL,
+    [AverageRating] decimal(3,2) NOT NULL,
+    [TotalRatings] int NOT NULL,
     [CategoryId] uniqueidentifier NOT NULL,
     [SellerId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
@@ -121,43 +119,127 @@ CREATE INDEX [IX_Products_SellerId]
     ON [business].[Products] ([SellerId]);
 GO
 
-CREATE TABLE [business].[ProductImages]
+CREATE TABLE [business].[ProductVariants]
 (
     [Id] uniqueidentifier NOT NULL,
     [ProductId] uniqueidentifier NOT NULL,
-    [ImageUrl] nvarchar(max) NOT NULL,
-    [DisplayOrder] int NOT NULL,
-    [IsDisplayed] bit NOT NULL CONSTRAINT [DF_ProductImages_IsDisplayed] DEFAULT (1),
-    [Description] nvarchar(512) NULL,
+    [Name] nvarchar(512) NOT NULL,
+    [Description] nvarchar(2048) NOT NULL,
+    [CurrentAmount] decimal(18,2) NOT NULL,
+    [Currency] nvarchar(3) NOT NULL,
+    [TotalInStock] int NOT NULL,
+    [DefaultImageUrl] nvarchar(max) NULL,
+    [Status] int NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_ProductImages] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_ProductImages_Products_ProductId] FOREIGN KEY ([ProductId])
+    [UpdatedAt] datetimeoffset NULL,
+    CONSTRAINT [PK_ProductVariants] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ProductVariants_Products_ProductId] FOREIGN KEY ([ProductId])
         REFERENCES [business].[Products] ([Id])
         ON DELETE CASCADE
 );
 GO
 
-CREATE INDEX [IX_ProductImages_ProductId]
-    ON [business].[ProductImages] ([ProductId]);
+CREATE INDEX [IX_ProductVariants_ProductId]
+    ON [business].[ProductVariants] ([ProductId]);
 GO
 
-CREATE TABLE [business].[ProductPrices]
+CREATE TABLE [business].[ProductVariantImages]
 (
     [Id] uniqueidentifier NOT NULL,
-    [ProductId] uniqueidentifier NOT NULL,
+    [ProductVariantId] uniqueidentifier NOT NULL,
+    [ImageUrl] nvarchar(max) NOT NULL,
+    [DisplayOrder] int NOT NULL,
+    [IsDisplayed] bit NOT NULL CONSTRAINT [DF_ProductVariantImages_IsDisplayed] DEFAULT (1),
+    [Description] nvarchar(512) NULL,
+    [CreatedAt] datetimeoffset NOT NULL,
+    CONSTRAINT [PK_ProductVariantImages] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ProductVariantImages_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
+        REFERENCES [business].[ProductVariants] ([Id])
+        ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_ProductVariantImages_ProductVariantId]
+    ON [business].[ProductVariantImages] ([ProductVariantId]);
+GO
+
+CREATE TABLE [business].[ProductVariantPrices]
+(
+    [Id] uniqueidentifier NOT NULL,
+    [ProductVariantId] uniqueidentifier NOT NULL,
     [EffectiveFrom] datetimeoffset NOT NULL,
     [Amount] decimal(18,2) NOT NULL,
     [Currency] nvarchar(3) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_ProductPrices] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_ProductPrices_Products_ProductId] FOREIGN KEY ([ProductId])
-        REFERENCES [business].[Products] ([Id])
+    CONSTRAINT [PK_ProductVariantPrices] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ProductVariantPrices_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
+        REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE CASCADE
 );
 GO
 
-CREATE INDEX [IX_ProductPrices_ProductId]
-    ON [business].[ProductPrices] ([ProductId]);
+CREATE INDEX [IX_ProductVariantPrices_ProductVariantId]
+    ON [business].[ProductVariantPrices] ([ProductVariantId]);
+GO
+
+CREATE TABLE [business].[Reviews]
+(
+    [Id] uniqueidentifier NOT NULL,
+    [ProductId] uniqueidentifier NOT NULL,
+    [CustomerId] uniqueidentifier NOT NULL,
+    [Rating] int NOT NULL,
+    [Comment] nvarchar(2048) NOT NULL,
+    [CreatedAt] datetimeoffset NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    CONSTRAINT [PK_Reviews] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Reviews_Products_ProductId] FOREIGN KEY ([ProductId])
+        REFERENCES [business].[Products] ([Id])
+        ON DELETE CASCADE,
+    CONSTRAINT [FK_Reviews_UserProfiles_CustomerId] FOREIGN KEY ([CustomerId])
+        REFERENCES [business].[UserProfiles] ([Id])
+        ON DELETE NO ACTION
+);
+GO
+
+CREATE INDEX [IX_Reviews_ProductId]
+    ON [business].[Reviews] ([ProductId]);
+GO
+
+CREATE INDEX [IX_Reviews_CustomerId]
+    ON [business].[Reviews] ([CustomerId]);
+GO
+
+CREATE TABLE [business].[ReviewResponses]
+(
+    [Id] uniqueidentifier NOT NULL,
+    [ReviewId] uniqueidentifier NOT NULL,
+    [FromUserId] uniqueidentifier NOT NULL,
+    [ToUserId] uniqueidentifier NOT NULL,
+    [Comment] nvarchar(2048) NOT NULL,
+    [CreatedAt] datetimeoffset NOT NULL,
+    CONSTRAINT [PK_ReviewResponses] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ReviewResponses_Reviews_ReviewId] FOREIGN KEY ([ReviewId])
+        REFERENCES [business].[Reviews] ([Id])
+        ON DELETE CASCADE,
+    CONSTRAINT [FK_ReviewResponses_UserProfiles_FromUserId] FOREIGN KEY ([FromUserId])
+        REFERENCES [business].[UserProfiles] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ReviewResponses_UserProfiles_ToUserId] FOREIGN KEY ([ToUserId])
+        REFERENCES [business].[UserProfiles] ([Id])
+        ON DELETE NO ACTION
+);
+GO
+
+CREATE INDEX [IX_ReviewResponses_ReviewId]
+    ON [business].[ReviewResponses] ([ReviewId]);
+GO
+
+CREATE INDEX [IX_ReviewResponses_FromUserId]
+    ON [business].[ReviewResponses] ([FromUserId]);
+GO
+
+CREATE INDEX [IX_ReviewResponses_ToUserId]
+    ON [business].[ReviewResponses] ([ToUserId]);
 GO
 
 CREATE TABLE [business].[Carts]
@@ -180,14 +262,14 @@ GO
 CREATE TABLE [business].[CartItems]
 (
     [Id] uniqueidentifier NOT NULL,
-    [ProductId] uniqueidentifier NOT NULL,
+    [ProductVariantId] uniqueidentifier NOT NULL,
     [CartId] uniqueidentifier NOT NULL,
     [Quantity] int NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
     CONSTRAINT [PK_CartItems] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_CartItems_Products_ProductId] FOREIGN KEY ([ProductId])
-        REFERENCES [business].[Products] ([Id])
+    CONSTRAINT [FK_CartItems_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
+        REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_CartItems_Carts_CartId] FOREIGN KEY ([CartId])
         REFERENCES [business].[Carts] ([Id])
@@ -199,8 +281,8 @@ CREATE INDEX [IX_CartItems_CartId]
     ON [business].[CartItems] ([CartId]);
 GO
 
-CREATE INDEX [IX_CartItems_ProductId]
-    ON [business].[CartItems] ([ProductId]);
+CREATE INDEX [IX_CartItems_ProductVariantId]
+    ON [business].[CartItems] ([ProductVariantId]);
 GO
 
 CREATE TABLE [business].[CustomerShippingAddresses]
@@ -231,7 +313,7 @@ GO
 CREATE TABLE [business].[Inventories]
 (
     [Id] uniqueidentifier NOT NULL,
-    [ProductId] uniqueidentifier NOT NULL,
+    [ProductVariantId] uniqueidentifier NOT NULL,
     [SellerWarehouseId] uniqueidentifier NOT NULL,
     [QuantityInStock] int NOT NULL,
     [QuantityReserved] int NOT NULL,
@@ -239,8 +321,8 @@ CREATE TABLE [business].[Inventories]
     [CreatedAt] datetimeoffset NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
     CONSTRAINT [PK_Inventories] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Inventories_Products_ProductId] FOREIGN KEY ([ProductId])
-        REFERENCES [business].[Products] ([Id])
+    CONSTRAINT [FK_Inventories_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
+        REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE CASCADE,
     CONSTRAINT [FK_Inventories_SellerWarehouses_SellerWarehouseId] FOREIGN KEY ([SellerWarehouseId])
         REFERENCES [business].[SellerWarehouses] ([Id])
@@ -248,8 +330,8 @@ CREATE TABLE [business].[Inventories]
 );
 GO
 
-CREATE UNIQUE INDEX [IX_Inventories_ProductId_SellerWarehouseId]
-    ON [business].[Inventories] ([ProductId], [SellerWarehouseId]);
+CREATE UNIQUE INDEX [IX_Inventories_ProductVariantId_SellerWarehouseId]
+    ON [business].[Inventories] ([ProductVariantId], [SellerWarehouseId]);
 GO
 
 CREATE INDEX [IX_Inventories_SellerWarehouseId]
@@ -334,7 +416,7 @@ GO
 CREATE TABLE [business].[OrderItems]
 (
     [Id] uniqueidentifier NOT NULL,
-    [ProductId] uniqueidentifier NOT NULL,
+    [ProductVariantId] uniqueidentifier NOT NULL,
     [OrderId] uniqueidentifier NOT NULL,
     [Quantity] int NOT NULL,
     [CurrentAmount] decimal(18,2) NOT NULL,
@@ -345,18 +427,18 @@ CREATE TABLE [business].[OrderItems]
     CONSTRAINT [FK_OrderItems_Orders_OrderId] FOREIGN KEY ([OrderId])
         REFERENCES [business].[Orders] ([Id])
         ON DELETE CASCADE,
-    CONSTRAINT [FK_OrderItems_Products_ProductId] FOREIGN KEY ([ProductId])
-        REFERENCES [business].[Products] ([Id])
+    CONSTRAINT [FK_OrderItems_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
+        REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION
 );
 GO
 
-CREATE UNIQUE INDEX [IX_OrderItems_OrderId_ProductId]
-    ON [business].[OrderItems] ([OrderId], [ProductId]);
+CREATE UNIQUE INDEX [IX_OrderItems_OrderId_ProductVariantId]
+    ON [business].[OrderItems] ([OrderId], [ProductVariantId]);
 GO
 
-CREATE INDEX [IX_OrderItems_ProductId]
-    ON [business].[OrderItems] ([ProductId]);
+CREATE INDEX [IX_OrderItems_ProductVariantId]
+    ON [business].[OrderItems] ([ProductVariantId]);
 GO
 
 CREATE TABLE [business].[Payments]

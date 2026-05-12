@@ -137,7 +137,7 @@ public class JsonStaticTextLocalizerTests
 
     private static string CreateContentRoot(string json)
     {
-        var contentRootPath = Path.Combine(Path.GetTempPath(), $"json-localizer-tests-{Guid.NewGuid():N}");
+        var contentRootPath = Path.Combine(Path.GetTempPath(), $"json-localizer-tests-{SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7():N}");
         var errorMessagesPath = Path.Combine(contentRootPath, "ErrorMessages");
 
         Directory.CreateDirectory(errorMessagesPath);

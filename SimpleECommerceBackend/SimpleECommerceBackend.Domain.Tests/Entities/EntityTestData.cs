@@ -1,5 +1,3 @@
-using System.Reflection;
-using FluentAssertions;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.ValueObjects;
@@ -26,24 +24,34 @@ internal static class EntityTestData
         return DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-age);
     }
 
-    public static ProductImage CreateProductImage(
+    public static ProductVariantImage CreateProductVariantImage(
         string imageUrl = "https://example.com/image.jpg",
         int displayOrder = 1,
         bool isDisplayed = true,
         string? description = "Front view")
     {
-        return ProductImage.Create(imageUrl, displayOrder, isDisplayed, description);
+        return new ProductVariantImage
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            ImageUrl = imageUrl,
+            DisplayOrder = displayOrder,
+            IsDisplayed = isDisplayed,
+            Description = description
+        };
     }
 
     public static SellerWarehouse CreateSellerWarehouse(Guid? sellerShopId = null)
     {
-        return SellerWarehouse.Create(CreateAddress(), sellerShopId ?? Guid.NewGuid());
+        return new SellerWarehouse
+        {
+            Id = Guid.NewGuid(),
+            FullAddress = CreateAddress(),
+            SellerShopId = sellerShopId ?? Guid.NewGuid()
+        };
     }
 
     public static void AssignId(Entity entity, Guid id)
     {
-        var setIdMethod = typeof(Entity).GetMethod("SetId", BindingFlags.Instance | BindingFlags.NonPublic);
-        setIdMethod.Should().NotBeNull();
-        setIdMethod!.Invoke(entity, [id]);
+        entity.Id = id;
     }
 }

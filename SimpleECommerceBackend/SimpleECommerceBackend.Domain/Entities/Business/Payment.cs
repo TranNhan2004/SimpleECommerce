@@ -13,20 +13,20 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private Payment(
-        Guid orderId,
-        Money money,
-        PaymentMethod method,
-        string? provider
-    )
-    {
-        Id = Guid.NewGuid();
-        OrderId = orderId;
-        Money = money;
-        Method = method;
-        Provider = provider;
-        Status = PaymentStatus.Pending;
-    }
+    // private Payment(
+    //     Guid orderId,
+    //     Money money,
+    //     PaymentMethod method,
+    //     string? provider
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     OrderId = orderId;
+    //     Money = money;
+    //     Method = method;
+    //     Provider = provider;
+    //     Status = PaymentStatus.Pending;
+    // }
 
     private Guid _orderId;
     private Money _money;

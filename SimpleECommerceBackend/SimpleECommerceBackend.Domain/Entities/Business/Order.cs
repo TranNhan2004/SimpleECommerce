@@ -15,34 +15,34 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private Order(
-        string code,
-        string? note,
-        Money shippingFee,
-        OrderStatus status,
-        string shopName,
-        Address warehouseAddress,
-        string recipientName,
-        string recipientPhoneNumber,
-        Address recipientAddress,
-        Guid customerId,
-        Guid sellerId
-    )
-    {
-        Id = Guid.NewGuid();
-        Code = code;
-        Note = note;
-        ShippingFee = shippingFee;
-        TotalPrice = shippingFee;
-        Status = status;
-        ShopName = shopName;
-        WarehouseAddress = warehouseAddress;
-        RecipientName = recipientName;
-        RecipientPhoneNumber = recipientPhoneNumber;
-        RecipientAddress = recipientAddress;
-        CustomerId = customerId;
-        SellerId = sellerId;
-    }
+    // private Order(
+    //     string code,
+    //     string? note,
+    //     Money shippingFee,
+    //     OrderStatus status,
+    //     string shopName,
+    //     Address warehouseAddress,
+    //     string recipientName,
+    //     string recipientPhoneNumber,
+    //     Address recipientAddress,
+    //     Guid customerId,
+    //     Guid sellerId
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     Code = code;
+    //     Note = note;
+    //     ShippingFee = shippingFee;
+    //     TotalPrice = shippingFee;
+    //     Status = status;
+    //     ShopName = shopName;
+    //     WarehouseAddress = warehouseAddress;
+    //     RecipientName = recipientName;
+    //     RecipientPhoneNumber = recipientPhoneNumber;
+    //     RecipientAddress = recipientAddress;
+    //     CustomerId = customerId;
+    //     SellerId = sellerId;
+    // }
 
     private string _code = null!;
     private string? _note;

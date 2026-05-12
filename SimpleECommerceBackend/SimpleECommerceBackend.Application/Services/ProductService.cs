@@ -12,29 +12,18 @@ namespace SimpleECommerceBackend.Application.Services;
 public class ProductService : ServiceBase, IProductService
 {
     private readonly IProductRepository _productRepository;
-    private readonly IProductPriceRepository _productPriceRepository;
 
     public ProductService(
         ICacheService cacheService,
-        IProductRepository productRepository,
-        IProductPriceRepository productPriceRepository
+        IProductRepository productRepository
     ) : base(cacheService)
     {
         _productRepository = productRepository;
-        _productPriceRepository = productPriceRepository;
     }
 
     public Product CreateProduct(Product product)
     {
-        var createdProduct = _productRepository.Add(product);
-        _productPriceRepository.Add(new ProductPrice
-        {
-            ProductId = createdProduct.Id,
-            Money = product.CurrentPrice,
-            EffectiveFrom = DateTimeOffset.UtcNow
-        });
-
-        return createdProduct;
+        return _productRepository.Add(product);
     }
 
     public async Task<GetAllProductsResultForCustomer> GetAllProductsForCustomerAsync(GetAllProductsQueryForCustomer query)

@@ -5,8 +5,8 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID(N'business.CartItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_CartItems_Products_ProductId')
-    ALTER TABLE [business].[CartItems] DROP CONSTRAINT [FK_CartItems_Products_ProductId];
+IF OBJECT_ID(N'business.CartItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_CartItems_ProductVariants_ProductVariantId')
+    ALTER TABLE [business].[CartItems] DROP CONSTRAINT [FK_CartItems_ProductVariants_ProductVariantId];
 GO
 
 IF OBJECT_ID(N'business.CartItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_CartItems_Carts_CartId')
@@ -17,8 +17,8 @@ IF OBJECT_ID(N'business.CustomerShippingAddresses', N'U') IS NOT NULL AND EXISTS
     ALTER TABLE [business].[CustomerShippingAddresses] DROP CONSTRAINT [FK_CustomerShippingAddresses_UserProfiles_CustomerId];
 GO
 
-IF OBJECT_ID(N'business.Inventories', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Inventories_Products_ProductId')
-    ALTER TABLE [business].[Inventories] DROP CONSTRAINT [FK_Inventories_Products_ProductId];
+IF OBJECT_ID(N'business.Inventories', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Inventories_ProductVariants_ProductVariantId')
+    ALTER TABLE [business].[Inventories] DROP CONSTRAINT [FK_Inventories_ProductVariants_ProductVariantId];
 GO
 
 IF OBJECT_ID(N'business.Inventories', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Inventories_SellerWarehouses_SellerWarehouseId')
@@ -33,8 +33,8 @@ IF OBJECT_ID(N'business.OrderItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM
     ALTER TABLE [business].[OrderItems] DROP CONSTRAINT [FK_OrderItems_Orders_OrderId];
 GO
 
-IF OBJECT_ID(N'business.OrderItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_OrderItems_Products_ProductId')
-    ALTER TABLE [business].[OrderItems] DROP CONSTRAINT [FK_OrderItems_Products_ProductId];
+IF OBJECT_ID(N'business.OrderItems', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_OrderItems_ProductVariants_ProductVariantId')
+    ALTER TABLE [business].[OrderItems] DROP CONSTRAINT [FK_OrderItems_ProductVariants_ProductVariantId];
 GO
 
 IF OBJECT_ID(N'business.Orders', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Orders_UserProfiles_CustomerId')
@@ -49,12 +49,36 @@ IF OBJECT_ID(N'business.Payments', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM s
     ALTER TABLE [business].[Payments] DROP CONSTRAINT [FK_Payments_Orders_OrderId];
 GO
 
-IF OBJECT_ID(N'business.ProductImages', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ProductImages_Products_ProductId')
-    ALTER TABLE [business].[ProductImages] DROP CONSTRAINT [FK_ProductImages_Products_ProductId];
+IF OBJECT_ID(N'business.ReviewResponses', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ReviewResponses_Reviews_ReviewId')
+    ALTER TABLE [business].[ReviewResponses] DROP CONSTRAINT [FK_ReviewResponses_Reviews_ReviewId];
 GO
 
-IF OBJECT_ID(N'business.ProductPrices', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ProductPrices_Products_ProductId')
-    ALTER TABLE [business].[ProductPrices] DROP CONSTRAINT [FK_ProductPrices_Products_ProductId];
+IF OBJECT_ID(N'business.ReviewResponses', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ReviewResponses_UserProfiles_FromUserId')
+    ALTER TABLE [business].[ReviewResponses] DROP CONSTRAINT [FK_ReviewResponses_UserProfiles_FromUserId];
+GO
+
+IF OBJECT_ID(N'business.ReviewResponses', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ReviewResponses_UserProfiles_ToUserId')
+    ALTER TABLE [business].[ReviewResponses] DROP CONSTRAINT [FK_ReviewResponses_UserProfiles_ToUserId];
+GO
+
+IF OBJECT_ID(N'business.Reviews', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Reviews_Products_ProductId')
+    ALTER TABLE [business].[Reviews] DROP CONSTRAINT [FK_Reviews_Products_ProductId];
+GO
+
+IF OBJECT_ID(N'business.Reviews', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Reviews_UserProfiles_CustomerId')
+    ALTER TABLE [business].[Reviews] DROP CONSTRAINT [FK_Reviews_UserProfiles_CustomerId];
+GO
+
+IF OBJECT_ID(N'business.ProductVariantImages', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ProductVariantImages_ProductVariants_ProductVariantId')
+    ALTER TABLE [business].[ProductVariantImages] DROP CONSTRAINT [FK_ProductVariantImages_ProductVariants_ProductVariantId];
+GO
+
+IF OBJECT_ID(N'business.ProductVariantPrices', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ProductVariantPrices_ProductVariants_ProductVariantId')
+    ALTER TABLE [business].[ProductVariantPrices] DROP CONSTRAINT [FK_ProductVariantPrices_ProductVariants_ProductVariantId];
+GO
+
+IF OBJECT_ID(N'business.ProductVariants', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_ProductVariants_Products_ProductId')
+    ALTER TABLE [business].[ProductVariants] DROP CONSTRAINT [FK_ProductVariants_Products_ProductId];
 GO
 
 IF OBJECT_ID(N'business.Products', N'U') IS NOT NULL AND EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Products_Categories_CategoryId')
@@ -87,8 +111,11 @@ DROP TABLE IF EXISTS [business].[Inventories];
 DROP TABLE IF EXISTS [business].[Notifications];
 DROP TABLE IF EXISTS [business].[OrderItems];
 DROP TABLE IF EXISTS [business].[Payments];
-DROP TABLE IF EXISTS [business].[ProductImages];
-DROP TABLE IF EXISTS [business].[ProductPrices];
+DROP TABLE IF EXISTS [business].[ReviewResponses];
+DROP TABLE IF EXISTS [business].[Reviews];
+DROP TABLE IF EXISTS [business].[ProductVariantImages];
+DROP TABLE IF EXISTS [business].[ProductVariantPrices];
+DROP TABLE IF EXISTS [business].[ProductVariants];
 DROP TABLE IF EXISTS [business].[Products];
 DROP TABLE IF EXISTS [business].[Carts];
 DROP TABLE IF EXISTS [business].[Orders];

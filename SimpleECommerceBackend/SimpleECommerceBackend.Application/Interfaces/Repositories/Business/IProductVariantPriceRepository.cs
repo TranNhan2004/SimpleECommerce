@@ -2,6 +2,6 @@ using SimpleECommerceBackend.Domain.Entities.Business;
 
 namespace SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 
-public interface IProductPriceRepository : IGenericRepository<ProductPrice>
+public interface IProductVariantPriceRepository : IGenericRepository<ProductVariantPrice>
 {
 }

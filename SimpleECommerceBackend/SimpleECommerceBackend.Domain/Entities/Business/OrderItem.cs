@@ -11,40 +11,40 @@ public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
-    private OrderItem(Guid productId, Guid orderId, int quantity, Money currentPrice)
-    {
-        Id = Guid.NewGuid();
-        ProductId = productId;
-        OrderId = orderId;
-        Quantity = quantity;
-        CurrentPrice = currentPrice;
-    }
+    // private OrderItem(Guid productId, Guid orderId, int quantity, Money currentPrice)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     ProductId = productId;
+    //     OrderId = orderId;
+    //     Quantity = quantity;
+    //     CurrentPrice = currentPrice;
+    // }
 
-    private Guid _productId;
+    private Guid _productVariantId;
     private Guid _orderId;
     private int _quantity;
     private Money _currentPrice;
 
-    public Guid ProductId
+    public Guid ProductVariantId
     {
-        get => _productId;
+        get => _productVariantId;
         set
         {
             if (value == Guid.Empty)
                 throw new ValidationException(
-                    OrderItemErrorCodes.ProductIdRequired,
-                    "Product ID is required",
+                    OrderItemErrorCodes.ProductVariantIdRequired,
+                    "Product variant ID is required",
                     new Dictionary<string, object?>
                     {
-                        ["field"] = "ProductId"
+                        ["field"] = "ProductVariantId"
                     }
                 );
 
-            _productId = value;
+            _productVariantId = value;
         }
     }
 
-    public Product? Product { get; private set; }
+    public ProductVariant? ProductVariant { get; private set; }
 
     public Guid OrderId
     {

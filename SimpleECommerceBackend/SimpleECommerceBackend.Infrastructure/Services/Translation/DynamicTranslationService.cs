@@ -6,6 +6,7 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
 using SimpleECommerceBackend.Domain.Entities.Translation;
+using SimpleECommerceBackend.Domain.Utils;
 using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
@@ -89,7 +90,7 @@ public partial class DynamicTranslationService : IDynamicTranslationService
             if (string.IsNullOrWhiteSpace(translatedValue)) return request.SourceText;
 
             var entry = new TranslationEntry(
-                Guid.NewGuid(),
+                UuidUtils.CreateV7(),
                 request.EntityName,
                 request.FieldName,
                 request.RowId,

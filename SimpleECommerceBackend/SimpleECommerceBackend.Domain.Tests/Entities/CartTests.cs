@@ -12,7 +12,10 @@ public class CartTests
     {
         var customerId = Guid.NewGuid();
 
-        var cart = Cart.Create(customerId);
+        var cart = new Cart
+        {
+            CustomerId = customerId
+        };
 
         cart.CustomerId.Should().Be(customerId);
         cart.CartItems.Should().BeEmpty();
@@ -21,7 +24,10 @@ public class CartTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenCustomerIdIsEmpty()
     {
-        var action = () => Cart.Create(Guid.Empty);
+        var action = () => new Cart
+        {
+            CustomerId = Guid.Empty
+        };
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(CartErrorCodes.CustomerIdRequired);
@@ -30,8 +36,16 @@ public class CartTests
     [Fact]
     public void AddCartItem_ShouldAppendItem()
     {
-        var cart = Cart.Create(Guid.NewGuid());
-        var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 2);
+        var cart = new Cart
+        {
+            CustomerId = Guid.NewGuid()
+        };
+        var cartItem = new CartItem
+        {
+            ProductVariantId = Guid.NewGuid(),
+            CartId = Guid.NewGuid(),
+            Quantity = 2
+        };
 
         cart.AddCartItem(cartItem);
 

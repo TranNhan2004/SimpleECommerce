@@ -9,7 +9,7 @@ public class KeycloakPayloadExtractionHelperTests
     [Fact]
     public void FindUserId_ShouldReturnMappedNameIdentifier_WhenSubClaimIsMissing()
     {
-        var userId = Guid.NewGuid().ToString();
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7().ToString();
         var principal = CreatePrincipal(new Claim(ClaimTypes.NameIdentifier, userId));
 
         var result = KeycloakPayloadExtractionHelper.FindUserId(principal);

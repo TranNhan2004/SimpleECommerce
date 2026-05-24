@@ -11,7 +11,7 @@ public class SellerShopTests
     [Fact]
     public void Create_ShouldCreateSellerShop_WhenInputIsValid()
     {
-        var sellerShop = SellerShop.Create(Guid.NewGuid(), "  My Shop  ", " 0987654321 ", "avatar.png");
+        var sellerShop = CreateSellerShop();
 
         sellerShop.Name.Should().Be("My Shop");
         sellerShop.PhoneNumber.Should().Be("0987654321");
@@ -21,27 +21,33 @@ public class SellerShopTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenSellerIdIsEmpty()
     {
-        var action = () => SellerShop.Create(Guid.Empty, "My Shop", "0987654321", "avatar.png");
+        var action = () => new SellerShop
+        {
+            SellerId = Guid.Empty,
+            Name = "My Shop",
+            PhoneNumber = "0987654321",
+            AvatarUrl = "avatar.png"
+        };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerShopErrorCode.SellerRequired);
+            .Which.ErrorCode.Should().Be(SellerShopErrorCodes.SellerRequired);
     }
 
     [Fact]
     public void SetPhoneNumber_ShouldThrowValidationException_WhenPhoneNumberExceedsMaxLength()
     {
-        var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
-        var phoneNumber = new string('1', CommonConstants.PhoneNumberMaxLength + 1);
-        var action = () => sellerShop.SetPhoneNumber(phoneNumber);
+        var sellerShop = CreateSellerShop();
+        var phoneNumber = new string('1', CommonValidationRules.PhoneNumberMaxLength + 1);
+        var action = () => sellerShop.PhoneNumber = phoneNumber;
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(SellerShopErrorCode.PhoneNumberMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(SellerShopErrorCodes.PhoneNumberMaxLengthExceeded);
     }
 
     [Fact]
     public void AddSellerWarehouse_ShouldAppendWarehouse()
     {
-        var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
+        var sellerShop = CreateSellerShop();
         var warehouse = EntityTestData.CreateSellerWarehouse();
 
         sellerShop.AddSellerWarehouse(warehouse);
@@ -52,10 +58,15 @@ public class SellerShopTests
     [Fact]
     public void ChangeSellerWarehouse_ShouldUpdateExistingWarehouse_WhenWarehouseExists()
     {
-        var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
+        var sellerShop = CreateSellerShop();
         var warehouseId = Guid.NewGuid();
         var existingWarehouse = EntityTestData.CreateSellerWarehouse();
-        var updatedWarehouse = SellerWarehouse.Create(EntityTestData.CreateAddress("999 New Street", "Ward 5", "Hue"), Guid.NewGuid());
+        var updatedWarehouse = new SellerWarehouse
+        {
+            Id = Guid.NewGuid(),
+            FullAddress = EntityTestData.CreateAddress("999 New Street", "Ward 5", "Hue"),
+            SellerShopId = Guid.NewGuid()
+        };
         EntityTestData.AssignId(existingWarehouse, warehouseId);
         EntityTestData.AssignId(updatedWarehouse, warehouseId);
         sellerShop.AddSellerWarehouse(existingWarehouse);
@@ -68,12 +79,23 @@ public class SellerShopTests
     [Fact]
     public void RemoveSellerWarehouse_ShouldSoftDeleteWarehouse_WhenWarehouseExists()
     {
-        var sellerShop = SellerShop.Create(Guid.NewGuid(), "My Shop", "0987654321", "avatar.png");
+        var sellerShop = CreateSellerShop();
         var warehouse = EntityTestData.CreateSellerWarehouse();
         sellerShop.AddSellerWarehouse(warehouse);
 
         sellerShop.RemoveSellerWarehouse(warehouse.Id);
 
         warehouse.IsDeleted.Should().BeTrue();
+    }
+
+    private static SellerShop CreateSellerShop()
+    {
+        return new SellerShop
+        {
+            SellerId = Guid.NewGuid(),
+            Name = "  My Shop  ",
+            PhoneNumber = " 0987654321 ",
+            AvatarUrl = "avatar.png"
+        };
     }
 }

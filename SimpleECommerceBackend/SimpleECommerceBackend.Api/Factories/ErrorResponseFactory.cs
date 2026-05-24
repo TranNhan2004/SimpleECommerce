@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Api.DTOs.Errors;
+using SimpleECommerceBackend.Api.Dtos.Common.Errors;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -43,6 +43,7 @@ public static class ErrorResponseFactory
     {
         var locale = ResolveLocale(context);
         var localizedError = staticTextLocalizer.LocalizeError(errorCode, details, locale);
+        var localizedTitle = staticTextLocalizer.LocalizeProblemTitle(titleKey, locale);
         var extensions = new Dictionary<string, object>
         {
             ["errorCode"] = errorCode,
@@ -64,7 +65,7 @@ public static class ErrorResponseFactory
         return new ErrorResponse
         {
             Type = type,
-            Title = staticTextLocalizer.LocalizeProblemTitle(titleKey, locale),
+            Title = localizedTitle,
             Status = statusCode,
             Message = localizedError.Message,
             Instance = context.Request.Path,

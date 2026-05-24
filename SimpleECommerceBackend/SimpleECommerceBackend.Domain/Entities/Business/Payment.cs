@@ -7,132 +7,137 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Payment : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
-    private Payment()
+    public Payment()
     {
     }
 
-    private Payment(
-        Guid orderId,
-        Money money,
-        PaymentMethod method,
-        string? provider
-    )
+    // private Payment(
+    //     Guid orderId,
+    //     Money money,
+    //     PaymentMethod method,
+    //     string? provider
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     OrderId = orderId;
+    //     Money = money;
+    //     Method = method;
+    //     Provider = provider;
+    //     Status = PaymentStatus.Pending;
+    // }
+
+    private Guid _orderId;
+    private Money _money;
+    private PaymentMethod _method;
+    private string? _provider;
+    private PaymentStatus _status;
+    private string? _externalTransactionId;
+
+    public Guid OrderId
     {
-        SetId(Guid.NewGuid());
-        SetOrderId(orderId);
-        SetMoney(money);
-        SetMethod(method);
-        SetProvider(provider);
-        SetStatus(PaymentStatus.Pending);
+        get => _orderId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    PaymentErrorCodes.OrderIdRequired,
+                    "Order ID is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "OrderId"
+                    }
+                );
+
+            _orderId = value;
+        }
     }
 
-    public Guid OrderId { get; private set; }
     public Order? Order { get; private set; }
 
-    public Money Money { get; private set; }
-    public PaymentMethod Method { get; private set; }
-    public string? Provider { get; private set; }
-    public PaymentStatus Status { get; private set; }
-    public string? ExternalTransactionId { get; private set; }
+    public Money Money
+    {
+        get => _money;
+        set => _money = value;
+    }
+
+    public PaymentMethod Method
+    {
+        get => _method;
+        set => _method = value;
+    }
+
+    public string? Provider
+    {
+        get => _provider;
+        set
+        {
+            if (value is null)
+            {
+                _provider = null;
+                return;
+            }
+
+            var trimmedProvider = value.Trim();
+
+            if (trimmedProvider.Length > PaymentValidationRules.ProviderMaxLength)
+                throw new ValidationException(
+                    PaymentErrorCodes.ProviderMaxLengthExceeded,
+                    $"Provider cannot exceed {PaymentValidationRules.ProviderMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Provider",
+                        ["max"] = PaymentValidationRules.ProviderMaxLength
+                    }
+                );
+
+            _provider = string.IsNullOrWhiteSpace(trimmedProvider) ? null : trimmedProvider;
+        }
+    }
+
+    public PaymentStatus Status
+    {
+        get => _status;
+        set => _status = value;
+    }
+
+    public string? ExternalTransactionId
+    {
+        get => _externalTransactionId;
+        set
+        {
+            if (value is null)
+            {
+                _externalTransactionId = null;
+                return;
+            }
+
+            var trimmedId = value.Trim();
+
+            if (trimmedId.Length > PaymentValidationRules.ExternalTransactionIdMaxLength)
+                throw new ValidationException(
+                    PaymentErrorCodes.ExternalTransactionIdMaxLengthExceeded,
+                    $"External transaction ID cannot exceed {PaymentValidationRules.ExternalTransactionIdMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "ExternalTransactionId",
+                        ["max"] = PaymentValidationRules.ExternalTransactionIdMaxLength
+                    }
+                );
+
+            _externalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
+        }
+    }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
-
-    public static Payment Create(
-        Guid orderId,
-        Money money,
-        PaymentMethod method,
-        string? provider = null
-    )
-    {
-        return new Payment(orderId, money, method, provider);
-    }
-
-    private void SetOrderId(Guid orderId)
-    {
-        if (orderId == Guid.Empty)
-            throw new ValidationException(
-                PaymentErrorCode.OrderIdRequired,
-                "Order ID is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "OrderId"
-                }
-            );
-
-        OrderId = orderId;
-    }
-
-    public void SetMoney(Money money)
-    {
-        Money = money;
-    }
-
-    public void SetMethod(PaymentMethod method)
-    {
-        Method = method;
-    }
-
-    public void SetProvider(string? provider)
-    {
-        if (provider is null)
-        {
-            Provider = null;
-            return;
-        }
-
-        var trimmedProvider = provider.Trim();
-
-        if (trimmedProvider.Length > PaymentConstants.ProviderMaxLength)
-            throw new ValidationException(
-                PaymentErrorCode.ProviderMaxLengthExceeded,
-                $"Provider cannot exceed {PaymentConstants.ProviderMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Provider",
-                    ["max"] = PaymentConstants.ProviderMaxLength
-                }
-            );
-
-        Provider = string.IsNullOrWhiteSpace(trimmedProvider) ? null : trimmedProvider;
-    }
-
-    private void SetStatus(PaymentStatus status)
-    {
-        Status = status;
-    }
-
-    public void SetExternalTransactionId(string? externalTransactionId)
-    {
-        if (externalTransactionId is null)
-        {
-            ExternalTransactionId = null;
-            return;
-        }
-
-        var trimmedId = externalTransactionId.Trim();
-
-        if (trimmedId.Length > PaymentConstants.ExternalTransactionIdMaxLength)
-            throw new ValidationException(
-                PaymentErrorCode.ExternalTransactionIdMaxLengthExceeded,
-                $"External transaction ID cannot exceed {PaymentConstants.ExternalTransactionIdMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "ExternalTransactionId",
-                    ["max"] = PaymentConstants.ExternalTransactionIdMaxLength
-                }
-            );
-
-        ExternalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
-    }
 
     public void Complete(string? externalTransactionId = null)
     {
         if (Status != PaymentStatus.Pending)
             throw new ValidationException(
-                PaymentErrorCode.CompleteNotAllowed,
+                PaymentErrorCodes.CompleteNotAllowed,
                 "Only pending payments can be marked as completed",
                 new Dictionary<string, object?>
                 {
@@ -143,16 +148,16 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
             );
 
         if (externalTransactionId != null)
-            SetExternalTransactionId(externalTransactionId);
+            ExternalTransactionId = externalTransactionId;
 
-        SetStatus(PaymentStatus.Completed);
+        Status = PaymentStatus.Completed;
     }
 
     public void Fail()
     {
         if (Status != PaymentStatus.Pending)
             throw new ValidationException(
-                PaymentErrorCode.FailNotAllowed,
+                PaymentErrorCodes.FailNotAllowed,
                 "Only pending payments can be marked as failed",
                 new Dictionary<string, object?>
                 {
@@ -162,14 +167,14 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(PaymentStatus.Failed);
+        Status = PaymentStatus.Failed;
     }
 
     public void Refund()
     {
         if (Status != PaymentStatus.Completed)
             throw new ValidationException(
-                PaymentErrorCode.RefundNotAllowed,
+                PaymentErrorCodes.RefundNotAllowed,
                 "Only completed payments can be refunded",
                 new Dictionary<string, object?>
                 {
@@ -179,6 +184,6 @@ public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
                 }
             );
 
-        SetStatus(PaymentStatus.Refunded);
+        Status = PaymentStatus.Refunded;
     }
 }

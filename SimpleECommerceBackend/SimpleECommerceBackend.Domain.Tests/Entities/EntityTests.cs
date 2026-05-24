@@ -8,31 +8,25 @@ namespace SimpleECommerceBackend.Domain.Tests.Entities;
 public class EntityTests
 {
     [Fact]
-    public void SetId_ShouldAssignId_WhenIdIsValid()
+    public void Id_ShouldAssign_WhenIdIsValid()
     {
         var entity = new TestEntity();
         var id = Guid.NewGuid();
 
-        entity.AssignId(id);
+        entity.Id = id;
 
         entity.Id.Should().Be(id);
     }
 
     [Fact]
-    public void SetId_ShouldThrowValidationException_WhenIdIsEmpty()
+    public void Id_ShouldThrowValidationException_WhenIdIsEmpty()
     {
         var entity = new TestEntity();
-        var action = () => entity.AssignId(Guid.Empty);
+        var action = () => entity.Id = Guid.Empty;
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(EntityErrorCode.EmptyId);
+            .Which.ErrorCode.Should().Be(EntityErrorCodes.EmptyId);
     }
 
-    private sealed class TestEntity : Entity
-    {
-        public void AssignId(Guid id)
-        {
-            SetId(id);
-        }
-    }
+    private sealed class TestEntity : EntityBase;
 }

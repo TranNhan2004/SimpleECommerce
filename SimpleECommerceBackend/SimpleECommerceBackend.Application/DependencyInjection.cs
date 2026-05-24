@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
-using SimpleECommerceBackend.Application.Services;
+using SimpleECommerceBackend.Application.Services.Business;
+using SimpleECommerceBackend.Application.Services.Uam;
 using SimpleECommerceBackend.Application.UseCases;
 
 namespace SimpleECommerceBackend.Application;
@@ -21,8 +23,10 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IUserProfileService, UserProfileService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
         return services;
     }
 
@@ -41,11 +45,9 @@ public static class DependencyInjection
 
         var allTypes = assemblies
             .SelectMany(a => a.GetTypes())
-            .Where(t =>
-                t is { IsClass: true, IsAbstract: false } &&
-                !excludedSet.Contains(t));
+            .Where(t => t.IsClass && !t.IsAbstract && !excludedSet.Contains(t));
 
-        Console.WriteLine($"Registering Use Case Handlers: {allTypes.Count()} found.");
+        var count = 0;
         foreach (var implementationType in allTypes)
         {
             var serviceTypes = implementationType
@@ -59,7 +61,11 @@ public static class DependencyInjection
 
             foreach (var serviceType in serviceTypes)
                 services.AddScoped(serviceType, implementationType);
+
+            count += serviceTypes?.Count() ?? 0;
         }
+
+        Console.WriteLine($"Registering Use Case Handlers: {count} found.");
 
         services.AddScoped<IUseCaseDispatcher, UseCaseDispatcher>();
 

@@ -10,7 +10,7 @@ public readonly record struct Address
     {
         if (string.IsNullOrWhiteSpace(addressLine))
             throw new ValidationException(
-                AddressErrorCode.AddressLineRequired,
+                AddressErrorCodes.AddressLineRequired,
                 "Address line is required",
                 new Dictionary<string, object?>
                 {
@@ -19,20 +19,20 @@ public readonly record struct Address
             );
 
         var trimmedAddress = addressLine.Trim();
-        if (trimmedAddress.Length > AddressConstants.AddressLineMaxLength)
+        if (trimmedAddress.Length > AddressValidationRules.AddressLineMaxLength)
             throw new ValidationException(
-                AddressErrorCode.AddressLineMaxLengthExceeded,
-                $"Address line cannot exceed {AddressConstants.AddressLineMaxLength} characters",
+                AddressErrorCodes.AddressLineMaxLengthExceeded,
+                $"Address line cannot exceed {AddressValidationRules.AddressLineMaxLength} characters",
                 new Dictionary<string, object?>
                 {
                     ["field"] = "AddressLine",
-                    ["max"] = AddressConstants.AddressLineMaxLength
+                    ["max"] = AddressValidationRules.AddressLineMaxLength
                 }
             );
 
         if (string.IsNullOrWhiteSpace(ward))
             throw new ValidationException(
-                AddressErrorCode.WardRequired,
+                AddressErrorCodes.WardRequired,
                 "Ward is required",
                 new Dictionary<string, object?>
                 {
@@ -42,7 +42,7 @@ public readonly record struct Address
 
         if (string.IsNullOrWhiteSpace(province))
             throw new ValidationException(
-                AddressErrorCode.ProvinceRequired,
+                AddressErrorCodes.ProvinceRequired,
                 "Province is required",
                 new Dictionary<string, object?>
                 {

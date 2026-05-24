@@ -1,8 +1,10 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.AuditTracking;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Entities.Translation;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence;
@@ -24,14 +26,26 @@ public class AppDbContext : DbContext
     public DbSet<CustomerShippingAddress> CustomerShippingAddresses => Set<CustomerShippingAddress>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
-    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
-    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<ProductVariantImage> ProductVariantImages => Set<ProductVariantImage>();
+    public DbSet<ProductVariantPrice> ProductVariantPrices => Set<ProductVariantPrice>();
+    public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<ReviewResponse> ReviewResponses => Set<ReviewResponse>();
     public DbSet<SellerShop> SellerShops => Set<SellerShop>();
     public DbSet<SellerWarehouse> SellerWarehouses => Set<SellerWarehouse>();
 
+    // UAM
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
     // Translation
     public DbSet<TranslationEntry> TranslationEntries => Set<TranslationEntry>();
+
+    // Audit Tracking
+    public DbSet<Audit> Audits => Set<Audit>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

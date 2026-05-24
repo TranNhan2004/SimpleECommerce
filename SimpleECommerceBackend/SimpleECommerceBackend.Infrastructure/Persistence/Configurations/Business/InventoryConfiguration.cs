@@ -19,10 +19,10 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
         builder.Property(i => i.Version)
             .IsRequired();
 
-        builder.HasOne(i => i.Product)
+        builder.HasOne(i => i.ProductVariant)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(i => i.ProductId)
+            .HasForeignKey(i => i.ProductVariantId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(i => i.SellerWarehouse)
@@ -31,7 +31,7 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
             .HasForeignKey(i => i.SellerWarehouseId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(i => new { i.ProductId, i.SellerWarehouseId })
+        builder.HasIndex(i => new { i.ProductVariantId, i.SellerWarehouseId })
             .IsUnique();
     }
 }

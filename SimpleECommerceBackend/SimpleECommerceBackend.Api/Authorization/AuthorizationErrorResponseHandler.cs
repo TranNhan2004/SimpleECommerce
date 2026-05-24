@@ -35,7 +35,7 @@ public sealed class AuthorizationErrorResponseHandler : IAuthorizationMiddleware
                 StatusCodes.Status401Unauthorized,
                 "Problem.Unauthorized",
                 "https://tools.ietf.org/html/rfc7235#section-3.1",
-                AuthorizationErrorCode.Unauthorized,
+                AuthorizationErrorCodes.Unauthorized,
                 environment,
                 staticTextLocalizer
             );
@@ -49,7 +49,7 @@ public sealed class AuthorizationErrorResponseHandler : IAuthorizationMiddleware
                 StatusCodes.Status403Forbidden,
                 "Problem.Forbidden",
                 "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-                AuthorizationErrorCode.Forbidden,
+                AuthorizationErrorCodes.Forbidden,
                 environment,
                 staticTextLocalizer
             );

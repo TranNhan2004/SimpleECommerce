@@ -16,7 +16,7 @@ public class SellerWarehouseConfiguration : IEntityTypeConfiguration<SellerWareh
             address.Property(a => a.AddressLine)
                 .HasColumnName("AddressLine")
                 .IsRequired()
-                .HasMaxLength(AddressConstants.AddressLineMaxLength);
+                .HasMaxLength(AddressValidationRules.AddressLineMaxLength);
 
             address.Property(a => a.Province)
                 .HasColumnName("Province")

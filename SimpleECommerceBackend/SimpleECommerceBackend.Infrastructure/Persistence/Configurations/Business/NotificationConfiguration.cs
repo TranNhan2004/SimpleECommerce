@@ -13,7 +13,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 
         builder.Property(n => n.Message)
             .IsRequired()
-            .HasMaxLength(NotificationConstants.MessageMaxLength);
+            .HasMaxLength(NotificationValidationRules.MessageMaxLength);
 
         builder.Property(n => n.IsRead)
             .IsRequired()

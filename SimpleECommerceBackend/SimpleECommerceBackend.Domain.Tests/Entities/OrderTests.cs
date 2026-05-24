@@ -24,18 +24,21 @@ public class OrderTests
     [Fact]
     public void Create_ShouldTrimShopNameAndRecipientFields()
     {
-        var order = Order.Create(
-            "ORD-001",
-            "note",
-            EntityTestData.CreateMoney(),
-            OrderStatus.PendingPayment,
-            "  Book Shop  ",
-            EntityTestData.CreateAddress(),
-            "  Nhan  ",
-            " 0987654321 ",
-            EntityTestData.CreateAddress("456 Le Loi", "Ward 2", "Da Nang"),
-            Guid.NewGuid(),
-            Guid.NewGuid());
+        var order = new Order
+        {
+            Code = "ORD-001",
+            Note = "note",
+            ShippingFee = EntityTestData.CreateMoney(),
+            TotalPrice = EntityTestData.CreateMoney(),
+            Status = OrderStatus.PendingPayment,
+            ShopName = "  Book Shop  ",
+            WarehouseAddress = EntityTestData.CreateAddress(),
+            RecipientName = "  Nhan  ",
+            RecipientPhoneNumber = " 0987654321 ",
+            RecipientAddress = EntityTestData.CreateAddress("456 Le Loi", "Ward 2", "Da Nang"),
+            CustomerId = Guid.NewGuid(),
+            SellerId = Guid.NewGuid()
+        };
 
         order.ShopName.Should().Be("Book Shop");
         order.RecipientName.Should().Be("Nhan");
@@ -45,21 +48,24 @@ public class OrderTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenCodeIsBlank()
     {
-        var action = () => Order.Create(
-            " ",
-            null,
-            EntityTestData.CreateMoney(),
-            OrderStatus.PendingPayment,
-            "Shop",
-            EntityTestData.CreateAddress(),
-            "Nhan",
-            "0987654321",
-            EntityTestData.CreateAddress(),
-            Guid.NewGuid(),
-            Guid.NewGuid());
+        var action = () => new Order
+        {
+            Code = " ",
+            Note = null,
+            ShippingFee = EntityTestData.CreateMoney(),
+            TotalPrice = EntityTestData.CreateMoney(),
+            Status = OrderStatus.PendingPayment,
+            ShopName = "Shop",
+            WarehouseAddress = EntityTestData.CreateAddress(),
+            RecipientName = "Nhan",
+            RecipientPhoneNumber = "0987654321",
+            RecipientAddress = EntityTestData.CreateAddress(),
+            CustomerId = Guid.NewGuid(),
+            SellerId = Guid.NewGuid()
+        };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderErrorCode.CodeRequired);
+            .Which.ErrorCode.Should().Be(OrderErrorCodes.CodeRequired);
     }
 
     [Fact]
@@ -79,7 +85,7 @@ public class OrderTests
         var action = () => order.Deliver();
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(OrderErrorCode.DeliverNotAllowed);
+            .Which.ErrorCode.Should().Be(OrderErrorCodes.DeliverNotAllowed);
     }
 
     [Fact]
@@ -110,17 +116,22 @@ public class OrderTests
 
     private static Order CreateOrder()
     {
-        return Order.Create(
-            "ORD-001",
-            "Please deliver fast",
-            EntityTestData.CreateMoney(),
-            OrderStatus.PendingPayment,
-            "Book Shop",
-            EntityTestData.CreateAddress(),
-            "Nhan",
-            "0987654321",
-            EntityTestData.CreateAddress("456 Le Loi", "Ward 2", "Da Nang"),
-            Guid.NewGuid(),
-            Guid.NewGuid());
+        var shippingFee = EntityTestData.CreateMoney();
+
+        return new Order
+        {
+            Code = "ORD-001",
+            Note = "Please deliver fast",
+            ShippingFee = shippingFee,
+            TotalPrice = shippingFee,
+            Status = OrderStatus.PendingPayment,
+            ShopName = "Book Shop",
+            WarehouseAddress = EntityTestData.CreateAddress(),
+            RecipientName = "Nhan",
+            RecipientPhoneNumber = "0987654321",
+            RecipientAddress = EntityTestData.CreateAddress("456 Le Loi", "Ward 2", "Da Nang"),
+            CustomerId = Guid.NewGuid(),
+            SellerId = Guid.NewGuid()
+        };
     }
 }

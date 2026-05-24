@@ -1,29 +1,17 @@
 using SimpleECommerceBackend.Api.Authorization;
-using SimpleECommerceBackend.Domain.Enums;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Api.Extensions;
 
 public static class PolicyExtension
 {
-    public static IServiceCollection AddKeycloakPolicies(this IServiceCollection services)
+    public static IServiceCollection AddApiAuthorization(this IServiceCollection services)
     {
         services.AddSingleton<
             Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
             AuthorizationErrorResponseHandler
         >();
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(RoleUtils.RequireCustomerRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Customer)));
-
-            options.AddPolicy(RoleUtils.RequireSellerRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Seller)));
-
-            options.AddPolicy(RoleUtils.RequireAdminRole, policy =>
-                policy.RequireRole(RoleUtils.ToKeycloakRoleName(Role.Admin)));
-        });
+        services.AddAuthorization();
 
         return services;
     }

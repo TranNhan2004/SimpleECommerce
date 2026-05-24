@@ -6,11 +6,11 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Application.Models.Translations;
 using SimpleECommerceBackend.Domain.Entities.Translation;
+using SimpleECommerceBackend.Domain.Utils;
 using SimpleECommerceBackend.Infrastructure.Options.Translation;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Translation;
 
-[AutoConstructor]
 public partial class DynamicTranslationService : IDynamicTranslationService
 {
     private readonly ICacheService _cache;
@@ -19,6 +19,23 @@ public partial class DynamicTranslationService : IDynamicTranslationService
     private readonly IEnumerable<ITranslationProvider> _providers;
     private readonly ITranslationEntryRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
+
+    public DynamicTranslationService(
+        ICacheService cache,
+        ILogger<DynamicTranslationService> logger,
+        IOptions<TranslationOptions> options,
+        IEnumerable<ITranslationProvider> providers,
+        ITranslationEntryRepository repository,
+        IUnitOfWork unitOfWork
+    )
+    {
+        _cache = cache;
+        _logger = logger;
+        _options = options;
+        _providers = providers;
+        _repository = repository;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<string> TranslateAsync(
         DynamicTranslationRequest request,
@@ -73,7 +90,7 @@ public partial class DynamicTranslationService : IDynamicTranslationService
             if (string.IsNullOrWhiteSpace(translatedValue)) return request.SourceText;
 
             var entry = new TranslationEntry(
-                Guid.NewGuid(),
+                UuidUtils.CreateV7(),
                 request.EntityName,
                 request.FieldName,
                 request.RowId,

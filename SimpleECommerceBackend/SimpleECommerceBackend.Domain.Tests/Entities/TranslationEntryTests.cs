@@ -11,10 +11,10 @@ public class TranslationEntryTests
     public void Constructor_ShouldCreateTranslationEntry_WhenInputIsValid()
     {
         var translationEntry = new TranslationEntry(
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "  Product  ",
             "  Name  ",
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "  EN-US  ",
             "  Book  ");
 
@@ -28,7 +28,7 @@ public class TranslationEntryTests
     public void Constructor_ShouldThrowValidationException_WhenRowIdIsEmpty()
     {
         var action = () => new TranslationEntry(
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "Product",
             "Name",
             Guid.Empty,
@@ -36,32 +36,32 @@ public class TranslationEntryTests
             "Book");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(TranslationEntryErrorCode.RowIdRequired);
+            .Which.ErrorCode.Should().Be(TranslationEntryErrorCodes.RowIdRequired);
     }
 
     [Fact]
     public void Constructor_ShouldThrowValidationException_WhenLocaleIsBlank()
     {
         var action = () => new TranslationEntry(
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "Product",
             "Name",
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             " ",
             "Book");
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(TranslationEntryErrorCode.LocaleRequired);
+            .Which.ErrorCode.Should().Be(TranslationEntryErrorCodes.LocaleRequired);
     }
 
     [Fact]
     public void UpdateValue_ShouldTrimAndReplaceValue()
     {
         var translationEntry = new TranslationEntry(
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "Product",
             "Name",
-            Guid.NewGuid(),
+            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
             "en-us",
             "Book");
 

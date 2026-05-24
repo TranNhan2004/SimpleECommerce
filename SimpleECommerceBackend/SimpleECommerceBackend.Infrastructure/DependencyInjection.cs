@@ -5,6 +5,7 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
@@ -14,6 +15,7 @@ using SimpleECommerceBackend.Infrastructure.Extensions;
 using SimpleECommerceBackend.Infrastructure.Options.Authentication;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
 using SimpleECommerceBackend.Infrastructure.Options.Email;
+using SimpleECommerceBackend.Infrastructure.Options.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Options.RateLimiter;
 using SimpleECommerceBackend.Infrastructure.Options.Translation;
 using SimpleECommerceBackend.Infrastructure.Persistence;
@@ -21,9 +23,11 @@ using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
+using SimpleECommerceBackend.Infrastructure.Repositories.Uam;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
+using SimpleECommerceBackend.Infrastructure.Services.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
 using StackExchange.Redis;
 
@@ -46,6 +50,9 @@ public static class DependencyInjection
         services.Configure<GlobalRateLimiterOptions>(configuration.GetSection(GlobalRateLimiterOptions.SectionName));
         services.Configure<IpRateLimiterOptions>(configuration.GetSection(IpRateLimiterOptions.SectionName));
 
+        // Maintenance
+        services.Configure<HardDeleteOptions>(configuration.GetSection(HardDeleteOptions.SectionName));
+
         // Translation
         services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
         services.Configure<OpenAITranslationOptions>(configuration.GetSection(OpenAITranslationOptions.SectionName));
@@ -63,12 +70,20 @@ public static class DependencyInjection
         services.AddSingleton<IEmailSender, SmtpEmailSender>();
         services.AddHostedService<EmailBackgroundWorker>();
 
+        // Hard delete
+        services.AddScoped<HardDeleteCleanupService>();
+        services.AddHostedService<HardDeleteBackgroundWorker>();
+        services.AddSingleton(TimeProvider.System);
+
         // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
 
         // Request User Context
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContextHolder, UserContextHolder>();
+        services.AddSingleton<IBackgroundJobContextAccessor, BackgroundJobContextAccessor>();
+        services.AddSingleton<IServerIpAddressResolver, ServerIpAddressResolver>();
+        services.AddScoped<ICurrentRequestContext, CurrentRequestContext>();
 
         // Cache Services
         var redisOptions = configuration.GetRequiredOptions<RedisOptions>(RedisOptions.SectionName);
@@ -112,8 +127,14 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductVariantPriceRepository, ProductVariantPriceRepository>();
         services.AddScoped<ISellerShopRepository, SellerShopRepository>();
-        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
+        // UAM Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
 
         return services;
     }

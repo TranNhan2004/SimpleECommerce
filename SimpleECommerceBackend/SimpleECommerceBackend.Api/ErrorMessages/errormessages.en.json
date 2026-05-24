@@ -106,13 +106,44 @@
       "Seller": "Seller",
       "Image": "Image"
     },
+    "ProductVariant": {
+      "ProductVariant": "Product variant",
+      "ProductId": "Product",
+      "Name": "Name",
+      "Description": "Description",
+      "CurrentPrice": "Current price",
+      "TotalInStock": "Total in stock",
+      "Image": "Image"
+    },
     "ProductImage": {
+      "ImageUrl": "Image URL",
+      "DisplayOrder": "Display order",
+      "Description": "Description"
+    },
+    "ProductVariantImage": {
+      "ProductVariantId": "Product variant",
       "ImageUrl": "Image URL",
       "DisplayOrder": "Display order",
       "Description": "Description"
     },
     "ProductPrice": {
       "Price": "Price"
+    },
+    "ProductVariantPrice": {
+      "ProductVariantId": "Product variant",
+      "Price": "Price"
+    },
+    "Review": {
+      "ProductId": "Product",
+      "CustomerId": "Customer",
+      "Rating": "Rating",
+      "Comment": "Comment"
+    },
+    "ReviewResponse": {
+      "ReviewId": "Review",
+      "FromUserId": "From user",
+      "ToUserId": "To user",
+      "Comment": "Comment"
     },
     "Role": {
       "Role": "Role"
@@ -172,6 +203,7 @@
     },
     "CartItem": {
       "ProductIdRequired": "{field} is required.",
+      "ProductVariantIdRequired": "{field} is required.",
       "CartIdRequired": "{field} is required.",
       "QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
       "QuantityCannotExceed": "{field} cannot exceed {max}.",
@@ -185,7 +217,13 @@
       "ActivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
       "DeactivateNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
       "AlreadyArchived": "{field} is already archived.",
-      "AdminRequired": "{field} is required."
+      "AdminRequired": "{field} is required.",
+      "NotFoundById": "Category not found.",
+      "OwnerRequired": "Just owner can perform this operation."
+    },
+    "CategoryStatus": {
+      "InvalidCategroyStatus": "{field} is invalid. Allowed values: {allowedValues}.",
+      "UnsupportedCategoryStatus": "{field} '{value}' is not supported."
     },
     "Credential": {
       "EmailRequired": "{field} is required.",
@@ -195,6 +233,18 @@
       "PasswordMinLengthNotMet": "{field} must be at least {min} characters long.",
       "PasswordMaxLengthExceeded": "{field} cannot exceed {max} characters.",
       "PasswordInvalidFormat": "{field} format is invalid."
+    },
+    "EnumConversion": {
+      "InvalidDisplayValue": "The provided value is invalid.",
+      "UnsupportedValue": "The provided value is invalid."
+    },
+    "Filter": {
+      "UnknownField": "Filter field '{fieldName}' is not supported.",
+      "InvalidValue": "The value provided for filter field '{fieldName}' is invalid.",
+      "InvalidValueCount": "Filter field '{fieldName}' has an invalid number of values.",
+      "UnsupportedOperator": "Filter operator '{operator}' is not supported for field '{fieldName}'.",
+      "UnsupportedGroupLogic": "Filter group logic '{logic}' is not supported.",
+      "InvalidGroup": "The filter group structure is invalid."
     },
     "CurrentUser": {
       "Unauthenticated": "Current user is not authenticated.",
@@ -217,6 +267,7 @@
     },
     "Inventory": {
       "ProductRequired": "{field} is required.",
+      "ProductVariantRequired": "{field} is required.",
       "SellerWarehouseRequired": "{field} is required.",
       "QuantityOnHandCannotBeNegative": "{field} cannot be negative.",
       "QuantityOnHandCannotExceed": "{field} cannot exceed {max}.",
@@ -264,9 +315,14 @@
     },
     "OrderItem": {
       "ProductIdRequired": "{field} is required.",
+      "ProductVariantIdRequired": "{field} is required.",
       "OrderIdRequired": "{field} is required.",
       "QuantityMustBeGreaterThanZero": "{field} must be greater than zero.",
       "AmountCannotBeNegative": "{field} cannot be negative."
+    },
+    "Pagination": {
+      "InvalidCurrentPage": "Current page must be greater than or equal to 1.",
+      "InvalidItemsPerPage": "Items per page must be greater than or equal to 1."
     },
     "Payment": {
       "OrderIdRequired": "{field} is required.",
@@ -285,6 +341,18 @@
       "HideNotAllowed": "{operation} is only allowed when {field} is {allowedStates}.",
       "CategoryRequired": "{field} is required.",
       "SellerRequired": "{field} is required.",
+      "ImageNotFound": "{field} was not found.",
+      "AverageRatingOutOfRange": "{field} must be between {min} and {max}.",
+      "TotalRatingsCannotBeNegative": "{field} cannot be negative."
+    },
+    "ProductVariant": {
+      "ProductRequired": "{field} is required.",
+      "NameRequired": "{field} is required.",
+      "NameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "DescriptionRequired": "{field} is required.",
+      "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters.",
+      "CurrentPriceMustBePositive": "{field} must be positive.",
+      "TotalInStockCannotBeNegative": "{field} cannot be negative.",
       "ImageNotFound": "{field} was not found."
     },
     "ProductImage": {
@@ -293,8 +361,33 @@
       "DescriptionMustNotBeBlank": "{field} must not be blank.",
       "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters."
     },
+    "ProductVariantImage": {
+      "ProductVariantIdRequired": "{field} is required.",
+      "ImageUrlRequired": "{field} is required.",
+      "DisplayOrderCannotBeNegative": "{field} cannot be negative.",
+      "DescriptionMustNotBeBlank": "{field} must not be blank.",
+      "DescriptionMaxLengthExceeded": "{field} cannot exceed {max} characters."
+    },
     "ProductPrice": {
       "PriceMustBePositive": "{field} must be positive."
+    },
+    "ProductVariantPrice": {
+      "ProductVariantIdRequired": "{field} is required.",
+      "PriceMustBePositive": "{field} must be positive."
+    },
+    "Review": {
+      "ProductIdRequired": "{field} is required.",
+      "CustomerIdRequired": "{field} is required.",
+      "RatingOutOfRange": "{field} must be between {min} and {max}.",
+      "CommentRequired": "{field} is required.",
+      "CommentMaxLengthExceeded": "{field} cannot exceed {max} characters."
+    },
+    "ReviewResponse": {
+      "ReviewIdRequired": "{field} is required.",
+      "FromUserIdRequired": "{field} is required.",
+      "ToUserIdRequired": "{field} is required.",
+      "CommentRequired": "{field} is required.",
+      "CommentMaxLengthExceeded": "{field} cannot exceed {max} characters."
     },
     "Role": {
       "InvalidRole": "{field} is invalid. Allowed values: {allowedValues}.",
@@ -343,6 +436,7 @@
       "AgeCannotExceed": "{field} cannot exceed {max}.",
       "ArchiveNotAllowed": "Cannot archive this user profile.",
       "ActivateNotAllowed": "Cannot activate this user profile.",
+      "InactiveUser": "User is not active.",
       "NotFoundById": "User profile not found."
     },
     "VnAddress": {

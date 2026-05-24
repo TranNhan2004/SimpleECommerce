@@ -1,48 +1,49 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Cart : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
-    private Cart()
+    public Cart()
     {
     }
 
-    private Cart(Guid customerId)
+    // private Cart(Guid customerId)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     CustomerId = customerId;
+    // }
+
+    private Guid _customerId;
+
+    public Guid CustomerId
     {
-        SetId(Guid.NewGuid());
-        SetCustomerId(customerId);
+        get => _customerId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    CartErrorCodes.CustomerIdRequired,
+                    "Customer ID is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "CustomerId"
+                    }
+                );
+
+            _customerId = value;
+        }
     }
 
-    public Guid CustomerId { get; private set; }
-    public UserProfile? Customer { get; private set; }
+    public User? Customer { get; private set; }
 
     public List<CartItem> CartItems { get; } = [];
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
-
-    public static Cart Create(Guid customerId)
-    {
-        return new Cart(customerId);
-    }
-
-    public void SetCustomerId(Guid customerId)
-    {
-        if (customerId == Guid.Empty)
-            throw new ValidationException(
-                CartErrorCode.CustomerIdRequired,
-                "Customer ID is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "CustomerId"
-                }
-            );
-
-        CustomerId = customerId;
-    }
 
     public void AddCartItem(CartItem cartItem)
     {

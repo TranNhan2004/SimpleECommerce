@@ -1,8 +1,15 @@
+using SimpleECommerceBackend.Domain.Attributes;
+
 namespace SimpleECommerceBackend.Domain.Enums;
 
 public enum UserStatus
 {
+    [DisplayValue("pending")]
+    Pending = 0,
+
+    [DisplayValue("active")]
     Active = 1,
-    Inactive = 2,
+
+    [DisplayValue("archived")]
     Archived = 99
 }

@@ -1,125 +1,63 @@
-using System.Text;
+using System.Reflection;
+using SimpleECommerceBackend.Domain.Attributes;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Utils;
 
 public static class EnumUtils
 {
-    public static IReadOnlyList<TEnum> GetSupportedValues<TEnum>()
-        where TEnum : struct, Enum
-    {
-        return Enum.GetValues<TEnum>();
-    }
-
-    public static IReadOnlyList<string> GetSupportedNames<TEnum>(Func<TEnum, string>? nameSelector = null)
-        where TEnum : struct, Enum
-    {
-        return [.. GetSupportedValues<TEnum>().Select(value => FormatName(value, nameSelector))];
-    }
-
-    public static string GetSupportedDisplay<TEnum>(Func<TEnum, string>? nameSelector = null)
-        where TEnum : struct, Enum
-    {
-        return string.Join(", ", GetSupportedNames(nameSelector));
-    }
-
-    public static TEnum Parse<TEnum>(
-        string? input,
-        string fieldName,
-        string invalidErrorCode,
-        Func<TEnum, string>? nameSelector = null)
-        where TEnum : struct, Enum
-    {
-        if (TryParse(input, out TEnum value, nameSelector))
-            return value;
-
-        var allowedValues = GetSupportedDisplay(nameSelector);
-        throw new ValidationException(
-            invalidErrorCode,
-            $"Invalid {fieldName}. Must be one of: {allowedValues}",
-            new Dictionary<string, object?>
-            {
-                ["field"] = fieldName,
-                ["allowedValues"] = allowedValues
-            }
-        );
-    }
-
-    public static bool TryParse<TEnum>(string? input, out TEnum value, Func<TEnum, string>? nameSelector = null)
-        where TEnum : struct, Enum
-    {
-        value = default;
-
-        if (string.IsNullOrWhiteSpace(input))
-            return false;
-
-        var normalizedInput = Normalize(input);
-        if (normalizedInput.Length == 0)
-            return false;
-
-        foreach (var candidate in GetSupportedValues<TEnum>())
-        {
-            if (!IsMatch(candidate, normalizedInput, nameSelector))
-                continue;
-
-            value = candidate;
-            return true;
-        }
-
-        return false;
-    }
-
-    public static string ToName<TEnum>(
-        TEnum value,
-        string fieldName,
-        string unsupportedErrorCode,
-        Func<TEnum, string>? nameSelector = null)
+    public static string ToDisplayValue<TEnum>(TEnum value)
         where TEnum : struct, Enum
     {
         if (!Enum.IsDefined(value))
         {
             throw new ValidationException(
-                unsupportedErrorCode,
-                $"Unsupported {fieldName} value: {value}",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = fieldName,
-                    ["value"] = value
-                }
+                EnumConversionErrorCodes.UnsupportedValue,
+                $"Unsupported {typeof(TEnum).Name} value: {value}."
             );
         }
 
-        return FormatName(value, nameSelector);
-    }
+        var member = typeof(TEnum).GetMember(value.ToString()).SingleOrDefault();
+        var displayValueAttribute = member?.GetCustomAttribute<DisplayValueAttribute>();
 
-    private static bool IsMatch<TEnum>(TEnum value, string normalizedInput, Func<TEnum, string>? nameSelector)
-        where TEnum : struct, Enum
-    {
-        if (Normalize(value.ToString()).Equals(normalizedInput, StringComparison.Ordinal))
-            return true;
-
-        if (nameSelector is null)
-            return false;
-
-        return Normalize(nameSelector(value)).Equals(normalizedInput, StringComparison.Ordinal);
-    }
-
-    private static string FormatName<TEnum>(TEnum value, Func<TEnum, string>? nameSelector)
-        where TEnum : struct, Enum
-    {
-        return nameSelector?.Invoke(value) ?? value.ToString();
-    }
-
-    private static string Normalize(string value)
-    {
-        var builder = new StringBuilder(value.Length);
-
-        foreach (var character in value.Trim())
+        if (displayValueAttribute is null || string.IsNullOrWhiteSpace(displayValueAttribute.Value))
         {
-            if (char.IsLetterOrDigit(character))
-                builder.Append(char.ToLowerInvariant(character));
+            throw new ValidationException(
+                EnumConversionErrorCodes.UnsupportedValue,
+                $"Missing display value for {typeof(TEnum).Name}.{value}."
+            );
         }
 
-        return builder.ToString();
+        return displayValueAttribute.Value;
+    }
+
+    public static TEnum FromDisplayValue<TEnum>(string displayValue)
+        where TEnum : struct, Enum
+    {
+        var trimmedDisplayValue = displayValue?.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedDisplayValue))
+        {
+            throw new ValidationException(
+                EnumConversionErrorCodes.InvalidDisplayValue,
+                $"Invalid {typeof(TEnum).Name} display value."
+            );
+        }
+
+        var supportedDisplayValues = new List<string>();
+
+        foreach (var value in Enum.GetValues<TEnum>())
+        {
+            var candidateDisplayValue = ToDisplayValue(value);
+            supportedDisplayValues.Add(candidateDisplayValue);
+
+            if (string.Equals(candidateDisplayValue, trimmedDisplayValue, StringComparison.OrdinalIgnoreCase))
+                return value;
+        }
+
+        throw new ValidationException(
+            EnumConversionErrorCodes.InvalidDisplayValue,
+            $"Invalid {typeof(TEnum).Name} display value '{trimmedDisplayValue}'. Supported values: {string.Join(", ", supportedDisplayValues)}."
+        );
     }
 }

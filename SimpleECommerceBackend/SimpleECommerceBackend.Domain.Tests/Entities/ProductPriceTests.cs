@@ -8,12 +8,17 @@ namespace SimpleECommerceBackend.Domain.Tests.Entities;
 public class ProductPriceTests
 {
     [Fact]
-    public void Create_ShouldCreateProductPrice_WhenInputIsValid()
+    public void Create_ShouldCreateProductVariantPrice_WhenInputIsValid()
     {
         var effectiveFrom = DateTimeOffset.UtcNow;
         var money = EntityTestData.CreateMoney();
 
-        var productPrice = ProductPrice.Create(money, effectiveFrom);
+        var productPrice = new ProductVariantPrice
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Money = money,
+            EffectiveFrom = effectiveFrom
+        };
 
         productPrice.Money.Should().Be(money);
         productPrice.EffectiveFrom.Should().Be(effectiveFrom);
@@ -22,16 +27,26 @@ public class ProductPriceTests
     [Fact]
     public void Create_ShouldThrowValidationException_WhenPriceAmountIsZero()
     {
-        var action = () => ProductPrice.Create(EntityTestData.CreateMoney(0), DateTimeOffset.UtcNow);
+        var action = () => new ProductVariantPrice
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Money = EntityTestData.CreateMoney(0),
+            EffectiveFrom = DateTimeOffset.UtcNow
+        };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(ProductPriceErrorCode.PriceMustBePositive);
+            .Which.ErrorCode.Should().Be(ProductVariantPriceErrorCodes.PriceMustBePositive);
     }
 
     [Fact]
     public void Create_ShouldThrowValidationException_WhenPriceAmountIsNegative()
     {
-        var action = () => ProductPrice.Create(new SimpleECommerceBackend.Domain.ValueObjects.Money(-1, "VND"), DateTimeOffset.UtcNow);
+        var action = () => new ProductVariantPrice
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Money = new SimpleECommerceBackend.Domain.ValueObjects.Money(-1, "VND"),
+            EffectiveFrom = DateTimeOffset.UtcNow
+        };
 
         action.Should().Throw<ValidationException>();
     }

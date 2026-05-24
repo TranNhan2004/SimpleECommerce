@@ -5,25 +5,50 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
+public class SellerWarehouse : EntityBase, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
-    private SellerWarehouse()
+    public SellerWarehouse()
     {
     }
 
-    private SellerWarehouse(
-        Address fullAddress,
-        Guid sellerShopId
-    )
+    // private SellerWarehouse(
+    //     Address fullAddress,
+    //     Guid sellerShopId
+    // )
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     FullAddress = fullAddress;
+    //     SellerShopId = sellerShopId;
+    // }
+
+    private Address _fullAddress;
+    private Guid _sellerShopId;
+
+    public Address FullAddress
     {
-        SetId(Guid.NewGuid());
-        SetFullAddress(fullAddress);
-        SetSellerShopId(sellerShopId);
+        get => _fullAddress;
+        set => _fullAddress = value;
     }
 
-    public Address FullAddress { get; private set; }
+    public Guid SellerShopId
+    {
+        get => _sellerShopId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    SellerWarehouseErrorCodes.SellerShopRequired,
+                    "Seller shop is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "SellerShop"
+                    }
+                );
 
-    public Guid SellerShopId { get; private set; }
+            _sellerShopId = value;
+        }
+    }
+
     public SellerShop? SellerShop { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -35,7 +60,7 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
     {
         if (IsDeleted)
             throw new ValidationException(
-                SellerWarehouseErrorCode.AlreadyDeleted,
+                SellerWarehouseErrorCodes.AlreadyDeleted,
                 "Warehouse is already deleted",
                 new Dictionary<string, object?>
                 {
@@ -49,34 +74,4 @@ public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISo
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public static SellerWarehouse Create(
-        Address fullAddress,
-        Guid sellerShopId
-    )
-    {
-        return new SellerWarehouse(
-            fullAddress,
-            sellerShopId
-        );
-    }
-
-    public void SetFullAddress(Address fullAddress)
-    {
-        FullAddress = fullAddress;
-    }
-
-    private void SetSellerShopId(Guid sellerShopId)
-    {
-        if (sellerShopId == Guid.Empty)
-            throw new ValidationException(
-                SellerWarehouseErrorCode.SellerShopRequired,
-                "Seller shop is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "SellerShop"
-                }
-            );
-
-        SellerShopId = sellerShopId;
-    }
 }

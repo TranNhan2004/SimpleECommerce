@@ -9,7 +9,7 @@ public class KeycloakPayloadExtractionHelperTests
     [Fact]
     public void FindUserId_ShouldReturnMappedNameIdentifier_WhenSubClaimIsMissing()
     {
-        var userId = Guid.NewGuid().ToString();
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7().ToString();
         var principal = CreatePrincipal(new Claim(ClaimTypes.NameIdentifier, userId));
 
         var result = KeycloakPayloadExtractionHelper.FindUserId(principal);
@@ -54,6 +54,19 @@ public class KeycloakPayloadExtractionHelperTests
             "customer",
             "manage-account"
         );
+    }
+
+    [Fact]
+    public void GetRoleNames_ShouldIgnoreInvalidJsonPayloads()
+    {
+        var principal = CreatePrincipal(
+            new Claim("realm_access", "\"unexpected-string\""),
+            new Claim("resource_access", "{\"account\":\"invalid-shape\"}")
+        );
+
+        var result = KeycloakPayloadExtractionHelper.GetRoleNames(principal);
+
+        result.Should().BeEmpty();
     }
 
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)

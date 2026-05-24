@@ -13,18 +13,18 @@ public class CustomerShippingAddressConfiguration : IEntityTypeConfiguration<Cus
 
         builder.Property(csa => csa.RecipientName)
             .IsRequired()
-            .HasMaxLength(ShippingAddressConstants.RecipientNameMaxLength);
+            .HasMaxLength(ShippingAddressValidationRules.RecipientNameMaxLength);
 
         builder.Property(csa => csa.RecipientPhoneNumber)
             .IsRequired()
-            .HasMaxLength(CommonConstants.PhoneNumberMaxLength);
+            .HasMaxLength(CommonValidationRules.PhoneNumberMaxLength);
 
         builder.ComplexProperty(csa => csa.RecipientAddress, address =>
         {
             address.Property(a => a.AddressLine)
                 .HasColumnName("RecipientAddressLine")
                 .IsRequired()
-                .HasMaxLength(AddressConstants.AddressLineMaxLength);
+                .HasMaxLength(AddressValidationRules.AddressLineMaxLength);
 
             address.Property(a => a.Province)
                 .HasColumnName("RecipientProvince")

@@ -94,3 +94,5 @@ Desktop.ini
 # Env
 .env*
 !.env.example
+
+Test.cs

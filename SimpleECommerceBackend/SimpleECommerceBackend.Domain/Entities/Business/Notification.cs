@@ -1,84 +1,89 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Notification : Entity, ICreatedTrackable
+public class Notification : EntityBase, ICreatedTrackable
 {
-    private Notification()
+    public Notification()
     {
     }
 
-    private Notification(Guid userId, string message)
+    // private Notification(Guid userId, string message)
+    // {
+    //     Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+    //     UserId = userId;
+    //     Message = message;
+    // }
+
+    private Guid _userId;
+    private string _message = null!;
+
+    public Guid UserId
     {
-        SetId(Guid.NewGuid());
-        SetUserId(userId);
-        SetMessage(message);
+        get => _userId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    NotificationErrorCodes.UserIdRequired,
+                    "User ID is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "UserId"
+                    }
+                );
+
+            _userId = value;
+        }
     }
 
-    public Guid UserId { get; private set; }
-    public UserProfile? User { get; private set; }
+    public User? User { get; private set; }
 
-    public string Message { get; private set; } = null!;
+    public string Message
+    {
+        get => _message;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    NotificationErrorCodes.MessageRequired,
+                    "Message is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Message"
+                    }
+                );
+
+            var trimmedMessage = value.Trim();
+
+            if (trimmedMessage.Length > NotificationValidationRules.MessageMaxLength)
+                throw new ValidationException(
+                    NotificationErrorCodes.MessageMaxLengthExceeded,
+                    $"Message cannot exceed {NotificationValidationRules.MessageMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Message",
+                        ["max"] = NotificationValidationRules.MessageMaxLength
+                    }
+                );
+
+            _message = trimmedMessage;
+        }
+    }
+
     public bool IsRead { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
-
-    public static Notification Create(Guid userId, string message)
-    {
-        return new Notification(userId, message);
-    }
-
-    private void SetUserId(Guid userId)
-    {
-        if (userId == Guid.Empty)
-            throw new ValidationException(
-                NotificationErrorCode.UserIdRequired,
-                "User ID is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "UserId"
-                }
-            );
-
-        UserId = userId;
-    }
-
-    private void SetMessage(string message)
-    {
-        if (string.IsNullOrWhiteSpace(message))
-            throw new ValidationException(
-                NotificationErrorCode.MessageRequired,
-                "Message is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Message"
-                }
-            );
-
-        var trimmedMessage = message.Trim();
-
-        if (trimmedMessage.Length > NotificationConstants.MessageMaxLength)
-            throw new ValidationException(
-                NotificationErrorCode.MessageMaxLengthExceeded,
-                $"Message cannot exceed {NotificationConstants.MessageMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Message",
-                    ["max"] = NotificationConstants.MessageMaxLength
-                }
-            );
-
-        Message = trimmedMessage;
-    }
 
     public void MarkAsRead()
     {
         if (IsRead)
             throw new ValidationException(
-                NotificationErrorCode.AlreadyMarkedAsRead,
+                NotificationErrorCodes.AlreadyMarkedAsRead,
                 "Notification is already marked as read",
                 new Dictionary<string, object?>
                 {

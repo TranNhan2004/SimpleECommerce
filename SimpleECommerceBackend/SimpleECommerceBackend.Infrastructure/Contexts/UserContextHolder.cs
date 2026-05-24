@@ -3,16 +3,18 @@ using Microsoft.AspNetCore.Http;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
-[AutoConstructor]
 public partial class UserContextHolder : IUserContextHolder
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserContextHolder(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
 
     public IUserContext GetUserContext()
     {
@@ -20,12 +22,12 @@ public partial class UserContextHolder : IUserContextHolder
             return userContext;
 
         throw new UnauthorizedException(
-            CurrentUserErrorCode.Unauthenticated,
+            CurrentUserErrorCodes.Unauthenticated,
             "Current user is not authenticated."
         );
     }
 
-    public bool TryGet(out IUserContext? userContext)
+    private bool TryGet(out IUserContext? userContext)
     {
         userContext = null;
 
@@ -36,7 +38,7 @@ public partial class UserContextHolder : IUserContextHolder
         var rawUserId = KeycloakPayloadExtractionHelper.FindUserId(principal);
         if (string.IsNullOrWhiteSpace(rawUserId))
             throw new UnauthorizedException(
-                CurrentUserErrorCode.UserIdMissing,
+                CurrentUserErrorCodes.UserIdMissing,
                 "Current user id claim 'sub' is missing.",
                 new Dictionary<string, object?>
                 {
@@ -46,7 +48,7 @@ public partial class UserContextHolder : IUserContextHolder
 
         if (!Guid.TryParse(rawUserId, out var userId))
             throw new UnauthorizedException(
-                CurrentUserErrorCode.UserIdInvalid,
+                CurrentUserErrorCodes.UserIdInvalid,
                 $"Current user id claim 'sub' is invalid: {rawUserId}.",
                 new Dictionary<string, object?>
                 {
@@ -55,33 +57,11 @@ public partial class UserContextHolder : IUserContextHolder
                 }
             );
 
-        if (!TryResolveRole(principal, out var role))
-            throw new ForbiddenException(
-                CurrentUserErrorCode.RoleMissing,
-                "Current user role claim is missing or invalid.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Role"
-                }
-            );
-
         var email = KeycloakPayloadExtractionHelper.FindEmail(principal) ?? string.Empty;
 
-        userContext = new UserContext(userId, email, role);
+        userContext = new UserContext(userId, email);
         return true;
     }
 
-    private static bool TryResolveRole(ClaimsPrincipal principal, out Role role)
-    {
-        foreach (var roleName in KeycloakPayloadExtractionHelper.GetRoleNames(principal))
-        {
-            if (RoleUtils.TryParse(roleName, out role))
-                return true;
-        }
-
-        role = default;
-        return false;
-    }
-
-    private sealed record UserContext(Guid Id, string Email, Role Role) : IUserContext;
+    private sealed record UserContext(Guid Id, string Email) : IUserContext;
 }

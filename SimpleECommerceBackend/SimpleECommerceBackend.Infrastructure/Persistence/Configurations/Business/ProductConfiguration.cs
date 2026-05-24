@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Enums;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
@@ -13,26 +14,21 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Name)
             .IsRequired()
-            .HasMaxLength(ProductConstants.NameMaxLength);
+            .HasMaxLength(ProductValidationRules.NameMaxLength);
 
         builder.Property(p => p.Description)
             .IsRequired()
-            .HasMaxLength(ProductConstants.DescriptionMaxLength);
+            .HasMaxLength(ProductValidationRules.DescriptionMaxLength);
 
-        builder.ComplexProperty(p => p.CurrentPrice, money =>
-        {
-            money.Property(m => m.Amount)
-                .HasColumnName("CurrentAmount")
-                .HasColumnType("decimal(18,2)")
-                .IsRequired();
+        builder.Property(p => p.AverageRating)
+            .HasColumnType("decimal(3,2)")
+            .IsRequired();
 
-            money.Property(m => m.Currency)
-                .HasColumnName("Currency")
-                .HasMaxLength(3)
-                .IsRequired();
-        });
+        builder.Property(p => p.TotalRatings)
+            .IsRequired();
 
         builder.Property(p => p.Status)
+            .HasDefaultValue(ProductStatus.Active)
             .IsRequired();
 
         builder.HasOne(p => p.Category)

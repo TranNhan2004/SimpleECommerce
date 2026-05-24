@@ -11,39 +11,59 @@ public class CartItemTests
     [Fact]
     public void Create_ShouldCreateCartItem_WhenInputIsValid()
     {
-        var productId = Guid.NewGuid();
-        var cartId = Guid.NewGuid();
+        var productVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
+        var cartId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
 
-        var cartItem = CartItem.Create(productId, cartId, 2);
+        var cartItem = new CartItem
+        {
+            ProductVariantId = productVariantId,
+            CartId = cartId,
+            Quantity = 2
+        };
 
-        cartItem.ProductId.Should().Be(productId);
+        cartItem.ProductVariantId.Should().Be(productVariantId);
         cartItem.CartId.Should().Be(cartId);
         cartItem.Quantity.Should().Be(2);
     }
 
     [Fact]
-    public void Create_ShouldThrowValidationException_WhenProductIdIsEmpty()
+    public void Create_ShouldThrowValidationException_WhenProductVariantIdIsEmpty()
     {
-        var action = () => CartItem.Create(Guid.Empty, Guid.NewGuid(), 1);
+        var action = () => new CartItem
+        {
+            ProductVariantId = Guid.Empty,
+            CartId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Quantity = 1
+        };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.ProductIdRequired);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.ProductVariantIdRequired);
     }
 
     [Fact]
     public void SetQuantity_ShouldThrowValidationException_WhenQuantityExceedsMaximum()
     {
-        var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
-        var action = () => cartItem.SetQuantity(CartConstants.MaxQuantityPerItem + 1);
+        var cartItem = new CartItem
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            CartId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Quantity = 1
+        };
+        var action = () => cartItem.Quantity = CartValidationRules.MaxQuantityPerItem + 1;
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.QuantityCannotExceed);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.QuantityCannotExceed);
     }
 
     [Fact]
     public void IncreaseQuantity_ShouldUpdateQuantity_WhenAmountIsValid()
     {
-        var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 2);
+        var cartItem = new CartItem
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            CartId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Quantity = 2
+        };
 
         cartItem.IncreaseQuantity(3);
 
@@ -53,10 +73,15 @@ public class CartItemTests
     [Fact]
     public void DecreaseQuantity_ShouldThrowValidationException_WhenResultIsNotPositive()
     {
-        var cartItem = CartItem.Create(Guid.NewGuid(), Guid.NewGuid(), 2);
+        var cartItem = new CartItem
+        {
+            ProductVariantId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            CartId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Quantity = 2
+        };
         var action = () => cartItem.DecreaseQuantity(2);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(CartItemErrorCode.QuantityMustBeGreaterThanZero);
+            .Which.ErrorCode.Should().Be(CartItemErrorCodes.QuantityMustBeGreaterThanZero);
     }
 }

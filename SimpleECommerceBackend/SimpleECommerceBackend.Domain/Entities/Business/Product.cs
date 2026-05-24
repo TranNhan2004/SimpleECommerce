@@ -1,238 +1,186 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Product : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
-    private readonly List<ProductImage> _productImages = [];
-    private readonly List<ProductPrice> _productPrices = [];
+    private readonly List<ProductVariant> _productVariants = [];
+    private readonly List<Review> _reviews = [];
 
-    private Product()
+    public Product()
     {
     }
 
-    private Product(
-        string name,
-        string description,
-        Money currentPrice,
-        ProductStatus status,
-        Guid categoryId,
-        Guid sellerId
-    )
+    private string _name = null!;
+    private string _description = null!;
+    private Guid _categoryId;
+    private Guid _sellerId;
+    private double _averageRating;
+    private int _totalRatings;
+
+    public string Name
     {
-        SetId(Guid.NewGuid());
-        SetName(name);
-        SetDescription(description);
-        SetCurrentPrice(currentPrice);
-        SetStatus(status);
-        SetCategoryId(categoryId);
-        SetSellerId(sellerId);
+        get => _name;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    ProductErrorCodes.NameRequired,
+                    "Name is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Name"
+                    }
+                );
+
+            var trimmedName = value.Trim();
+            if (trimmedName.Length > ProductValidationRules.NameMaxLength)
+                throw new ValidationException(
+                    ProductErrorCodes.NameMaxLengthExceeded,
+                    $"Name cannot exceed {ProductValidationRules.NameMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Name",
+                        ["max"] = ProductValidationRules.NameMaxLength
+                    }
+                );
+
+            _name = trimmedName;
+        }
     }
 
-    public string Name { get; private set; } = null!;
-    public string Description { get; private set; } = null!;
-    public Money CurrentPrice { get; private set; }
-    public int TotalInStock { get; private set; }
-    public ProductStatus Status { get; private set; }
-
-    public Guid CategoryId { get; private set; }
-    public Category? Category { get; private set; }
-
-    public Guid SellerId { get; private set; }
-    public UserProfile? Seller { get; private set; }
-    public IReadOnlyCollection<ProductImage> ProductImages => _productImages;
-    public IReadOnlyCollection<ProductPrice> ProductPrices => _productPrices;
-
-
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
-    public void SetName(string name)
+    public string Description
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ValidationException(
-                ProductErrorCode.NameRequired,
-                "Name is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Name"
-                }
-            );
+        get => _description;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(
+                    ProductErrorCodes.DescriptionRequired,
+                    "Description is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Description"
+                    }
+                );
 
-        var trimmedName = name.Trim();
-        if (trimmedName.Length > ProductConstants.NameMaxLength)
-            throw new ValidationException(
-                ProductErrorCode.NameMaxLengthExceeded,
-                $"Name cannot exceed {ProductConstants.NameMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Name",
-                    ["max"] = ProductConstants.NameMaxLength
-                }
-            );
+            var trimmedDescription = value.Trim();
+            if (trimmedDescription.Length > ProductValidationRules.DescriptionMaxLength)
+                throw new ValidationException(
+                    ProductErrorCodes.DescriptionMaxLengthExceeded,
+                    $"Description cannot exceed {ProductValidationRules.DescriptionMaxLength} characters",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Description",
+                        ["max"] = ProductValidationRules.DescriptionMaxLength
+                    }
+                );
 
-        Name = trimmedName;
+            _description = trimmedDescription;
+        }
     }
 
-    public void SetDescription(string description)
+    public Guid CategoryId
     {
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ValidationException(
-                ProductErrorCode.DescriptionRequired,
-                "Description is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Description"
-                }
-            );
+        get => _categoryId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    ProductErrorCodes.CategoryRequired,
+                    "Category is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Category"
+                    }
+                );
 
-        var trimmedDescription = description.Trim();
-        if (trimmedDescription.Length > ProductConstants.DescriptionMaxLength)
-            throw new ValidationException(
-                ProductErrorCode.DescriptionMaxLengthExceeded,
-                $"Description cannot exceed {ProductConstants.DescriptionMaxLength} characters",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Description",
-                    ["max"] = ProductConstants.DescriptionMaxLength
-                }
-            );
-
-        Description = trimmedDescription;
+            _categoryId = value;
+        }
     }
 
-    public void SetCurrentPrice(Money currentPrice)
+    public Category? Category { get; set; }
+
+    public Guid SellerId
     {
-        CurrentPrice = currentPrice;
+        get => _sellerId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    ProductErrorCodes.SellerRequired,
+                    "Seller is required",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Seller"
+                    }
+                );
+
+            _sellerId = value;
+        }
     }
 
-    private void SetStatus(ProductStatus status)
+    public User? Seller { get; set; }
+
+    public double AverageRating
     {
-        Status = status;
+        get => _averageRating;
+        set
+        {
+            if (value < 0 || value > 5)
+                throw new ValidationException(
+                    ProductErrorCodes.AverageRatingOutOfRange,
+                    "Average rating must be between 0 and 5",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "AverageRating",
+                        ["min"] = 0,
+                        ["max"] = 5
+                    }
+                );
+
+            _averageRating = value;
+        }
     }
 
-    public void Activate()
+    public int TotalRatings
     {
-        if (Status != ProductStatus.Draft && Status != ProductStatus.Hidden)
-            throw new ValidationException(
-                ProductErrorCode.ActivateNotAllowed,
-                "Only draft or hidden product can be activated",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Status",
-                    ["operation"] = "Activate",
-                    ["allowedStates"] = "draft, hidden"
-                }
-            );
+        get => _totalRatings;
+        set
+        {
+            if (value < 0)
+                throw new ValidationException(
+                    ProductErrorCodes.TotalRatingsCannotBeNegative,
+                    "Total ratings cannot be negative",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "TotalRatings"
+                    }
+                );
 
-        Status = ProductStatus.Active;
+            _totalRatings = value;
+        }
     }
 
-    public void Hide()
-    {
-        if (Status != ProductStatus.Draft && Status != ProductStatus.Active)
-            throw new ValidationException(
-                ProductErrorCode.HideNotAllowed,
-                "Only draft or active product can be hidden",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Status",
-                    ["operation"] = "Hide",
-                    ["allowedStates"] = "draft, active"
-                }
-            );
+    public ProductStatus Status { get; set; } = ProductStatus.Active;
 
-        Status = ProductStatus.Hidden;
+    public IReadOnlyCollection<ProductVariant> ProductVariants => _productVariants;
+    public IReadOnlyCollection<Review> Reviews => _reviews;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+
+    public void AddVariant(ProductVariant variant)
+    {
+        _productVariants.Add(variant);
     }
 
-    public void SetCategoryId(Guid categoryId)
+    public void AddReview(Review review)
     {
-        if (categoryId == Guid.Empty)
-            throw new ValidationException(
-                ProductErrorCode.CategoryRequired,
-                "Category is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Category"
-                }
-            );
-
-        CategoryId = categoryId;
-    }
-
-    public void SetSellerId(Guid sellerId)
-    {
-        if (sellerId == Guid.Empty)
-            throw new ValidationException(
-                ProductErrorCode.SellerRequired,
-                "Seller is required",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Seller"
-                }
-            );
-
-        SellerId = sellerId;
-    }
-
-    public void AddImage(ProductImage image)
-    {
-        _productImages.Add(image);
-    }
-
-    public void ChangeImage(ProductImage image)
-    {
-        var existingImage = _productImages.FirstOrDefault(pi => pi.Id == image.Id);
-        if (existingImage is null)
-            throw new ValidationException(
-                ProductErrorCode.ImageNotFound,
-                "Image not found",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Image"
-                }
-            );
-
-        existingImage.SetDescription(image.Description);
-        existingImage.SetDisplayOrder(image.DisplayOrder);
-        existingImage.SetIsDisplayed(image.IsDisplayed);
-    }
-
-    public void RemoveImage(Guid imageId)
-    {
-        var existingImage = _productImages.FirstOrDefault(pi => pi.Id == imageId);
-        if (existingImage is null)
-            throw new ValidationException(
-                ProductErrorCode.ImageNotFound,
-                "Image not found",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Image"
-                }
-            );
-
-        _productImages.Remove(existingImage);
-    }
-
-    public void AddPrice(ProductPrice price)
-    {
-        _productPrices.Add(price);
-    }
-
-    public static Product Create(
-        string name,
-        string description,
-        Money currentPrice,
-        Guid categoryId,
-        Guid sellerId
-    )
-    {
-        return new Product(name, description, currentPrice, ProductStatus.Draft, categoryId, sellerId);
+        _reviews.Add(review);
     }
 }

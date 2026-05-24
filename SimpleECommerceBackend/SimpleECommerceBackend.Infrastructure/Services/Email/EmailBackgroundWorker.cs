@@ -4,12 +4,22 @@ using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Email;
 
-[AutoConstructor]
 public partial class EmailBackgroundWorker : BackgroundService
 {
     private readonly IEmailSender _emailSender;
     private readonly ILogger<EmailBackgroundWorker> _logger;
     private readonly BackgroundEmailQueue _queue;
+
+    public EmailBackgroundWorker(
+        IEmailSender emailSender,
+        ILogger<EmailBackgroundWorker> logger,
+        BackgroundEmailQueue queue
+    )
+    {
+        _emailSender = emailSender;
+        _logger = logger;
+        _queue = queue;
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
@@ -34,22 +35,24 @@ public class RedisCacheServiceTests
     }
 
     [Fact]
-    public async Task SetAsync_ShouldStoreAndReturnUserProfile()
+    public async Task SetAsync_ShouldStoreAndReturnUser()
     {
         var sut = CreateSut();
-        var expected = UserProfile.Create(
-            SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
-            "user@example.com",
-            "Nhan",
-            "Tran",
-            "nhan",
-            Sex.Male,
-            new DateOnly(2000, 1, 1),
-            "avatar.png"
-        );
+        var expected = new User
+        {
+            Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Email = "user@example.com",
+            FirstName = "Nhan",
+            LastName = "Tran",
+            NickName = "nhan",
+            Sex = Sex.Male,
+            Status = UserStatus.Active,
+            BirthDate = new DateOnly(2000, 1, 1),
+            AvatarUrl = "avatar.png"
+        };
 
         await sut.SetAsync("cache:user-profile", expected, TimeSpan.FromMinutes(5));
-        var result = await sut.GetAsync<UserProfile>("cache:user-profile");
+        var result = await sut.GetAsync<User>("cache:user-profile");
 
         result.Should().NotBeNull();
         result!.Id.Should().Be(expected.Id);
@@ -67,7 +70,14 @@ public class RedisCacheServiceTests
     public async Task SetAsync_ShouldStoreAndReturnCategory()
     {
         var sut = CreateSut();
-        var expected = Category.Create("Books", "Fiction books", SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7());
+        var expected = new Category
+        {
+            Id = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7(),
+            Name = "Books",
+            Description = "Fiction books",
+            Status = CategoryStatus.Active,
+            AdminId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7()
+        };
 
         await sut.SetAsync("cache:category", expected, TimeSpan.FromMinutes(5));
         var result = await sut.GetAsync<Category>("cache:category");
@@ -160,9 +170,9 @@ public class RedisCacheServiceTests
     public async Task GetAsync_ShouldReturnDefaultAndRemoveKey_WhenPayloadCannotBeDeserialized()
     {
         var sut = CreateSut(out var storage);
-        storage["test:cache:invalid-profile"] = """{"id":"00000000-0000-0000-0000-000000000001","email":"bad@example.com"}""";
+        storage["test:cache:invalid-profile"] = """{"id":"00000000-0000-0000-0000-000000000001","email":"bad@example.com","firstName":"","lastName":"User","sex":1,"status":1,"birthDate":"2000-01-01"}""";
 
-        var result = await sut.GetAsync<SimpleECommerceBackend.Domain.Entities.Business.UserProfile>("cache:invalid-profile");
+        var result = await sut.GetAsync<User>("cache:invalid-profile");
 
         result.Should().BeNull();
         storage.Should().NotContainKey("test:cache:invalid-profile");
@@ -172,7 +182,7 @@ public class RedisCacheServiceTests
     public async Task GetBulkAsync_ShouldTreatInvalidPayloadAsCacheMiss_AndRemoveBrokenKey()
     {
         var sut = CreateSut(out var storage);
-        storage["test:cache:invalid-category"] = """{"id":"00000000-0000-0000-0000-000000000001","name":"Category A"}""";
+        storage["test:cache:invalid-category"] = """{"id":"00000000-0000-0000-0000-000000000001","name":"Category A","description":"Example","status":1,"adminId":"00000000-0000-0000-0000-000000000000"}""";
 
         var result = (await sut.GetBulkAsync<SimpleECommerceBackend.Domain.Entities.Business.Category>(
             ["cache:missing-category", "cache:invalid-category"]))

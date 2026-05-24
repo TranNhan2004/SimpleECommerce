@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Translation;
 
-public class TranslationEntry : Entity
+public class TranslationEntry : EntityBase
 {
     public TranslationEntry()
     {

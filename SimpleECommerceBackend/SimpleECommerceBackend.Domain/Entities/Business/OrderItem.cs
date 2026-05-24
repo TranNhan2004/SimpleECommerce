@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class OrderItem : Entity, ICreatedTrackable, IUpdatedTrackable
+public class OrderItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public OrderItem()
     {

@@ -1,12 +1,13 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
+public class CustomerShippingAddress : EntityBase, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
     public CustomerShippingAddress()
     {
@@ -108,7 +109,7 @@ public class CustomerShippingAddress : Entity, ICreatedTrackable, IUpdatedTracka
     }
 
     public Guid CustomerId { get; private set; }
-    public UserProfile? Customer { get; private set; }
+    public User? Customer { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public bool IsDeleted { get; private set; }

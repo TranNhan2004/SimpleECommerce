@@ -7,15 +7,15 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Queries;
 public partial class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, GetMyProfileResult>
 {
     private readonly IUserContextHolder _userContextHolder;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserService _userService;
 
     public GetMyProfileHandler(
         IUserContextHolder userContextHolder,
-        IUserProfileService userProfileService
+        IUserService userService
     )
     {
         _userContextHolder = userContextHolder;
-        _userProfileService = userProfileService;
+        _userService = userService;
     }
 
     public async Task<GetMyProfileResult> HandleAsync(
@@ -24,8 +24,8 @@ public partial class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, Ge
     )
     {
         var currentUser = _userContextHolder.GetUserContext();
-        var userProfile = await _userProfileService.GetByIdAsync(currentUser.Id);
+        var user = await _userService.GetByIdAsync(currentUser.Id);
 
-        return GetMyProfileResult.FromEntity(userProfile);
+        return GetMyProfileResult.FromEntity(user);
     }
 }

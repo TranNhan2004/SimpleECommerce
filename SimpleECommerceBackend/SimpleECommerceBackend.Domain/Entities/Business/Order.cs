@@ -1,13 +1,14 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Order : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<OrderItem> _orderItems = [];
 
@@ -164,7 +165,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Customer { get; private set; }
+    public User? Customer { get; private set; }
     public Guid SellerId
     {
         get => _sellerId;
@@ -184,7 +185,7 @@ public class Order : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Seller { get; private set; }
+    public User? Seller { get; private set; }
 
     public string ShopName
     {

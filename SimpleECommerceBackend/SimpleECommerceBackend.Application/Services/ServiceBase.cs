@@ -1,4 +1,3 @@
-using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 
 namespace SimpleECommerceBackend.Application.Services;

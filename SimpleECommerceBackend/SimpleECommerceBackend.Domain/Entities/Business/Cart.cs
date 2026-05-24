@@ -1,10 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Cart : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public Cart()
     {
@@ -37,7 +38,7 @@ public class Cart : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Customer { get; private set; }
+    public User? Customer { get; private set; }
 
     public List<CartItem> CartItems { get; } = [];
 

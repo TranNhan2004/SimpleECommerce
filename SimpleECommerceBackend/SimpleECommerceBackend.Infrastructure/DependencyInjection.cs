@@ -5,6 +5,7 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
+using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
@@ -22,6 +23,7 @@ using SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 using SimpleECommerceBackend.Infrastructure.Repositories;
 using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
+using SimpleECommerceBackend.Infrastructure.Repositories.Uam;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
@@ -79,6 +81,9 @@ public static class DependencyInjection
         // Request User Context
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContextHolder, UserContextHolder>();
+        services.AddSingleton<IBackgroundJobContextAccessor, BackgroundJobContextAccessor>();
+        services.AddSingleton<IServerIpAddressResolver, ServerIpAddressResolver>();
+        services.AddScoped<ICurrentRequestContext, CurrentRequestContext>();
 
         // Cache Services
         var redisOptions = configuration.GetRequiredOptions<RedisOptions>(RedisOptions.SectionName);
@@ -124,7 +129,12 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductVariantPriceRepository, ProductVariantPriceRepository>();
         services.AddScoped<ISellerShopRepository, SellerShopRepository>();
-        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
+        // UAM Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
 
         return services;
     }

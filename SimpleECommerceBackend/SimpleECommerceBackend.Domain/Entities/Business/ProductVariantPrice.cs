@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariantPrice : Entity, ICreatedTrackable
+public class ProductVariantPrice : EntityBase, ICreatedTrackable
 {
     public ProductVariantPrice()
     {

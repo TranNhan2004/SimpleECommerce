@@ -1,25 +1,25 @@
 using FluentAssertions;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Tests.Entities;
 
-public class UserProfileTests
+public class UserTests
 {
     [Fact]
-    public void Create_ShouldCreateUserProfile_WhenInputIsValid()
+    public void Create_ShouldCreateUser_WhenInputIsValid()
     {
-        var userProfile = CreateUserProfile();
+        var user = CreateUser();
 
-        userProfile.Email.Should().Be("nhan@example.com");
-        userProfile.FirstName.Should().Be("Nhan");
-        userProfile.LastName.Should().Be("Nguyen");
-        userProfile.NickName.Should().Be("nhan");
-        userProfile.Sex.Should().Be(Sex.Male);
-        userProfile.Status.Should().Be(UserStatus.Active);
+        user.Email.Should().Be("nhan@example.com");
+        user.FirstName.Should().Be("Nhan");
+        user.LastName.Should().Be("Nguyen");
+        user.NickName.Should().Be("nhan");
+        user.Sex.Should().Be(Sex.Male);
+        user.Status.Should().Be(UserStatus.Active);
     }
 
     [Theory]
@@ -27,7 +27,7 @@ public class UserProfileTests
     [InlineData("   ")]
     public void Create_ShouldThrowValidationException_WhenFirstNameIsBlank(string firstName)
     {
-        var action = () => new UserProfile
+        var action = () => new User
         {
             Id = Guid.NewGuid(),
             Email = "nhan@example.com",
@@ -49,7 +49,7 @@ public class UserProfileTests
     [InlineData("   ")]
     public void Create_ShouldThrowValidationException_WhenLastNameIsBlank(string lastName)
     {
-        var action = () => new UserProfile
+        var action = () => new User
         {
             Id = Guid.NewGuid(),
             Email = "nhan@example.com",
@@ -69,19 +69,19 @@ public class UserProfileTests
     [Fact]
     public void SetNickName_ShouldAllowNull()
     {
-        var userProfile = CreateUserProfile();
+        var user = CreateUser();
 
-        userProfile.NickName = null;
+        user.NickName = null;
 
-        userProfile.NickName.Should().BeNull();
+        user.NickName.Should().BeNull();
     }
 
     [Fact]
     public void SetNickName_ShouldThrowValidationException_WhenNickNameExceedsMaxLength()
     {
-        var userProfile = CreateUserProfile();
+        var user = CreateUser();
         var nickName = new string('a', UserProfileValidationRules.NickNameMaxLength + 1);
-        var action = () => userProfile.NickName = nickName;
+        var action = () => user.NickName = nickName;
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.NickNameMaxLengthExceeded);
@@ -90,8 +90,8 @@ public class UserProfileTests
     [Fact]
     public void SetBirthDate_ShouldThrowValidationException_WhenBirthDateIsInTheFuture()
     {
-        var userProfile = CreateUserProfile();
-        var action = () => userProfile.BirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1);
+        var user = CreateUser();
+        var action = () => user.BirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1);
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.BirthDateCannotBeFuture);
@@ -100,8 +100,8 @@ public class UserProfileTests
     [Fact]
     public void SetBirthDate_ShouldThrowValidationException_WhenAgeIsBelowMinimum()
     {
-        var userProfile = CreateUserProfile();
-        var action = () => userProfile.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MinAge - 1);
+        var user = CreateUser();
+        var action = () => user.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MinAge - 1);
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotBeLessThan);
@@ -110,16 +110,16 @@ public class UserProfileTests
     [Fact]
     public void SetBirthDate_ShouldThrowValidationException_WhenAgeExceedsMaximum()
     {
-        var userProfile = CreateUserProfile();
-        var action = () => userProfile.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MaxAge + 1);
+        var user = CreateUser();
+        var action = () => user.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MaxAge + 1);
 
         action.Should().Throw<ValidationException>()
             .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotExceed);
     }
 
-    private static UserProfile CreateUserProfile()
+    private static User CreateUser()
     {
-        return new UserProfile
+        return new User
         {
             Id = Guid.NewGuid(),
             Email = "nhan@example.com",

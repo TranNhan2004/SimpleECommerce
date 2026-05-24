@@ -7,7 +7,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariant : Entity, ICreatedTrackable, IUpdatedTrackable
+public class ProductVariant : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<ProductVariantImage> _productVariantImages = [];
     private readonly List<ProductVariantPrice> _productVariantPrices = [];

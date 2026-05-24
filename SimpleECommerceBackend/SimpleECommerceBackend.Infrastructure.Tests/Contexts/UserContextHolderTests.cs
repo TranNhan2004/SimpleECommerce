@@ -2,7 +2,6 @@ using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Infrastructure.Contexts;
 
@@ -20,7 +19,6 @@ public class UserContextHolderTests
             {
                 User = CreatePrincipal(
                     new Claim("sub", userId.ToString()),
-                    new Claim("roles", "seller"),
                     new Claim("email", "seller@example.com")
                 )
             }
@@ -31,7 +29,6 @@ public class UserContextHolderTests
         var result = sut.GetUserContext();
 
         result.Id.Should().Be(userId);
-        result.Role.Should().Be(Role.Seller);
         result.Email.Should().Be("seller@example.com");
     }
 
@@ -45,7 +42,6 @@ public class UserContextHolderTests
             {
                 User = CreatePrincipal(
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    new Claim("roles", "seller"),
                     new Claim("email", "seller@example.com")
                 )
             }
@@ -56,12 +52,11 @@ public class UserContextHolderTests
         var result = sut.GetUserContext();
 
         result.Id.Should().Be(userId);
-        result.Role.Should().Be(Role.Seller);
         result.Email.Should().Be("seller@example.com");
     }
 
     [Fact]
-    public void GetRequired_ShouldReturnCurrentUserContext_WhenRoleIsInRealmAccessClaim()
+    public void GetRequired_ShouldReturnCurrentUserContext_WhenRoleClaimsAreAbsent()
     {
         var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var httpContextAccessor = new HttpContextAccessor
@@ -70,10 +65,6 @@ public class UserContextHolderTests
             {
                 User = CreatePrincipal(
                     new Claim("sub", userId.ToString()),
-                    new Claim(
-                        "realm_access",
-                        "{\"roles\":[\"offline_access\",\"admin\",\"default-roles-simpleecommerce\",\"uma_authorization\"]}"
-                    ),
                     new Claim("email", "admin@example.com")
                 )
             }
@@ -84,7 +75,6 @@ public class UserContextHolderTests
         var result = sut.GetUserContext();
 
         result.Id.Should().Be(userId);
-        result.Role.Should().Be(Role.Admin);
         result.Email.Should().Be("admin@example.com");
     }
 
@@ -105,22 +95,23 @@ public class UserContextHolderTests
     }
 
     [Fact]
-    public void GetRequired_ShouldThrowForbiddenException_WhenRoleClaimIsMissing()
+    public void GetRequired_ShouldReturnCurrentUserContext_WhenRoleClaimIsMissing()
     {
+        var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7();
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
             {
-                User = CreatePrincipal(new Claim("sub", SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7().ToString()))
+                User = CreatePrincipal(new Claim("sub", userId.ToString()))
             }
         };
 
         var sut = CreateSut(httpContextAccessor);
 
-        var action = () => sut.GetUserContext();
+        var result = sut.GetUserContext();
 
-        action.Should().Throw<ForbiddenException>()
-            .Which.ErrorCode.Should().Be(CurrentUserErrorCodes.RoleMissing);
+        result.Id.Should().Be(userId);
+        result.Email.Should().BeEmpty();
     }
 
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)

@@ -2,13 +2,14 @@ using System.Text.Json.Serialization;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Category : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public Category()
     {
@@ -143,7 +144,7 @@ public class Category : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Admin { get; private set; }
+    public User? Admin { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }

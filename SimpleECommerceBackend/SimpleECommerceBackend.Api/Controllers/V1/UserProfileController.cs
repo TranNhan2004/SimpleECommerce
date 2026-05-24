@@ -6,6 +6,7 @@ using SimpleECommerceBackend.Api.Dtos.Common.Errors;
 using SimpleECommerceBackend.Api.Dtos.V1.UserProfiles;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
+using SimpleECommerceBackend.Domain.Constants.Permissions;
 
 namespace SimpleECommerceBackend.Api.Controllers.V1;
 
@@ -41,7 +42,7 @@ public class UserProfileController : ControllerBase
 
     [HttpGet("me/info")]
     [Authorize]
-    [RequireActiveUser]
+    [AllowPermissions(PermissionCodes.UsersSelfRead)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMyProfileResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -59,7 +60,7 @@ public class UserProfileController : ControllerBase
 
     [HttpPut("me/info")]
     [Authorize]
-    [RequireActiveUser]
+    [AllowPermissions(PermissionCodes.UsersSelfUpdate)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateMyProfileResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -77,7 +78,7 @@ public class UserProfileController : ControllerBase
 
     [HttpDelete("me")]
     [Authorize]
-    [RequireActiveUser]
+    [AllowPermissions(PermissionCodes.UsersSelfDelete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

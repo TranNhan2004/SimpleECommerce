@@ -1,11 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
+public class SellerShop : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<SellerWarehouse> _sellerWarehouses = [];
 
@@ -51,7 +52,7 @@ public class SellerShop : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Seller { get; private set; }
+    public User? Seller { get; private set; }
 
     public string Name
     {

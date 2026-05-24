@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Http;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
@@ -59,39 +57,11 @@ public partial class UserContextHolder : IUserContextHolder
                 }
             );
 
-        if (!TryResolveRole(principal, out var role))
-            throw new ForbiddenException(
-                CurrentUserErrorCodes.RoleMissing,
-                "Current user role claim is missing or invalid.",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Role"
-                }
-            );
-
         var email = KeycloakPayloadExtractionHelper.FindEmail(principal) ?? string.Empty;
 
-        userContext = new UserContext(userId, email, role);
+        userContext = new UserContext(userId, email);
         return true;
     }
 
-    private static bool TryResolveRole(ClaimsPrincipal principal, out Role role)
-    {
-        foreach (var roleName in KeycloakPayloadExtractionHelper.GetRoleNames(principal))
-        {
-            try
-            {
-                role = EnumUtils.FromDisplayValue<Role>(roleName);
-                return true;
-            }
-            catch (ValidationException)
-            {
-            }
-        }
-
-        role = default;
-        return false;
-    }
-
-    private sealed record UserContext(Guid Id, string Email, Role Role) : IUserContext;
+    private sealed record UserContext(Guid Id, string Email) : IUserContext;
 }

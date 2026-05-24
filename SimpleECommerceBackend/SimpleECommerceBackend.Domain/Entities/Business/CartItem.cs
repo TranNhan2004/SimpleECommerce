@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class CartItem : Entity, ICreatedTrackable, IUpdatedTrackable
+public class CartItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public CartItem()
     {

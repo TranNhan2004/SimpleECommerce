@@ -50,7 +50,7 @@ internal static class EntityTestData
         };
     }
 
-    public static void AssignId(Entity entity, Guid id)
+    public static void AssignId(EntityBase entity, Guid id)
     {
         entity.Id = id;
     }

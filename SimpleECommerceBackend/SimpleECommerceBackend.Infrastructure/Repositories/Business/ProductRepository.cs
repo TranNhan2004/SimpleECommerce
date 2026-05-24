@@ -27,39 +27,56 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         var totalItems = await sortedQuery.CountAsync();
         var pagedProducts = sortedQuery.ApplyPaging(query);
 
-        var queryable = pagedProducts.Select(product => new ProductItemForCustomer
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            AverageRating = product.AverageRating,
-            TotalRatings = product.TotalRatings,
-            Category = new NavigationResult
+        var queryable = pagedProducts
+            .Select(product => new
             {
-                Id = product.CategoryId,
-                DisplayName = product.Category != null ? product.Category.Name : string.Empty
-            },
-            Seller = new NavigationResult
-            {
-                Id = product.SellerId,
-                DisplayName = product.Seller != null
+                product.Id,
+                product.Name,
+                product.Description,
+                product.AverageRating,
+                product.TotalRatings,
+                product.CategoryId,
+                CategoryName = product.Category != null ? product.Category.Name : string.Empty,
+                product.SellerId,
+                SellerDisplayName = product.Seller != null
                     ? product.Seller.FirstName + " " + product.Seller.LastName
-                    : string.Empty
-            },
-            DefaultImageUrl = product.ProductVariants
-                .OrderBy(variant => variant.CurrentPrice.Amount)
-                .ThenBy(variant => variant.Id)
-                .Select(variant => variant.DefaultImageUrl)
-                .First(),
-            TotalInStock = product.ProductVariants.Sum(variant => variant.TotalInStock),
-            Price = product.ProductVariants
-                .OrderBy(variant => variant.CurrentPrice.Amount)
-                .ThenBy(variant => variant.Id)
-                .Select(variant => variant.CurrentPrice)
-                .First(),
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
-        });
+                    : string.Empty,
+                LowestPricedVariant = product.ProductVariants
+                    .Where(variant => variant.Status == ProductInvariantStatus.Active)
+                    .OrderBy(variant => variant.CurrentPrice.Amount)
+                    .Select(variant => new
+                    {
+                        variant.DefaultImageUrl,
+                        variant.CurrentPrice
+                    })
+                    .First(),
+                TotalInStock = product.ProductVariants.Sum(variant => variant.TotalInStock),
+                product.CreatedAt,
+                product.UpdatedAt
+            })
+            .Select(product => new ProductItemForCustomer
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                AverageRating = product.AverageRating,
+                TotalRatings = product.TotalRatings,
+                Category = new NavigationResult
+                {
+                    Id = product.CategoryId,
+                    DisplayName = product.CategoryName
+                },
+                Seller = new NavigationResult
+                {
+                    Id = product.SellerId,
+                    DisplayName = product.SellerDisplayName
+                },
+                DefaultImageUrl = product.LowestPricedVariant.DefaultImageUrl,
+                TotalInStock = product.TotalInStock,
+                Price = product.LowestPricedVariant.CurrentPrice,
+                CreatedAt = product.CreatedAt,
+                UpdatedAt = product.UpdatedAt
+            });
 
         return new FilterResult<ProductItemForCustomer>
         {

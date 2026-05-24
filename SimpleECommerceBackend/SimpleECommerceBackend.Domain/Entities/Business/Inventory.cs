@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Inventory : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Inventory : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public Inventory()
     {

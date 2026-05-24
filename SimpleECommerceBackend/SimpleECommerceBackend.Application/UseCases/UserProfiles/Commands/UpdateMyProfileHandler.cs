@@ -10,17 +10,17 @@ public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, Up
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContextHolder _userContextHolder;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserService _userService;
 
     public UpdateMyProfileHandler(
         IUnitOfWork unitOfWork,
         IUserContextHolder userContextHolder,
-        IUserProfileService userProfileService
+        IUserService userService
     )
     {
         _unitOfWork = unitOfWork;
         _userContextHolder = userContextHolder;
-        _userProfileService = userProfileService;
+        _userService = userService;
     }
 
     public async Task<UpdateMyProfileResult> HandleAsync(
@@ -29,23 +29,23 @@ public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, Up
     )
     {
         var currentUser = _userContextHolder.GetUserContext();
-        var userProfile = await _userProfileService.GetByIdForUpdateAsync(currentUser.Id);
+        var user = await _userService.GetByIdForUpdateAsync(currentUser.Id);
 
-        userProfile.NickName = request.NickName;
+        user.NickName = request.NickName;
 
         if (request.FirstName is not null)
-            userProfile.FirstName = request.FirstName;
+            user.FirstName = request.FirstName;
         if (request.LastName is not null)
-            userProfile.LastName = request.LastName;
+            user.LastName = request.LastName;
         if (request.Sex.HasValue)
-            userProfile.Sex = request.Sex.Value;
+            user.Sex = request.Sex.Value;
         if (request.BirthDate.HasValue)
-            userProfile.BirthDate = request.BirthDate.Value;
+            user.BirthDate = request.BirthDate.Value;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateCacheAsync(
-            exactKeys: [UserProfileCacheKeys.GetProfileKey(userProfile.Id)]
+        await _userService.InvalidateCacheAsync(
+            exactKeys: [UserCacheKeys.GetProfileKey(user.Id)]
         );
-        return UpdateMyProfileResult.FromEntity(userProfile);
+        return UpdateMyProfileResult.FromEntity(user);
     }
 }

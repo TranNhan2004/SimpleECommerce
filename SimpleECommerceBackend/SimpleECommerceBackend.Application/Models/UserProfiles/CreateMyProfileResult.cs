@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
@@ -11,7 +11,7 @@ public class CreateMyProfileResult
     public Sex Sex { get; init; }
     public DateOnly BirthDate { get; init; }
 
-    public static CreateMyProfileResult FromEntity(UserProfile entity)
+    public static CreateMyProfileResult FromEntity(User entity)
     {
         return new CreateMyProfileResult
         {

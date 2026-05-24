@@ -7,7 +7,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Payment : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Payment : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     public Payment()
     {

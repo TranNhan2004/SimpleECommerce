@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SimpleECommerceBackend.Application.Interfaces.Contexts;
 
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Maintenance;
@@ -10,16 +11,19 @@ public sealed class HardDeleteBackgroundWorker : BackgroundService
     private readonly ILogger _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly TimeProvider _timeProvider;
+    private readonly IBackgroundJobContextAccessor _backgroundJobContextAccessor;
 
     public HardDeleteBackgroundWorker(
         IServiceScopeFactory serviceScopeFactory,
         TimeProvider timeProvider,
-        ILogger logger
+        ILogger logger,
+        IBackgroundJobContextAccessor backgroundJobContextAccessor
     )
     {
         _serviceScopeFactory = serviceScopeFactory;
         _timeProvider = timeProvider;
         _logger = logger;
+        _backgroundJobContextAccessor = backgroundJobContextAccessor;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -42,6 +46,7 @@ public sealed class HardDeleteBackgroundWorker : BackgroundService
 
             try
             {
+                using var backgroundJobScope = _backgroundJobContextAccessor.BeginScope(nameof(HardDeleteBackgroundWorker));
                 using var scope = _serviceScopeFactory.CreateScope();
                 var cleanupService = scope.ServiceProvider.GetRequiredService<HardDeleteCleanupService>();
 

@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerWarehouse : Entity, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
+public class SellerWarehouse : EntityBase, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
 {
     public SellerWarehouse()
     {

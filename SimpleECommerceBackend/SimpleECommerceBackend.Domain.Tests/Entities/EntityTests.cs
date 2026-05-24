@@ -28,5 +28,5 @@ public class EntityTests
             .Which.ErrorCode.Should().Be(EntityErrorCodes.EmptyId);
     }
 
-    private sealed class TestEntity : Entity;
+    private sealed class TestEntity : EntityBase;
 }

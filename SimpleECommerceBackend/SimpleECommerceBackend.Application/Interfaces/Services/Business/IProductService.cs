@@ -1,3 +1,4 @@
+using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Models.Products;
 using SimpleECommerceBackend.Domain.Entities.Business;
 

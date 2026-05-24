@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 
 namespace SimpleECommerceBackend.Application.Models.UserProfiles;
@@ -14,7 +14,7 @@ public class UpdateMyProfileResult
     public UserStatus Status { get; init; }
     public DateOnly BirthDate { get; init; }
 
-    public static UpdateMyProfileResult FromEntity(UserProfile entity)
+    public static UpdateMyProfileResult FromEntity(User entity)
     {
         return new UpdateMyProfileResult
         {

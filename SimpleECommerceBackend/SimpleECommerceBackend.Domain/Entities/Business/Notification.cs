@@ -1,11 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Notification : Entity, ICreatedTrackable
+public class Notification : EntityBase, ICreatedTrackable
 {
     public Notification()
     {
@@ -40,7 +41,7 @@ public class Notification : Entity, ICreatedTrackable
         }
     }
 
-    public UserProfile? User { get; private set; }
+    public User? User { get; private set; }
 
     public string Message
     {

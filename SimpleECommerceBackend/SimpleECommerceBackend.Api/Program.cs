@@ -18,7 +18,7 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddApplication();
     builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);
-    builder.Services.AddKeycloakPolicies();
+    builder.Services.AddApiAuthorization();
     builder.Services.AddCustomRateLimiter(builder.Configuration);
     builder.Services.AddControllers();
 
@@ -44,7 +44,7 @@ try
             // Header: Accept: application/json;ver=1.0
             new MediaTypeApiVersionReader("ver"),
 
-            // 4. URL segment (phổ biến nhất)
+            // 4. URL segment
             // GET /api/v1/products
             new UrlSegmentApiVersionReader()
         );
@@ -110,6 +110,9 @@ try
     app.UseRateLimiter();
 
     app.MapControllers().RequireRateLimiting("ip-route");
+    // var sqlStatements = Test.GenerateInsertStatements();
+    // Console.WriteLine($"Generated SQL Insert Statements: {sqlStatements.Count}");
+    // Test.SaveToFile(sqlStatements);
     await app.RunAsync();
 }
 catch (Exception exception)

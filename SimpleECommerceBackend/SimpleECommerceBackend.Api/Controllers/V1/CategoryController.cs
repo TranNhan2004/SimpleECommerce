@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using SimpleECommerceBackend.Api.Attributes;
-using SimpleECommerceBackend.Api.Authorization;
 using SimpleECommerceBackend.Api.Dtos.Common.Errors;
 using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Api.Dtos.V1.Categories;
+using SimpleECommerceBackend.Domain.Constants.Permissions;
 
 namespace SimpleECommerceBackend.Api.Controllers.V1;
 
@@ -25,7 +25,7 @@ public class CategoryController : ControllerBase
 
     [HttpPost("get-all")]
     [Authorize]
-    [RequireActiveUser]
+    [AllowPermissions(PermissionCodes.CategoriesRead)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -42,8 +42,8 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost("get-all/for-admin")]
-    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [RequireActiveUser]
+    [Authorize]
+    [AllowPermissions(PermissionCodes.CategoriesReadAdmin)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -61,7 +61,7 @@ public class CategoryController : ControllerBase
 
     [HttpPost("{id}")]
     [Authorize]
-    [RequireActiveUser]
+    [AllowPermissions(PermissionCodes.CategoriesRead)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -77,8 +77,8 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet("{id}/for-admin")]
-    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [RequireActiveUser]
+    [Authorize]
+    [AllowPermissions(PermissionCodes.CategoriesReadAdmin)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCategoryForAdminResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -95,8 +95,8 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost("for-admin")]
-    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [RequireActiveUser]
+    [Authorize]
+    [AllowPermissions(PermissionCodes.CategoriesCreate)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -112,8 +112,8 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPut("for-admin")]
-    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [RequireActiveUser]
+    [Authorize]
+    [AllowPermissions(PermissionCodes.CategoriesUpdate)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateCategoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -129,8 +129,8 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete("{id}/for-admin")]
-    [Authorize(Policy = AuthorizationPolicies.RequireAdminRole)]
-    [RequireActiveUser]
+    [Authorize]
+    [AllowPermissions(PermissionCodes.CategoriesDelete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

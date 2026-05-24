@@ -1,12 +1,13 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
+public class Product : EntityBase, ICreatedTrackable, IUpdatedTrackable
 {
     private readonly List<ProductVariant> _productVariants = [];
     private readonly List<Review> _reviews = [];
@@ -124,7 +125,7 @@ public class Product : Entity, ICreatedTrackable, IUpdatedTrackable
         }
     }
 
-    public UserProfile? Seller { get; set; }
+    public User? Seller { get; set; }
 
     public double AverageRating
     {

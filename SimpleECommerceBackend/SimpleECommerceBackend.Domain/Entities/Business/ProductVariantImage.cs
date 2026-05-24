@@ -5,7 +5,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariantImage : Entity, ICreatedTrackable
+public class ProductVariantImage : EntityBase, ICreatedTrackable
 {
     public ProductVariantImage()
     {

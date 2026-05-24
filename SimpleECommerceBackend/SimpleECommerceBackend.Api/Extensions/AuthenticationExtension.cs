@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Infrastructure.Extensions;
 using SimpleECommerceBackend.Infrastructure.Options.Authentication;
 
@@ -29,27 +28,7 @@ public static class AuthenticationExtension
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidAudiences = [keycloakOptions.Resource],
-                    NameClaimType = "preferred_username",
-                    RoleClaimType = ClaimTypes.Role
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = context =>
-                    {
-                        if (context.Principal?.Identity is not ClaimsIdentity identity)
-                            return Task.CompletedTask;
-
-                        foreach (var roleName in KeycloakPayloadExtractionHelper.GetRoleNames(identity))
-                        {
-                            if (!identity.HasClaim(ClaimTypes.Role, roleName))
-                                identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
-
-                            if (!identity.HasClaim("roles", roleName))
-                                identity.AddClaim(new Claim("roles", roleName));
-                        }
-
-                        return Task.CompletedTask;
-                    }
+                    NameClaimType = "preferred_username"
                 };
             });
 

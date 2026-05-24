@@ -1,11 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ReviewResponse : Entity, ICreatedTrackable
+public class ReviewResponse : EntityBase, ICreatedTrackable
 {
     public ReviewResponse()
     {
@@ -56,7 +57,7 @@ public class ReviewResponse : Entity, ICreatedTrackable
         }
     }
 
-    public UserProfile? FromUser { get; private set; }
+    public User? FromUser { get; private set; }
 
     public Guid ToUserId
     {
@@ -77,7 +78,7 @@ public class ReviewResponse : Entity, ICreatedTrackable
         }
     }
 
-    public UserProfile? ToUser { get; private set; }
+    public User? ToUser { get; private set; }
 
     public string Comment
     {

@@ -3,6 +3,7 @@ using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
+using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.Uam;
 using SimpleECommerceBackend.Domain.Entities.Uam;
@@ -10,7 +11,7 @@ using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
-namespace SimpleECommerceBackend.Application.Models.UserProfiles;
+namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, CreateMyProfileResult>
 {

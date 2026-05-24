@@ -55,7 +55,7 @@ public class CategoryController : ControllerBase
     {
         var query = GetAllCategoriesRequestForAdmin.ToQuery(request);
         var result = await _dispatcher.SendAsync<GetAllCategoriesQueryForAdmin, GetAllCategoriesResultForAdmin>(query, cancellationToken);
-        var response = SimpleECommerceBackend.Api.Dtos.V1.Categories.GetAllCategoriesForAdminResponse.FromResult(result);
+        var response = GetAllCategoriesForAdminResponse.FromResult(result);
         return Ok(response);
     }
 

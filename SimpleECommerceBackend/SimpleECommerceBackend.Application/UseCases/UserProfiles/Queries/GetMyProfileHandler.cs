@@ -2,9 +2,10 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
+
 namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Queries;
 
-public partial class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, GetMyProfileResult>
+public class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, GetMyProfileResult>
 {
     private readonly IUserContextHolder _userContextHolder;
     private readonly IUserService _userService;

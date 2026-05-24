@@ -18,20 +18,19 @@ public sealed class AllowPermissionsAttribute : TypeFilterAttribute
 
 internal sealed class AllowPermissionsFilter : IAsyncActionFilter
 {
-    private readonly IUseCaseDispatcher _useCaseDispatcher;
+    private readonly IUseCaseDispatcher _dispatcher;
     private readonly IReadOnlyList<string> _permissions;
 
     public AllowPermissionsFilter(
-        IUseCaseDispatcher useCaseDispatcher,
+        IUseCaseDispatcher dispatcher,
         string[] permissions
     )
     {
-        _useCaseDispatcher = useCaseDispatcher;
-        _permissions = permissions
+        _dispatcher = dispatcher;
+        _permissions = [..permissions
             .Where(permission => !string.IsNullOrWhiteSpace(permission))
             .Select(permission => permission.Trim())
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+            .Distinct(StringComparer.OrdinalIgnoreCase)];
     }
 
     public async Task OnActionExecutionAsync(
@@ -45,7 +44,7 @@ internal sealed class AllowPermissionsFilter : IAsyncActionFilter
             return;
         }
 
-        var result = await _useCaseDispatcher.SendAsync<GetMyPermissionsQuery, GetMyPermissionsResult>(
+        var result = await _dispatcher.SendAsync<GetMyPermissionsQuery, GetMyPermissionsResult>(
             new GetMyPermissionsQuery(),
             context.HttpContext.RequestAborted
         );

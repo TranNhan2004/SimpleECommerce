@@ -2,9 +2,10 @@ using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
+using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
-namespace SimpleECommerceBackend.Application.Models.UserProfiles;
+namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
 {

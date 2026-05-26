@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 
 namespace SimpleECommerceBackend.Application.Interfaces.Repositories;

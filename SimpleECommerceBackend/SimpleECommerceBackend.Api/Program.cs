@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
 using Serilog;
+using SimpleECommerceBackend.Api;
 using SimpleECommerceBackend.Api.Extensions;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;

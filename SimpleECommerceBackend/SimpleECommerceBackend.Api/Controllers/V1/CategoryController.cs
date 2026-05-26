@@ -25,7 +25,7 @@ public class CategoryController : ControllerBase
 
     [HttpPost("get-all")]
     [Authorize]
-    [AllowPermissions(PermissionCodes.CategoriesRead)]
+    [AllowPermissions(PermissionCodes.CategoriesRead, PermissionCodes.CategoriesReadAdmin)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

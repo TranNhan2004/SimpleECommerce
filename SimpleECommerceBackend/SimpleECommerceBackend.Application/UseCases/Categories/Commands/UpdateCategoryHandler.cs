@@ -12,12 +12,12 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
 public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, UpdateCategoryResult>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateCategoryHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         ICategoryService categoryService,
         IUnitOfWork unitOfWork
     )

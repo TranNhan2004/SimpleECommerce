@@ -59,7 +59,7 @@ public class CategoryController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("{id}")]
+    [HttpGet("{id}")]
     [Authorize]
     [AllowPermissions(PermissionCodes.CategoriesRead)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCategoryResponse))]

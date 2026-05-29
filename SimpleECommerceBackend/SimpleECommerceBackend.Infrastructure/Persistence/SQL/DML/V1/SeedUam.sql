@@ -48,8 +48,8 @@ VALUES ('019e62f1-bbfd-750d-943f-6899db79d0cf', N'categories.delete', N'Categori
 GO
 
 -- Admin user from Keycloak account
-INSERT INTO [uam].[Users] ([Id], [Email], [FirstName], [LastName], [NickName], [Sex], [Status], [BirthDate], [AvatarUrl], [CreatedAt], [UpdatedAt])
-VALUES ('019e62f1-bbfe-74fe-91f2-c920ddb69ff8', N'admin@test.com', N'Admin', N'User', N'admin@test.com', 3, 1, '1990-01-01', NULL, '2026-05-26T06:21:10+00:00', NULL);
+INSERT INTO [uam].[Users] ([Id], [KeycloakSubjectId], [Email], [FirstName], [LastName], [NickName], [Sex], [Status], [BirthDate], [AvatarUrl], [CreatedAt], [UpdatedAt])
+VALUES ('019e62f1-bbfe-74fe-91f2-c920ddb69ff8', '313ce163-e7f6-4243-99de-e7816b5ccabd', N'admin@test.com', N'Admin', N'User', N'admin@test.com', 3, 1, '1990-01-01', NULL, '2026-05-26T06:21:10+00:00', NULL);
 GO
 
 -- User roles

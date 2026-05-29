@@ -38,16 +38,13 @@ public class UserService : ServiceBase, IUserService
                 $"User with Id = {id} not found."
             );
 
-        var cacheKey = UserCacheKeys.GetProfileKey(id);
+        var cacheKey = UserCacheKeys.GetUserByIdKey(id);
         var cachedUser = await CacheService.GetAsync<User>(cacheKey);
 
         if (cachedUser is not null)
         {
-            _logger.Debug("Cache hit for user {CacheKey}", cacheKey);
             return cachedUser;
         }
-
-        _logger.Debug("Cache miss for user {CacheKey}", cacheKey);
 
         var user = await _userRepository.FindByIdAsync(id)
                    ?? throw new ResourceNotFoundException(
@@ -58,7 +55,7 @@ public class UserService : ServiceBase, IUserService
         await CacheService.SetAsync(
             cacheKey,
             user,
-            TimeSpan.FromMinutes(UserCacheKeys.GetProfileTtlMinutes)
+            TimeSpan.FromMinutes(UserCacheKeys.GetUserByIdTtlMinutes)
         );
 
         return user;
@@ -71,6 +68,49 @@ public class UserService : ServiceBase, IUserService
                    UserProfileErrorCodes.NotFoundById,
                    $"User with Id = {id} not found."
                );
+    }
+
+    public async Task<Guid> GetIdByKeycloakSubjectIdAsync(Guid keycloakSubjectId)
+    {
+        if (keycloakSubjectId == Guid.Empty)
+            throw new ResourceNotFoundException(
+                UserProfileErrorCodes.NotFoundById,
+                $"User with Keycloak Subject Id = {keycloakSubjectId} not found."
+            );
+
+        var cacheKey = UserCacheKeys.GetUserByKeycloakSubjectIdKey(keycloakSubjectId);
+        var cachedUserId = await CacheService.GetAsync<string>(cacheKey);
+
+        if (cachedUserId is not null)
+        {
+            try
+            {
+                return Guid.Parse(cachedUserId);
+            }
+            catch (FormatException ex)
+            {
+                _logger.Error(ex, "Cached user id for Keycloak Subject Id = {KeycloakSubjectId} is invalid: {CachedUserId}", keycloakSubjectId, cachedUserId);
+                await CacheService.RemoveAsync(cacheKey);
+                throw new ResourceNotFoundException(
+                    UserProfileErrorCodes.NotFoundByKeycloakSubjectId,
+                    $"User with Keycloak Subject Id = {keycloakSubjectId} not found."
+                );
+            }
+        }
+
+        var userId = await _userRepository.FindIdByKeycloakSubjectIdAsync(keycloakSubjectId)
+                   ?? throw new ResourceNotFoundException(
+                       UserProfileErrorCodes.NotFoundByKeycloakSubjectId,
+                       $"User with Keycloak Subject Id = {keycloakSubjectId} not found."
+                   );
+
+        await CacheService.SetAsync(
+            cacheKey,
+            userId.ToString(),
+            TimeSpan.FromMinutes(UserCacheKeys.GetUserByKeycloakSubjectIdTtlMinutes)
+        );
+
+        return userId;
     }
 
     public async Task<bool> IsActiveUserAsync(Guid id)

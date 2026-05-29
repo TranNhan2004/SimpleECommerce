@@ -114,7 +114,7 @@ try
     // var sqlStatements = Test.GenerateInsertStatements();
     // Console.WriteLine($"Generated SQL Insert Statements: {sqlStatements.Count}");
     // Test.SaveToFile(sqlStatements);
-    await app.RunAsync();
+    app.Run();
 }
 catch (Exception exception)
 {

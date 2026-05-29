@@ -10,12 +10,12 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
 
     public UpdateMyProfileHandler(
         IUnitOfWork unitOfWork,
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IUserService userService
     )
     {
@@ -45,7 +45,7 @@ public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, Up
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userService.InvalidateCacheAsync(
-            exactKeys: [UserCacheKeys.GetProfileKey(user.Id)]
+            exactKeys: [UserCacheKeys.GetUserByIdKey(user.Id)]
         );
         return UpdateMyProfileResult.FromEntity(user);
     }

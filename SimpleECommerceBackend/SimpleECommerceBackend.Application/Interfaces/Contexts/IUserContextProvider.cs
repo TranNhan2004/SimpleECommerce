@@ -2,7 +2,7 @@ using SimpleECommerceBackend.Application.Interfaces.Security;
 
 namespace SimpleECommerceBackend.Application.Interfaces.Contexts;
 
-public interface IUserContextHolder
+public interface ICurrentUserContextProvider
 {
-    IUserContext GetUserContext();
+    ICurrentUserContext GetUserContext();
 }

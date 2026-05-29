@@ -71,16 +71,16 @@ public static class DependencyInjection
         services.AddHostedService<EmailBackgroundWorker>();
 
         // Hard delete
-        services.AddScoped<HardDeleteCleanupService>();
-        services.AddHostedService<HardDeleteBackgroundWorker>();
-        services.AddSingleton(TimeProvider.System);
+        // services.AddScoped<HardDeleteCleanupService>();
+        // services.AddHostedService<HardDeleteBackgroundWorker>();
+        // services.AddSingleton(TimeProvider.System);
 
         // Address Services
         services.AddSingleton<IAddressService, VnAddressService>();
 
         // Request User Context
         services.AddHttpContextAccessor();
-        services.AddScoped<IUserContextHolder, UserContextHolder>();
+        services.AddScoped<ICurrentUserContextProvider, CurrentUserContextProvider>();
         services.AddSingleton<IBackgroundJobContextAccessor, BackgroundJobContextAccessor>();
         services.AddSingleton<IServerIpAddressResolver, ServerIpAddressResolver>();
         services.AddScoped<ICurrentRequestContext, CurrentRequestContext>();

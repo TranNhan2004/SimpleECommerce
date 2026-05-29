@@ -11,12 +11,12 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
 public class DeleteCategoryHandler : IUseCaseHandler<DeleteCategoryCommand>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteCategoryHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         ICategoryService categoryService,
         IUnitOfWork unitOfWork
     )

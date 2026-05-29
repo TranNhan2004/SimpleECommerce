@@ -48,9 +48,21 @@ public abstract class ServiceBase : ICacheConsumingService
             }
         }
 
+        // Run prefix invalidation in background to avoid blocking the request
+        // (RemoveByPrefixAsync can be expensive for large keyspaces).
         foreach (var prefix in prefixSet)
         {
-            await CacheService.RemoveByPrefixAsync(prefix);
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await CacheService.RemoveByPrefixAsync(prefix);
+                }
+                catch
+                {
+                    // Swallow exceptions to keep the request path resilient.
+                }
+            });
         }
     }
 

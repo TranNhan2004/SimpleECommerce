@@ -7,11 +7,11 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Queries;
 
 public class GetMyProfileHandler : IUseCaseHandler<GetMyProfileQuery, GetMyProfileResult>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
 
     public GetMyProfileHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IUserService userService
     )
     {

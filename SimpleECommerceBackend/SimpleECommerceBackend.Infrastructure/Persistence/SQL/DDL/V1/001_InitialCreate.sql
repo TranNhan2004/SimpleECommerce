@@ -13,6 +13,7 @@ GO
 CREATE TABLE [uam].[Users]
 (
     [Id] uniqueidentifier NOT NULL,
+    [KeycloakSubjectId] uniqueidentifier NOT NULL,
     [Email] nvarchar(450) NOT NULL,
     [FirstName] nvarchar(64) NOT NULL,
     [LastName] nvarchar(128) NOT NULL,
@@ -25,6 +26,10 @@ CREATE TABLE [uam].[Users]
     [UpdatedAt] datetimeoffset NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
 );
+GO
+
+CREATE UNIQUE INDEX [IX_Users_KeycloakSubjectId]
+    ON [uam].[Users] ([KeycloakSubjectId]);
 GO
 
 CREATE UNIQUE INDEX [IX_Users_Email]

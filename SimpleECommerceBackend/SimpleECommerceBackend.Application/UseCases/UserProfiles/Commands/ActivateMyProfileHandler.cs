@@ -9,12 +9,12 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class ActivateMyProfileHandler : IUseCaseHandler<ActivateMyProfileCommand>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
     private readonly IUnitOfWork _unitOfWork;
 
     public ActivateMyProfileHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IUserService userService,
         IUnitOfWork unitOfWork
     )
@@ -36,7 +36,7 @@ public class ActivateMyProfileHandler : IUseCaseHandler<ActivateMyProfileCommand
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userService.InvalidateCacheAsync(
-            exactKeys: [UserCacheKeys.GetProfileKey(user.Id), PermissionCacheKeys.GetPermissionSetKey(user.Id)]
+            exactKeys: [UserCacheKeys.GetUserByIdKey(user.Id), PermissionCacheKeys.GetPermissionSetKey(user.Id)]
         );
     }
 }

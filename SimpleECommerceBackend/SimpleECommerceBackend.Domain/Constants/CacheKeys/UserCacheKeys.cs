@@ -2,11 +2,19 @@ namespace SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 public static class UserCacheKeys
 {
-    public const string GetProfile = "User:{id}";
-    public const int GetProfileTtlMinutes = 30;
+    public const string GetUserByKeycloakSubjectId = "User:{keycloakSubjectId}";
+    public const int GetUserByKeycloakSubjectIdTtlMinutes = 864_000;
 
-    public static string GetProfileKey(Guid id)
+    public const string GetUserById = "User:{id}";
+    public const int GetUserByIdTtlMinutes = 30;
+
+    public static string GetUserByKeycloakSubjectIdKey(Guid keycloakSubjectId)
     {
-        return GetProfile.Replace("{id}", id.ToString());
+        return GetUserByKeycloakSubjectId.Replace("{keycloakSubjectId}", keycloakSubjectId.ToString());
+    }
+
+    public static string GetUserByIdKey(Guid id)
+    {
+        return GetUserById.Replace("{id}", id.ToString());
     }
 }

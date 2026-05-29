@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Infrastructure.Persistence;
@@ -8,5 +9,13 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 {
     public UserRepository(AppDbContext appDbContext) : base(appDbContext)
     {
+    }
+
+    public async Task<Guid?> FindIdByKeycloakSubjectIdAsync(Guid keycloakSubjectId)
+    {
+        return await DbContext.Set<User>()
+            .Where(u => u.KeycloakSubjectId == keycloakSubjectId)
+            .Select(u => (Guid?)u.Id)
+            .FirstOrDefaultAsync();
     }
 }

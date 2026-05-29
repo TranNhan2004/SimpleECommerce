@@ -5,7 +5,7 @@ namespace SimpleECommerceBackend.Application.Interfaces.Contexts;
 
 public static class KeycloakPayloadExtractionHelper
 {
-    public static string? FindUserId(ClaimsPrincipal principal)
+    public static string? FindKeycloakSubjectId(ClaimsPrincipal principal)
     {
         return FindFirstValue(principal.Claims, "sub", ClaimTypes.NameIdentifier);
     }

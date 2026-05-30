@@ -12,6 +12,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable("Users", DbSchemas.Uam);
 
+        builder.Property(u => u.KeycloakSubjectId)
+            .IsRequired();
+
         builder.Property(u => u.Email)
             .IsRequired();
 
@@ -31,6 +34,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Status).IsRequired();
         builder.Property(u => u.BirthDate).HasDefaultValue(null);
         builder.Property(u => u.AvatarUrl).HasDefaultValue(null);
+
+        builder.HasIndex(u => u.KeycloakSubjectId)
+            .IsUnique();
 
         builder.HasIndex(u => u.Email)
             .IsUnique()

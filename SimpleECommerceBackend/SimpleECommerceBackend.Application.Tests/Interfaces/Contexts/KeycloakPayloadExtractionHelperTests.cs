@@ -12,7 +12,7 @@ public class KeycloakPayloadExtractionHelperTests
         var userId = SimpleECommerceBackend.Domain.Utils.UuidUtils.CreateV7().ToString();
         var principal = CreatePrincipal(new Claim(ClaimTypes.NameIdentifier, userId));
 
-        var result = KeycloakPayloadExtractionHelper.FindUserId(principal);
+        var result = KeycloakPayloadExtractionHelper.FindKeycloakSubjectId(principal);
 
         result.Should().Be(userId);
     }

@@ -2,6 +2,7 @@ namespace SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 
 public static class UserProfileErrorCodes
 {
+    public const string KeycloakSubjectIdInvalid = "UserProfile_KeycloakSubjectIdInvalid";
     public const string FirstNameRequired = "UserProfile_FirstNameRequired";
     public const string FirstNameMaxLengthExceeded = "UserProfile_FirstNameMaxLengthExceeded";
     public const string LastNameRequired = "UserProfile_LastNameRequired";
@@ -15,4 +16,5 @@ public static class UserProfileErrorCodes
     public const string ActivateNotAllowed = "UserProfile_ActivateNotAllowed";
     public const string InactiveUser = "UserProfile_InactiveUser";
     public const string NotFoundById = "UserProfile_NotFoundById";
+    public const string NotFoundByKeycloakSubjectId = "UserProfile_NotFoundByKeycloakSubjectId";
 }

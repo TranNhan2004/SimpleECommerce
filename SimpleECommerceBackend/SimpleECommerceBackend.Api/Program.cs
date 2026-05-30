@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi;
 using Serilog;
+using SimpleECommerceBackend.Api;
 using SimpleECommerceBackend.Api.Extensions;
 using SimpleECommerceBackend.Application;
 using SimpleECommerceBackend.Infrastructure;
@@ -113,7 +114,7 @@ try
     // var sqlStatements = Test.GenerateInsertStatements();
     // Console.WriteLine($"Generated SQL Insert Statements: {sqlStatements.Count}");
     // Test.SaveToFile(sqlStatements);
-    await app.RunAsync();
+    app.Run();
 }
 catch (Exception exception)
 {

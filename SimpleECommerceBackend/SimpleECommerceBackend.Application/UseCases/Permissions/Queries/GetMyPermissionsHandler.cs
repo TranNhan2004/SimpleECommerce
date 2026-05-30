@@ -7,11 +7,11 @@ namespace SimpleECommerceBackend.Application.UseCases.Permissions.Queries;
 
 public class GetMyPermissionsHandler : IUseCaseHandler<GetMyPermissionsQuery, GetMyPermissionsResult>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IPermissionService _permissionService;
 
     public GetMyPermissionsHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IPermissionService permissionService
     )
     {

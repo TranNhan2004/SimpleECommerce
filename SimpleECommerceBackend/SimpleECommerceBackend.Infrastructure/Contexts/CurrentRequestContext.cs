@@ -2,22 +2,26 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
-public sealed class CurrentRequestContext : ICurrentRequestContext
+public class CurrentRequestContext : ICurrentRequestContext
 {
     private const string AnonymousUserId = "anonymous";
+    private readonly IUserService _userService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IBackgroundJobContextAccessor _backgroundJobContextAccessor;
     private readonly IServerIpAddressResolver _serverIpAddressResolver;
 
     public CurrentRequestContext(
+        IUserService userService,
         IHttpContextAccessor httpContextAccessor,
         IBackgroundJobContextAccessor backgroundJobContextAccessor,
         IServerIpAddressResolver serverIpAddressResolver
     )
     {
+        _userService = userService;
         _httpContextAccessor = httpContextAccessor;
         _backgroundJobContextAccessor = backgroundJobContextAccessor;
         _serverIpAddressResolver = serverIpAddressResolver;
@@ -61,16 +65,18 @@ public sealed class CurrentRequestContext : ICurrentRequestContext
         }
     }
 
-    private static string ResolveRequestUserId(HttpContext httpContext)
+    private string ResolveRequestUserId(HttpContext httpContext)
     {
         var principal = httpContext.User;
         if (principal?.Identity?.IsAuthenticated != true)
             return AnonymousUserId;
 
-        return KeycloakPayloadExtractionHelper.FindUserId(principal) ?? AnonymousUserId;
+        var keycloakSubjectId = KeycloakPayloadExtractionHelper.FindKeycloakSubjectId(principal);
+        var userId = _userService.GetIdByKeycloakSubjectIdAsync(Guid.Parse(keycloakSubjectId!)).GetAwaiter().GetResult().ToString();
+        return userId ?? AnonymousUserId;
     }
 
-    private static string? ResolveRequestIpAddress(HttpContext httpContext)
+    private string? ResolveRequestIpAddress(HttpContext httpContext)
     {
         if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out StringValues forwardedForValues))
         {

@@ -9,12 +9,12 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCommand>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteMyProfileHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IUserService userService,
         IUnitOfWork unitOfWork
     )
@@ -36,7 +36,7 @@ public class DeleteMyProfileHandler : IUseCaseHandler<DeleteMyProfileCommand>
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _userService.InvalidateCacheAsync(
-            exactKeys: [UserCacheKeys.GetProfileKey(user.Id), PermissionCacheKeys.GetPermissionSetKey(user.Id)]
+            exactKeys: [UserCacheKeys.GetUserByIdKey(user.Id), PermissionCacheKeys.GetPermissionSetKey(user.Id)]
         );
     }
 }

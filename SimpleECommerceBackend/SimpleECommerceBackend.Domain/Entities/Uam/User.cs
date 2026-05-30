@@ -13,6 +13,7 @@ public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
     {
     }
 
+    private Guid _keycloakSubjectId;
     private string _email = null!;
     private string _firstName = null!;
     private string _lastName = null!;
@@ -21,6 +22,25 @@ public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
     private UserStatus _status;
     private DateOnly _birthDate;
     private string? _avatarUrl;
+
+    public Guid KeycloakSubjectId
+    {
+        get => _keycloakSubjectId;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    UserProfileErrorCodes.KeycloakSubjectIdInvalid,
+                    "Keycloak subject id is invalid",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "KeycloakSubjectId"
+                    }
+                );
+
+            _keycloakSubjectId = value;
+        }
+    }
 
     public string Email
     {

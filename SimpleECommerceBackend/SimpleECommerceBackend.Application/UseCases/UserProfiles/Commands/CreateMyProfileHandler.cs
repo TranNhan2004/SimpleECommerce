@@ -15,14 +15,14 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, CreateMyProfileResult>
 {
-    private readonly IUserContextHolder _userContextHolder;
+    private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
     private readonly IRoleRepository _roleRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateMyProfileHandler(
-        IUserContextHolder userContextHolder,
+        ICurrentUserContextProvider userContextHolder,
         IUserService userService,
         IRoleRepository roleRepository,
         IUserRoleRepository userRoleRepository,
@@ -46,6 +46,7 @@ public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, Cr
         var user = new User
         {
             Id = userContext.Id,
+            KeycloakSubjectId = userContext.KeycloakSubjectId,
             FirstName = request.FirstName,
             LastName = request.LastName,
             NickName = request.NickName,

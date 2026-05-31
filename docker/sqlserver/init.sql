@@ -1,0 +1,3 @@
+IF DB_ID(N'SimpleECommerce') IS NULL BEGIN CREATE DATABASE [SimpleECommerce];
+END;
+GO

@@ -176,6 +176,7 @@ CREATE TABLE [business].[Products]
     [Description] nvarchar(2048) NOT NULL,
     [AverageRating] decimal(3,2) NOT NULL,
     [TotalRatings] int NOT NULL,
+    [Status] INT NOT NULL DEFAULT 2,
     [CategoryId] uniqueidentifier NOT NULL,
     [SellerId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,

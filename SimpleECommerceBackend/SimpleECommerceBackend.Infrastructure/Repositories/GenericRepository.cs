@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Repositories;
 

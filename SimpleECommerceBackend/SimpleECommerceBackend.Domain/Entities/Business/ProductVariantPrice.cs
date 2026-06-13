@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariantPrice : EntityBase, ICreatedTrackable
+public class ProductVariantPrice : EntityBase
 {
     public ProductVariantPrice()
     {
@@ -60,6 +59,4 @@ public class ProductVariantPrice : EntityBase, ICreatedTrackable
         get => _effectiveFrom;
         set => _effectiveFrom = value;
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
 }

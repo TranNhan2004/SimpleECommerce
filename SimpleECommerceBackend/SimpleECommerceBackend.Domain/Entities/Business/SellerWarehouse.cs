@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerWarehouse : EntityBase, ICreatedTrackable, IUpdatedTrackable, ISoftDeleteTrackable
+public class SellerWarehouse : EntityBase
 {
     public SellerWarehouse()
     {
@@ -50,28 +49,4 @@ public class SellerWarehouse : EntityBase, ICreatedTrackable, IUpdatedTrackable,
     }
 
     public SellerShop? SellerShop { get; private set; }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public bool IsDeleted { get; private set; }
-    public DateTimeOffset? DeletedAt { get; private set; }
-
-    public void SoftDelete()
-    {
-        if (IsDeleted)
-            throw new ValidationException(
-                SellerWarehouseErrorCodes.AlreadyDeleted,
-                "Warehouse is already deleted",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Warehouse"
-                }
-            );
-
-        IsDeleted = true;
-        DeletedAt = DateTimeOffset.UtcNow;
-    }
-
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
 }

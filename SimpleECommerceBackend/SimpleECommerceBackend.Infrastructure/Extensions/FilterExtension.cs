@@ -60,8 +60,11 @@ public static class FilterExtension
         where TEntity : class
         where TResult : class
     {
+        Console.WriteLine($"FilterExtension: building query for {typeof(TEntity).Name}, criteria={filterQuery.FilterCriteria?.Count ?? 0}, sorts={filterQuery.SortFields?.Count ?? 0}");
         var mappedQuery = query.ApplyFiltering(filterQuery);
+        Console.WriteLine($"FilterExtension: filtering done for {typeof(TEntity).Name}");
         mappedQuery = mappedQuery.ApplySorting(filterQuery);
+        Console.WriteLine($"FilterExtension: sorting done for {typeof(TEntity).Name}");
 
         return await PaginationExpression.ToFilterResultAsync(
             mappedQuery,
@@ -843,11 +846,16 @@ public static class FilterExtension
             where TEntity : class
             where TResult : class
         {
+            Console.WriteLine($"FilterExtension: counting rows for {typeof(TEntity).Name}");
             var totalItems = await query.CountAsync(cancellationToken);
+            Console.WriteLine($"FilterExtension: count finished for {typeof(TEntity).Name} = {totalItems}");
+
+            Console.WriteLine($"FilterExtension: materializing page for {typeof(TEntity).Name}");
             var items = await query
                 .ApplyPaging(filterQuery)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
+            Console.WriteLine($"FilterExtension: materialization finished for {typeof(TEntity).Name}, items={items.Count}");
 
             return new FilterResult<TResult>
             {

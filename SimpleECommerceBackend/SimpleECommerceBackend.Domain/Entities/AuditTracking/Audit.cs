@@ -1,14 +1,16 @@
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.AuditTracking;
 
-public class Audit : EntityBase
+public class Audit : IEntity
 {
     public Audit()
     {
     }
 
+    private Guid _id;
     private string _entityName = null!;
     private Guid _entityId;
     private AuditOperationType _operationType;
@@ -17,7 +19,26 @@ public class Audit : EntityBase
     private string? _oldValues;
     private string? _newValues;
     private DateTimeOffset _auditedAt;
-    private string _auditedBy = null!;
+    private Guid _auditedById;
+
+    public Guid Id
+    {
+        get => _id;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    EntityErrorCodes.EmptyId,
+                    "Id cannot be empty.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "Id"
+                    }
+                );
+
+            _id = value;
+        }
+    }
 
     public string EntityName
     {
@@ -67,9 +88,22 @@ public class Audit : EntityBase
         set => _auditedAt = value;
     }
 
-    public string AuditedBy
+    public Guid AuditedById
     {
-        get => _auditedBy;
-        set => _auditedBy = value ?? throw new ArgumentNullException(nameof(AuditedBy));
+        get => _auditedById;
+        set
+        {
+            if (value == Guid.Empty)
+                throw new ValidationException(
+                    AuditErrorCodes.EmptyAuditById,
+                    "AuditedById cannot be empty.",
+                    new Dictionary<string, object?>
+                    {
+                        ["field"] = "AuditedById"
+                    }
+                );
+
+            _auditedById = value;
+        }
     }
 }

@@ -1,12 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Notification : EntityBase, ICreatedTrackable
+public class Notification : EntityBase
 {
     public Notification()
     {
@@ -76,9 +75,6 @@ public class Notification : EntityBase, ICreatedTrackable
     }
 
     public bool IsRead { get; private set; }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-
     public void MarkAsRead()
     {
         if (IsRead)

@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class CartItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class CartItem : EntityBase
 {
     public CartItem()
     {
@@ -86,10 +85,6 @@ public class CartItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
             _quantity = value;
         }
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
     public void IncreaseQuantity(int amount)
     {
         if (amount <= 0)

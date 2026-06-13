@@ -1,13 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Product : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Product : EntityBase
 {
     private readonly List<ProductVariant> _productVariants = [];
     private readonly List<Review> _reviews = [];
@@ -171,9 +170,6 @@ public class Product : EntityBase, ICreatedTrackable, IUpdatedTrackable
 
     public IReadOnlyCollection<ProductVariant> ProductVariants => _productVariants;
     public IReadOnlyCollection<Review> Reviews => _reviews;
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? UpdatedAt { get; set; }
-
     public void AddVariant(ProductVariant variant)
     {
         _productVariants.Add(variant);

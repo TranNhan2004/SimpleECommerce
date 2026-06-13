@@ -1,6 +1,7 @@
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities;
 using SimpleECommerceBackend.Domain.Entities.AuditTracking;
 using SimpleECommerceBackend.Domain.Entities.Business;
 using SimpleECommerceBackend.Domain.Entities.Translation;
@@ -86,26 +87,55 @@ public class AppDbContext : DbContext
                     .ValueGeneratedNever();
             }
 
-            // ===== ICreatedTime =====
-            if (typeof(ICreatedTrackable).IsAssignableFrom(clrType))
-                modelBuilder.Entity(clrType)
-                    .Property(nameof(ICreatedTrackable.CreatedAt))
+            // ===== EntityBase =====
+            if (typeof(EntityBase).IsAssignableFrom(clrType))
+            {
+                var entity = modelBuilder.Entity(clrType);
+
+                entity.Property(nameof(EntityBase.CreatedAt))
                     .IsRequired();
 
-            // ===== IUpdatedTime =====
-            if (typeof(IUpdatedTrackable).IsAssignableFrom(clrType))
-                modelBuilder.Entity(clrType)
-                    .Property(nameof(IUpdatedTrackable.UpdatedAt));
+                entity.Property(nameof(EntityBase.CreatedById))
+                    .IsRequired();
 
-            // ===== ISoftDeletable =====
-            if (typeof(ISoftDeleteTrackable).IsAssignableFrom(clrType))
-            {
-                modelBuilder.Entity(clrType)
-                    .Property(nameof(ISoftDeleteTrackable.IsDeleted))
-                    .HasDefaultValue(false);
+                entity.Property(nameof(EntityBase.UpdatedAt));
+                entity.Property(nameof(EntityBase.UpdatedById));
+                entity.Property(nameof(EntityBase.IsDeleted));
+                entity.Property(nameof(EntityBase.DeletedAt));
+                entity.Property(nameof(EntityBase.DeletedById));
 
-                modelBuilder.Entity(clrType)
-                    .Property(nameof(ISoftDeleteTrackable.DeletedAt));
+                entity.HasOne(nameof(EntityBase.CreatedBy))
+                    .WithMany()
+                    .HasForeignKey(nameof(EntityBase.CreatedById))
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(nameof(EntityBase.UpdatedBy))
+                    .WithMany()
+                    .HasForeignKey(nameof(EntityBase.UpdatedById))
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(nameof(EntityBase.DeletedBy))
+                    .WithMany()
+                    .HasForeignKey(nameof(EntityBase.DeletedById))
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Is Deleted Query Filter 
+                var parameter = Expression.Parameter(clrType, "e");
+
+                var isDeletedProperty = Expression.Call(
+                    typeof(EF),
+                    nameof(EF.Property),
+                    [typeof(bool)],
+                    parameter,
+                    Expression.Constant(nameof(EntityBase.IsDeleted))
+                );
+
+                var filter = Expression.Lambda(
+                    Expression.Not(isDeletedProperty),
+                    parameter
+                );
+
+                entity.HasQueryFilter(filter);
             }
         }
     }

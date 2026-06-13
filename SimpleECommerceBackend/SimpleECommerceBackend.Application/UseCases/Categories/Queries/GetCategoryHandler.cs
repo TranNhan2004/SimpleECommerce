@@ -18,6 +18,7 @@ public class GetCategoryHandler : IUseCaseHandler<GetCategoryQuery, GetCategoryR
         CancellationToken cancellationToken
     )
     {
+        Console.WriteLine($"GetCategoryHandler: handling GetCategoryQuery with Id={request.Id}");
         var category = await _categoryService.GetCategoryByIdAsync(request.Id);
 
         return GetCategoryResult.FromEntity(category);

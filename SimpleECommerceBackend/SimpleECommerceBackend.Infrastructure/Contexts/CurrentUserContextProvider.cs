@@ -20,7 +20,12 @@ public class CurrentUserContextProvider : ICurrentUserContextProvider
 
     public ICurrentUserContext GetUserContext()
     {
-        if (TryGet(out var userContext) && userContext is not null)
+        return GetUserContextAsync().GetAwaiter().GetResult();
+    }
+
+    public async Task<ICurrentUserContext> GetUserContextAsync(CancellationToken cancellationToken = default)
+    {
+        if (await TryGetAsync(cancellationToken) is { } userContext)
             return userContext;
 
         throw new UnauthorizedException(
@@ -29,13 +34,12 @@ public class CurrentUserContextProvider : ICurrentUserContextProvider
         );
     }
 
-    private bool TryGet(out ICurrentUserContext? userContext)
+    private async Task<ICurrentUserContext?> TryGetAsync(CancellationToken cancellationToken)
     {
-        userContext = null;
 
         var principal = _httpContextAccessor.HttpContext?.User;
         if (principal?.Identity?.IsAuthenticated != true)
-            return false;
+            return null;
 
         var rawKeycloakSubjectId = KeycloakPayloadExtractionHelper.FindKeycloakSubjectId(principal);
         if (string.IsNullOrWhiteSpace(rawKeycloakSubjectId))
@@ -64,10 +68,9 @@ public class CurrentUserContextProvider : ICurrentUserContextProvider
         }
 
         var email = KeycloakPayloadExtractionHelper.FindEmail(principal) ?? string.Empty;
-        var userId = _userService.GetIdByKeycloakSubjectIdAsync(keycloakSubjectId).GetAwaiter().GetResult();
+        var userId = await _userService.GetIdByKeycloakSubjectIdAsync(keycloakSubjectId);
 
-        userContext = new UserContext(userId, keycloakSubjectId, email);
-        return true;
+        return new UserContext(userId, keycloakSubjectId, email);
     }
 
     private sealed record UserContext(Guid Id, Guid KeycloakSubjectId, string Email) : ICurrentUserContext;

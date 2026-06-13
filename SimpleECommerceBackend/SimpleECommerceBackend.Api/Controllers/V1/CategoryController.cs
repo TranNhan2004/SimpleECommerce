@@ -17,15 +17,17 @@ namespace SimpleECommerceBackend.Api.Controllers.V1;
 public class CategoryController : ControllerBase
 {
     private readonly IUseCaseDispatcher _dispatcher;
+    private readonly Serilog.ILogger _logger;
 
-    public CategoryController(IUseCaseDispatcher dispatcher)
+    public CategoryController(IUseCaseDispatcher dispatcher, Serilog.ILogger logger)
     {
         _dispatcher = dispatcher;
+        _logger = logger;
     }
 
     [HttpPost("get-all")]
-    [Authorize]
-    [AllowPermissions(PermissionCodes.CategoriesRead, PermissionCodes.CategoriesReadAdmin)]
+    // [Authorize]
+    // [AllowPermissions(PermissionCodes.CategoriesRead, PermissionCodes.CategoriesReadAdmin)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetAllCategoriesResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]

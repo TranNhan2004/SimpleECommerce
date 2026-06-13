@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.AuditTracking;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Utils;
+using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Interceptors;
 
@@ -45,18 +45,8 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
         var now = DateTimeOffset.UtcNow;
         var auditRecords = new List<Audit>();
 
-        foreach (var entry in context.ChangeTracker.Entries<IEntity>().ToList())
+        foreach (var entry in context.ChangeTracker.Entries<EntityBase>().ToList())
         {
-            if (entry.Entity is Audit) continue;
-
-            if (entry.State == EntityState.Added &&
-                entry.Entity is ICreatedTrackable)
-                entry.Property(nameof(ICreatedTrackable.CreatedAt)).CurrentValue = now;
-
-            if (entry.State == EntityState.Modified &&
-                entry.Entity is IUpdatedTrackable)
-                entry.Property(nameof(IUpdatedTrackable.UpdatedAt)).CurrentValue = now;
-
             if (!TryMapOperationType(entry.State, out var operationType))
                 continue;
 
@@ -72,7 +62,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
                     OldValues = GetOldValues(entry, operationType),
                     NewValues = GetNewValues(entry, operationType),
                     AuditedAt = now,
-                    AuditedBy = _currentRequestContext.UserId
+                    AuditedById = Guid.Parse(_currentRequestContext.UserId)
                 }
             );
         }
@@ -81,7 +71,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
             context.Set<Audit>().AddRange(auditRecords);
     }
 
-    private static string? GetOldValues(EntityEntry<IEntity> entry, AuditOperationType operationType)
+    private static string? GetOldValues(EntityEntry<EntityBase> entry, AuditOperationType operationType)
     {
         return operationType switch
         {
@@ -92,7 +82,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
         };
     }
 
-    private static string? GetNewValues(EntityEntry<IEntity> entry, AuditOperationType operationType)
+    private static string? GetNewValues(EntityEntry<EntityBase> entry, AuditOperationType operationType)
     {
         return operationType switch
         {
@@ -123,7 +113,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
     }
 
     private static Dictionary<string, object?> GetModifiedPropertyValues(
-        EntityEntry<IEntity> entry,
+        EntityEntry<EntityBase> entry,
         bool useOriginalValues
     )
     {
@@ -136,7 +126,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
     }
 
     private static Dictionary<string, object?> GetAllPropertyValues(
-        EntityEntry<IEntity> entry,
+        EntityEntry<EntityBase> entry,
         bool useOriginalValues
     )
     {

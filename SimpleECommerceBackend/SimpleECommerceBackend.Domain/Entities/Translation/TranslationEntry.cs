@@ -1,5 +1,4 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Translation;
@@ -130,10 +129,5 @@ public class TranslationEntry : EntityBase
 
             _value = value.Trim();
         }
-    }
-
-    public void UpdateValue(string value)
-    {
-        Value = value;
     }
 }

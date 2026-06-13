@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Inventory : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Inventory : EntityBase
 {
     public Inventory()
     {
@@ -136,10 +135,6 @@ public class Inventory : EntityBase, ICreatedTrackable, IUpdatedTrackable
     }
 
     public int AvailableQuantity => QuantityInStock - QuantityReserved;
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
     public void IncreaseVersion()
     {
         ++Version;

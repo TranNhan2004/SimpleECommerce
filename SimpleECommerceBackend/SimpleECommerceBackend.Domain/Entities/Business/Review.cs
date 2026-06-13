@@ -1,12 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Review : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Review : EntityBase
 {
     private readonly List<ReviewResponse> _responses = [];
 
@@ -114,9 +113,6 @@ public class Review : EntityBase, ICreatedTrackable, IUpdatedTrackable
     }
 
     public IReadOnlyCollection<ReviewResponse> Responses => _responses;
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
     public void AddResponse(ReviewResponse response)
     {
         _responses.Add(response);

@@ -24,7 +24,7 @@ public class GetMyPermissionsHandler : IUseCaseHandler<GetMyPermissionsQuery, Ge
         CancellationToken cancellationToken
     )
     {
-        var currentUser = _userContextHolder.GetUserContext();
+        var currentUser = await _userContextHolder.GetUserContextAsync(cancellationToken);
         var permissions = await _permissionService.GetPermissionCodesByUserIdAsync(currentUser.Id, cancellationToken);
 
         return new GetMyPermissionsResult

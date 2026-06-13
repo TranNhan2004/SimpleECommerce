@@ -1,8 +1,6 @@
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
-
 namespace SimpleECommerceBackend.Domain.Entities.Uam;
 
-public class Permission : EntityBase, ICreatedTrackable
+public class Permission : EntityBase
 {
     private string _code = null!;
     private string _name = null!;
@@ -20,5 +18,4 @@ public class Permission : EntityBase, ICreatedTrackable
     }
 
     public string? Description { get; set; }
-    public DateTimeOffset CreatedAt { get; private set; }
 }

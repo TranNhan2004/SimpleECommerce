@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class OrderItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class OrderItem : EntityBase
 {
     public OrderItem()
     {
@@ -104,10 +103,6 @@ public class OrderItem : EntityBase, ICreatedTrackable, IUpdatedTrackable
             _currentPrice = value;
         }
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
     public Money GetLineTotal()
     {
         return new Money(CurrentPrice.Amount * Quantity, CurrentPrice.Currency);

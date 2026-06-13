@@ -1,12 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ReviewResponse : EntityBase, ICreatedTrackable
+public class ReviewResponse : EntityBase
 {
     public ReviewResponse()
     {
@@ -110,6 +109,4 @@ public class ReviewResponse : EntityBase, ICreatedTrackable
             _comment = trimmedComment;
         }
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
 }

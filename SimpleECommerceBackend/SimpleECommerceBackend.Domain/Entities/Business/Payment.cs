@@ -1,13 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Payment : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Payment : EntityBase
 {
     public Payment()
     {
@@ -129,9 +128,6 @@ public class Payment : EntityBase, ICreatedTrackable, IUpdatedTrackable
             _externalTransactionId = string.IsNullOrWhiteSpace(trimmedId) ? null : trimmedId;
         }
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public void Complete(string? externalTransactionId = null)
     {

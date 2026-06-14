@@ -1,12 +1,11 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class SellerShop : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class SellerShop : EntityBase
 {
     private readonly List<SellerWarehouse> _sellerWarehouses = [];
 
@@ -126,10 +125,6 @@ public class SellerShop : EntityBase, ICreatedTrackable, IUpdatedTrackable
 
     public IReadOnlyCollection<SellerWarehouse> SellerWarehouses => _sellerWarehouses;
 
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
     public void AddSellerWarehouse(SellerWarehouse sellerWarehouse)
     {
         _sellerWarehouses.Add(sellerWarehouse);
@@ -150,21 +145,4 @@ public class SellerShop : EntityBase, ICreatedTrackable, IUpdatedTrackable
 
         existing.FullAddress = sellerWarehouse.FullAddress;
     }
-
-    public void RemoveSellerWarehouse(Guid id)
-    {
-        var existing = _sellerWarehouses.FirstOrDefault(s => s.Id == id);
-        if (existing is null)
-            throw new ValidationException(
-                SellerShopErrorCodes.WarehouseNotFound,
-                "Warehouse not found",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Warehouse"
-                }
-            );
-
-        existing.SoftDelete();
-    }
-
 }

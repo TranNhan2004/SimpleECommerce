@@ -1,53 +1,19 @@
-using System.Text.Json.Serialization;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
-using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
-using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Category : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Category : EntityBase
 {
     public Category()
     {
     }
 
-    // [JsonConstructor]
-    // private Category(
-    //     Guid id,
-    //     string name,
-    //     string? description,
-    //     CategoryStatus status,
-    //     Guid adminId,
-    //     DateTimeOffset createdAt,
-    //     DateTimeOffset? updatedAt
-    // )
-    // {
-    //     Id = id;
-    //     Name = name;
-    //     Description = description;
-    //     Status = status;
-    //     AdminId = adminId;
-    //     CreatedAt = createdAt;
-    //     UpdatedAt = updatedAt;
-    // }
-
-    private Category(string name, string? description, CategoryStatus status, Guid adminId)
-    {
-        Id = UuidUtils.CreateV7();
-        Name = name;
-        Description = description;
-        Status = status;
-        AdminId = adminId;
-    }
-
     private string _name = null!;
     private string? _description;
     private CategoryStatus _status;
-    private Guid _adminId;
 
     public string Name
     {
@@ -124,30 +90,6 @@ public class Category : EntityBase, ICreatedTrackable, IUpdatedTrackable
         get => _status;
         set => _status = value;
     }
-
-    public Guid AdminId
-    {
-        get => _adminId;
-        set
-        {
-            if (value == Guid.Empty)
-                throw new ValidationException(
-                    CategoryErrorCodes.AdminRequired,
-                    "Admin is required",
-                    new Dictionary<string, object?>
-                    {
-                        ["field"] = "Admin"
-                    }
-                );
-
-            _adminId = value;
-        }
-    }
-
-    public User? Admin { get; private set; }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public void Activate()
     {

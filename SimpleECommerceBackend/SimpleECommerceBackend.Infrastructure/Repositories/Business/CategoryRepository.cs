@@ -10,18 +10,22 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
 {
-    public CategoryRepository(AppDbContext appDbContext) : base(appDbContext)
+    private readonly Serilog.ILogger _logger;
+    public CategoryRepository(AppDbContext appDbContext, Serilog.ILogger logger) : base(appDbContext)
     {
+        _logger = logger;
     }
 
     public async Task<FilterResult<CategoryItemForAdmin>> FindAllForAdminWithFilterAsync(FilterQuery<Category> query)
     {
+        _logger.Debug("CategoryRepository: entered FindAllForAdminWithFilterAsync");
         return await QueryAll()
             .ToFilterResultAsync(query, e => CategoryItemForAdmin.FromEntity(e));
     }
 
     public async Task<FilterResult<CategoryItem>> FindAllWithFilterAsync(FilterQuery<Category> query)
     {
+        _logger.Debug("CategoryRepository: entered FindAllWithFilterAsync");
         return await QueryAllByCondition(e => e.Where(e => e.Status == CategoryStatus.Active))
             .ToFilterResultAsync(query, e => CategoryItem.FromEntity(e));
     }

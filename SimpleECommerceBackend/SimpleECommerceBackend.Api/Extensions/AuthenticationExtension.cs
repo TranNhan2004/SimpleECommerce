@@ -15,12 +15,13 @@ public static class AuthenticationExtension
     )
     {
         var keycloakOptions = configuration.GetRequiredOptions<KeycloakOptions>(KeycloakOptions.SectionName);
+        var authorityBaseUrl = keycloakOptions.AuthServerUrl.TrimEnd('/');
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = $"{keycloakOptions.AuthServerUrl}/realms/{keycloakOptions.Realm}/";
+                options.Authority = $"{authorityBaseUrl}/realms/{keycloakOptions.Realm}/";
                 options.RequireHttpsMetadata = !environment.IsDevelopment();
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters

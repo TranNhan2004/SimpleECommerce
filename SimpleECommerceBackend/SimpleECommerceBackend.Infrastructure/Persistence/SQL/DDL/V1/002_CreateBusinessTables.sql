@@ -2,129 +2,34 @@ IF SCHEMA_ID(N'business') IS NULL
     EXEC(N'CREATE SCHEMA business');
 GO
 
-IF SCHEMA_ID(N'uam') IS NULL
-    EXEC(N'CREATE SCHEMA uam');
-GO
-
-IF SCHEMA_ID(N'translation') IS NULL
-    EXEC(N'CREATE SCHEMA translation');
-GO
-
-CREATE TABLE [uam].[Users]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [KeycloakSubjectId] uniqueidentifier NOT NULL,
-    [Email] nvarchar(450) NOT NULL,
-    [FirstName] nvarchar(64) NOT NULL,
-    [LastName] nvarchar(128) NOT NULL,
-    [NickName] nvarchar(128) NULL,
-    [Sex] int NOT NULL,
-    [Status] int NOT NULL,
-    [BirthDate] date NOT NULL,
-    [AvatarUrl] nvarchar(max) NULL,
-    [CreatedAt] datetimeoffset NOT NULL,
-    [UpdatedAt] datetimeoffset NULL,
-    CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
-);
-GO
-
-CREATE UNIQUE INDEX [IX_Users_KeycloakSubjectId]
-    ON [uam].[Users] ([KeycloakSubjectId]);
-GO
-
-CREATE UNIQUE INDEX [IX_Users_Email]
-    ON [uam].[Users] ([Email])
-    WHERE [Status] <> 99;
-GO
-
-CREATE TABLE [uam].[Roles]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [Code] nvarchar(64) NOT NULL,
-    [Name] nvarchar(128) NOT NULL,
-    [Description] nvarchar(512) NULL,
-    [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_Roles] PRIMARY KEY ([Id])
-);
-GO
-
-CREATE UNIQUE INDEX [IX_Roles_Code]
-    ON [uam].[Roles] ([Code]);
-GO
-
-CREATE TABLE [uam].[Permissions]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [Code] nvarchar(128) NOT NULL,
-    [Name] nvarchar(256) NOT NULL,
-    [Description] nvarchar(512) NULL,
-    [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_Permissions] PRIMARY KEY ([Id])
-);
-GO
-
-CREATE UNIQUE INDEX [IX_Permissions_Code]
-    ON [uam].[Permissions] ([Code]);
-GO
-
-CREATE TABLE [uam].[UserRoles]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [UserId] uniqueidentifier NOT NULL,
-    [RoleId] uniqueidentifier NOT NULL,
-    [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_UserRoles] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_UserRoles_Users_UserId] FOREIGN KEY ([UserId])
-        REFERENCES [uam].[Users] ([Id])
-        ON DELETE CASCADE,
-    CONSTRAINT [FK_UserRoles_Roles_RoleId] FOREIGN KEY ([RoleId])
-        REFERENCES [uam].[Roles] ([Id])
-        ON DELETE CASCADE
-);
-GO
-
-CREATE UNIQUE INDEX [IX_UserRoles_UserId_RoleId]
-    ON [uam].[UserRoles] ([UserId], [RoleId]);
-GO
-
-CREATE TABLE [uam].[RolePermissions]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [RoleId] uniqueidentifier NOT NULL,
-    [PermissionId] uniqueidentifier NOT NULL,
-    [CreatedAt] datetimeoffset NOT NULL,
-    CONSTRAINT [PK_RolePermissions] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_RolePermissions_Roles_RoleId] FOREIGN KEY ([RoleId])
-        REFERENCES [uam].[Roles] ([Id])
-        ON DELETE CASCADE,
-    CONSTRAINT [FK_RolePermissions_Permissions_PermissionId] FOREIGN KEY ([PermissionId])
-        REFERENCES [uam].[Permissions] ([Id])
-        ON DELETE CASCADE
-);
-GO
-
-CREATE UNIQUE INDEX [IX_RolePermissions_RoleId_PermissionId]
-    ON [uam].[RolePermissions] ([RoleId], [PermissionId]);
-GO
-
 CREATE TABLE [business].[Categories]
 (
     [Id] uniqueidentifier NOT NULL,
     [Name] nvarchar(256) NOT NULL,
     [Description] nvarchar(1024) NULL,
     [Status] int NOT NULL,
-    [AdminId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Categories] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Categories_Users_AdminId] FOREIGN KEY ([AdminId])
+    CONSTRAINT [FK_Categories_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Categories_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Categories_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
 
-CREATE INDEX [IX_Categories_AdminId]
-    ON [business].[Categories] ([AdminId]);
+CREATE INDEX [IX_Categories_CreatedById]
+    ON [business].[Categories] ([CreatedById]);
 GO
 
 CREATE TABLE [business].[SellerShops]
@@ -232,10 +137,25 @@ CREATE TABLE [business].[ProductVariantImages]
     [IsDisplayed] bit NOT NULL CONSTRAINT [DF_ProductVariantImages_IsDisplayed] DEFAULT (1),
     [Description] nvarchar(512) NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_ProductVariantImages] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ProductVariantImages_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariantImages_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariantImages_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariantImages_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION
 );
 GO
 
@@ -251,10 +171,17 @@ CREATE TABLE [business].[ProductVariantPrices]
     [Amount] decimal(18,2) NOT NULL,
     [Currency] nvarchar(3) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,    
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_ProductVariantPrices] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ProductVariantPrices_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION,
+    
 );
 GO
 
@@ -274,7 +201,7 @@ CREATE TABLE [business].[Reviews]
     CONSTRAINT [PK_Reviews] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Reviews_Products_ProductId] FOREIGN KEY ([ProductId])
         REFERENCES [business].[Products] ([Id])
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
     CONSTRAINT [FK_Reviews_Users_CustomerId] FOREIGN KEY ([CustomerId])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
@@ -300,7 +227,7 @@ CREATE TABLE [business].[ReviewResponses]
     CONSTRAINT [PK_ReviewResponses] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ReviewResponses_Reviews_ReviewId] FOREIGN KEY ([ReviewId])
         REFERENCES [business].[Reviews] ([Id])
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
     CONSTRAINT [FK_ReviewResponses_Users_FromUserId] FOREIGN KEY ([FromUserId])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION,
@@ -331,7 +258,7 @@ CREATE TABLE [business].[Carts]
     CONSTRAINT [PK_Carts] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Carts_Users_CustomerId] FOREIGN KEY ([CustomerId])
         REFERENCES [uam].[Users] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 GO
 
@@ -353,7 +280,7 @@ CREATE TABLE [business].[CartItems]
         ON DELETE NO ACTION,
     CONSTRAINT [FK_CartItems_Carts_CartId] FOREIGN KEY ([CartId])
         REFERENCES [business].[Carts] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 GO
 
@@ -382,7 +309,7 @@ CREATE TABLE [business].[CustomerShippingAddresses]
     CONSTRAINT [PK_CustomerShippingAddresses] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_CustomerShippingAddresses_Users_CustomerId] FOREIGN KEY ([CustomerId])
         REFERENCES [uam].[Users] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 GO
 
@@ -403,10 +330,10 @@ CREATE TABLE [business].[Inventories]
     CONSTRAINT [PK_Inventories] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Inventories_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
     CONSTRAINT [FK_Inventories_SellerWarehouses_SellerWarehouseId] FOREIGN KEY ([SellerWarehouseId])
         REFERENCES [business].[SellerWarehouses] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 GO
 
@@ -428,7 +355,7 @@ CREATE TABLE [business].[Notifications]
     CONSTRAINT [PK_Notifications] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Notifications_Users_UserId] FOREIGN KEY ([UserId])
         REFERENCES [uam].[Users] ([Id])
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 GO
 
@@ -506,7 +433,7 @@ CREATE TABLE [business].[OrderItems]
     CONSTRAINT [PK_OrderItems] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_OrderItems_Orders_OrderId] FOREIGN KEY ([OrderId])
         REFERENCES [business].[Orders] ([Id])
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
     CONSTRAINT [FK_OrderItems_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION
@@ -550,18 +477,6 @@ GO
 
 CREATE INDEX [IX_Payments_ExternalTransactionId]
     ON [business].[Payments] ([ExternalTransactionId]);
-GO
-
-CREATE TABLE [translation].[Translations]
-(
-    [Id] uniqueidentifier NOT NULL,
-    [EntityName] nvarchar(128) NOT NULL,
-    [FieldName] nvarchar(128) NOT NULL,
-    [RowId] uniqueidentifier NOT NULL,
-    [Locale] nvarchar(16) NOT NULL,
-    [Value] nvarchar(max) NOT NULL,
-    CONSTRAINT [PK_Translations] PRIMARY KEY ([Id])
-);
 GO
 
 CREATE UNIQUE INDEX [IX_Translations_EntityName_FieldName_RowId_Locale]

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
@@ -86,11 +87,10 @@ public static class DependencyInjection
         services.AddScoped<ICurrentRequestContext, CurrentRequestContext>();
 
         // Cache Services
-        var redisOptions = configuration.GetRequiredOptions<RedisOptions>(RedisOptions.SectionName);
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
-            ConnectionMultiplexer.Connect(redisOptions.ConnectionString));
-
-        services.AddScoped<ICacheService, RedisCacheService>();
+        services.AddSingleton<ICacheService>(sp => new RedisCacheService(
+            sp.GetRequiredService<IOptions<RedisOptions>>(),
+            sp.GetRequiredService<Serilog.ILogger>()
+        ));
 
         // Translation Services
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();

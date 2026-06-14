@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariantImage : EntityBase, ICreatedTrackable
+public class ProductVariantImage : EntityBase
 {
     public ProductVariantImage()
     {
@@ -113,6 +112,4 @@ public class ProductVariantImage : EntityBase, ICreatedTrackable
             _description = trimmedDescription;
         }
     }
-
-    public DateTimeOffset CreatedAt { get; private set; }
 }

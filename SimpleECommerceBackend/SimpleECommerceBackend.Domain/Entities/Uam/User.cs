@@ -1,13 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.Utils;
 
 namespace SimpleECommerceBackend.Domain.Entities.Uam;
 
-public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class User : EntityBase
 {
     public User()
     {
@@ -19,7 +18,7 @@ public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
     private string _lastName = null!;
     private string? _nickName;
     private Sex _sex;
-    private UserStatus _status;
+    private bool _isActive;
     private DateOnly _birthDate;
     private string? _avatarUrl;
 
@@ -156,10 +155,10 @@ public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
         set => _sex = value;
     }
 
-    public UserStatus Status
+    public bool IsActive
     {
-        get => _status;
-        set => _status = value;
+        get => _isActive;
+        set => _isActive = value;
     }
 
     public DateOnly BirthDate
@@ -209,42 +208,5 @@ public class User : EntityBase, ICreatedTrackable, IUpdatedTrackable
     {
         get => _avatarUrl;
         set => _avatarUrl = value;
-    }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
-
-    public void Archived()
-    {
-        if (Status == UserStatus.Archived)
-        {
-            throw new ValidationException(
-                UserProfileErrorCodes.ArchiveNotAllowed,
-                "Cannot archive this user",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Status",
-                }
-            );
-        }
-
-        Status = UserStatus.Archived;
-    }
-
-    public void Activate()
-    {
-        if (Status == UserStatus.Active)
-        {
-            throw new ValidationException(
-                UserProfileErrorCodes.ActivateNotAllowed,
-                "Cannot activate this user",
-                new Dictionary<string, object?>
-                {
-                    ["field"] = "Status",
-                }
-            );
-        }
-
-        Status = UserStatus.Active;
     }
 }

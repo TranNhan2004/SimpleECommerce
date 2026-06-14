@@ -1,4 +1,4 @@
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
+using SimpleECommerceBackend.Domain.Entities;
 
 namespace SimpleECommerceBackend.Application.Interfaces.Repositories;
 

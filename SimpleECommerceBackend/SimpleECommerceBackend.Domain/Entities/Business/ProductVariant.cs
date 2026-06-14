@@ -1,13 +1,12 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class ProductVariant : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class ProductVariant : EntityBase
 {
     private readonly List<ProductVariantImage> _productVariantImages = [];
     private readonly List<ProductVariantPrice> _productVariantPrices = [];
@@ -149,8 +148,6 @@ public class ProductVariant : EntityBase, ICreatedTrackable, IUpdatedTrackable
 
     public IReadOnlyCollection<ProductVariantImage> ProductVariantImages => _productVariantImages;
     public IReadOnlyCollection<ProductVariantPrice> ProductVariantPrices => _productVariantPrices;
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? UpdatedAt { get; set; }
 
     public void AddImage(ProductVariantImage image)
     {

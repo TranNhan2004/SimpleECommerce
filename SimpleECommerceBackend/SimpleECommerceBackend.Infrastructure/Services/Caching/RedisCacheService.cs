@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using Serilog;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Exceptions;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
@@ -11,24 +12,44 @@ public sealed class RedisCacheService : ICacheService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private static readonly JsonSerializerOptions PrefixIndexJsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly TimeSpan ConnectTimeout = TimeSpan.FromSeconds(2);
 
-    private readonly IDatabase _database;
     private readonly RedisOptions _redisOptions;
+    private readonly ILogger? _logger;
+    private readonly SemaphoreSlim _connectionLock = new(1, 1);
+
+    private IConnectionMultiplexer? _connection;
+
+    public RedisCacheService(IOptions<RedisOptions> redisOptions, ILogger logger)
+    {
+        _redisOptions = redisOptions.Value;
+        _logger = logger;
+    }
 
     public RedisCacheService(
         IConnectionMultiplexer connectionMultiplexer,
         IOptions<RedisOptions> redisOptions)
     {
-        _database = connectionMultiplexer.GetDatabase();
+        _connection = connectionMultiplexer;
         _redisOptions = redisOptions.Value;
     }
 
     public async Task<string?> GetStringAsync(string key, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return null;
 
-        var value = await _database.StringGetAsync(BuildKey(key));
-        return value.HasValue ? value.ToString() : null;
+        try
+        {
+            var value = await database.StringGetAsync(BuildKey(key));
+            return value.HasValue ? value.ToString() : null;
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            LogCacheFailure(ex, "read string", key);
+            return null;
+        }
     }
 
     public Task SetStringAsync(string key, string value, TimeSpan ttl, CancellationToken cancellationToken = default)
@@ -38,20 +59,28 @@ public sealed class RedisCacheService : ICacheService
 
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return default;
 
         var redisKey = BuildKey(key);
-        var value = await _database.StringGetAsync(redisKey);
-        if (!value.HasValue)
-            return default;
 
         try
         {
+            var value = await database.StringGetAsync(redisKey);
+            if (!value.HasValue)
+                return default;
+
             return JsonSerializer.Deserialize<T>(value.ToString(), JsonOptions);
         }
-        catch (Exception ex) when (ex is JsonException or NotSupportedException or ValidationException)
+        catch (Exception ex) when (IsInvalidCachedValue(ex))
         {
-            await _database.KeyDeleteAsync(redisKey);
+            await DeleteInvalidCacheEntryAsync(database, redisKey);
+            return default;
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            LogCacheFailure(ex, "read", key);
             return default;
         }
     }
@@ -62,162 +91,200 @@ public sealed class RedisCacheService : ICacheService
         return SetValueAsync(key, json, ttl, cancellationToken);
     }
 
-    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var redisKey = BuildKey(key);
-        await _database.KeyDeleteAsync(redisKey);
-        await RemoveTrackedKeyAsync(BuildPrefixIndexKey(ExtractPrefix(key)), redisKey);
-    }
-
-    public async Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var pattern = BuildKey($"{prefix}*");
-
-        foreach (var endpoint in _database.Multiplexer.GetEndPoints())
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var server = _database.Multiplexer.GetServer(endpoint);
-            if (!server.IsConnected)
-            {
-                continue;
-            }
-
-            foreach (var key in server.Keys(_database.Database, pattern: pattern))
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await _database.KeyDeleteAsync(key);
-            }
-        }
-
-        await _database.KeyDeleteAsync(BuildPrefixIndexKey(ExtractPrefix(prefix)));
-    }
-
     public async Task<IEnumerable<T?>> GetBulkAsync<T>(
         IReadOnlyList<string> keys,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(keys);
-        cancellationToken.ThrowIfCancellationRequested();
 
         if (keys.Count == 0)
             return [];
 
-        RedisKey[] redisKeys = [.. keys.Select(k => (RedisKey)BuildKey(k))];
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return [.. keys.Select(_ => default(T?))];
 
-        RedisValue[] values = await _database.StringGetAsync(redisKeys);
+        RedisKey[] redisKeys = [.. keys.Select(key => (RedisKey)BuildKey(key))];
 
-        var results = new T?[values.Length];
-
-        for (int i = 0; i < values.Length; i++)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (!values[i].HasValue)
-            {
-                results[i] = default;
-                continue;
-            }
-
-            try
-            {
-                results[i] = JsonSerializer.Deserialize<T>(values[i].ToString(), JsonOptions);
-            }
-            catch (Exception ex) when (ex is JsonException or NotSupportedException or ValidationException)
-            {
-                await _database.KeyDeleteAsync(redisKeys[i]);
-                results[i] = default;
-            }
+            var values = await database.StringGetAsync(redisKeys);
+            return await DeserializeBulkAsync<T>(database, redisKeys, values, cancellationToken);
         }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            _logger?.Warning(ex, "Redis cache failed to read {Count} keys.", keys.Count);
+            return [.. keys.Select(_ => default(T?))];
+        }
+    }
 
-        return results;
+    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+    {
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return;
+
+        var redisKey = BuildKey(key);
+
+        try
+        {
+            await database.KeyDeleteAsync(redisKey);
+            await RemoveTrackedKeyAsync(database, BuildPrefixIndexKey(ExtractPrefix(key)), redisKey);
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            LogCacheFailure(ex, "remove", key);
+        }
+    }
+
+    public async Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return;
+
+        try
+        {
+            var pattern = BuildKey($"{prefix}*");
+            foreach (var endpoint in database.Multiplexer.GetEndPoints())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var server = database.Multiplexer.GetServer(endpoint);
+                if (!server.IsConnected)
+                    continue;
+
+                foreach (var key in server.Keys(database.Database, pattern: pattern))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await database.KeyDeleteAsync(key);
+                }
+            }
+
+            await database.KeyDeleteAsync(BuildPrefixIndexKey(ExtractPrefix(prefix)));
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            _logger?.Warning(ex, "Redis cache failed to remove keys with prefix {Prefix}.", prefix);
+        }
     }
 
     private async Task SetValueAsync(
         string key,
         RedisValue value,
         TimeSpan ttl,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-        cancellationToken.ThrowIfCancellationRequested();
 
-        var redisKey = BuildKey(key);
-        await _database.StringSetAsync(redisKey, value, ttl);
-        await EnforcePrefixKeyLimitAsync(key, redisKey, cancellationToken);
+        var database = await TryGetDatabaseAsync(cancellationToken);
+        if (database is null)
+            return;
+
+        try
+        {
+            var redisKey = BuildKey(key);
+            await database.StringSetAsync(redisKey, value, ttl);
+            await EnforcePrefixKeyLimitAsync(database, key, redisKey, cancellationToken);
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            LogCacheFailure(ex, "write", key);
+        }
     }
 
-    private async Task EnforcePrefixKeyLimitAsync(
-        string logicalKey,
-        string redisKey,
-        CancellationToken cancellationToken
-    )
+    private async Task<T?[]> DeserializeBulkAsync<T>(
+        IDatabase database,
+        RedisKey[] redisKeys,
+        RedisValue[] values,
+        CancellationToken cancellationToken)
     {
-        var prefix = ExtractPrefix(logicalKey);
-        if (!_redisOptions.PrefixKeyLimits.TryGetValue(prefix, out var prefixKeyLimit))
-        {
-            return;
-        }
+        var results = new T?[values.Length];
 
-        var prefixIndexKey = BuildPrefixIndexKey(prefix);
-        var trackedKeys = await GetTrackedKeysAsync(prefixIndexKey, cancellationToken);
-
-        for (var index = trackedKeys.Count - 1; index >= 0; index--)
+        for (var index = 0; index < values.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var exists = await _database.KeyExistsAsync((RedisKey)trackedKeys[index]);
-            if (!exists)
+            if (!values[index].HasValue)
+                continue;
+
+            try
             {
-                trackedKeys.RemoveAt(index);
+                results[index] = JsonSerializer.Deserialize<T>(values[index].ToString(), JsonOptions);
+            }
+            catch (Exception ex) when (IsInvalidCachedValue(ex))
+            {
+                await DeleteInvalidCacheEntryAsync(database, redisKeys[index]);
             }
         }
 
-        trackedKeys.Remove(redisKey);
-        trackedKeys.Add(redisKey);
+        return results;
+    }
 
-        while (trackedKeys.Count > prefixKeyLimit)
+    private async Task EnforcePrefixKeyLimitAsync(
+        IDatabase database,
+        string logicalKey,
+        RedisKey redisKey,
+        CancellationToken cancellationToken)
+    {
+        var prefix = ExtractPrefix(logicalKey);
+        if (!_redisOptions.PrefixKeyLimits.TryGetValue(prefix, out var limit))
+            return;
+
+        var prefixIndexKey = BuildPrefixIndexKey(prefix);
+        var trackedKeys = await GetTrackedKeysAsync(database, prefixIndexKey);
+
+        await RemoveMissingTrackedKeysAsync(database, trackedKeys, cancellationToken);
+
+        trackedKeys.Remove(redisKey!);
+        trackedKeys.Add(redisKey!);
+
+        while (trackedKeys.Count > limit)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var oldestKey = trackedKeys[0];
             trackedKeys.RemoveAt(0);
-            await _database.KeyDeleteAsync((RedisKey)oldestKey);
+            await database.KeyDeleteAsync((RedisKey)oldestKey);
         }
 
-        await SaveTrackedKeysAsync(prefixIndexKey, trackedKeys);
+        await SaveTrackedKeysAsync(database, prefixIndexKey, trackedKeys);
+    }
+
+    private static async Task RemoveMissingTrackedKeysAsync(
+        IDatabase database,
+        List<string> trackedKeys,
+        CancellationToken cancellationToken)
+    {
+        for (var index = trackedKeys.Count - 1; index >= 0; index--)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var exists = await database.KeyExistsAsync((RedisKey)trackedKeys[index]);
+            if (!exists)
+                trackedKeys.RemoveAt(index);
+        }
     }
 
     private async Task RemoveTrackedKeyAsync(
+        IDatabase database,
         string prefixIndexKey,
-        string redisKey
-    )
+        string redisKey)
     {
-        var trackedKeys = await GetTrackedKeysAsync(prefixIndexKey, CancellationToken.None);
+        var trackedKeys = await GetTrackedKeysAsync(database, prefixIndexKey);
         if (!trackedKeys.Remove(redisKey))
-        {
             return;
-        }
 
-        await SaveTrackedKeysAsync(prefixIndexKey, trackedKeys);
+        await SaveTrackedKeysAsync(database, prefixIndexKey, trackedKeys);
     }
 
-    private async Task<List<string>> GetTrackedKeysAsync(
-        string prefixIndexKey,
-        CancellationToken cancellationToken
-    )
+    private async Task<List<string>> GetTrackedKeysAsync(IDatabase database, string prefixIndexKey)
     {
-        var serializedTrackedKeys = await _database.StringGetAsync(prefixIndexKey);
+        var serializedTrackedKeys = await database.StringGetAsync(prefixIndexKey);
         if (!serializedTrackedKeys.HasValue)
-        {
             return [];
-        }
 
         try
         {
@@ -228,23 +295,94 @@ public sealed class RedisCacheService : ICacheService
         }
         catch (JsonException)
         {
-            await _database.KeyDeleteAsync(prefixIndexKey);
+            await database.KeyDeleteAsync(prefixIndexKey);
             return [];
         }
     }
 
-    private async Task SaveTrackedKeysAsync(string prefixIndexKey, List<string> trackedKeys)
+    private static async Task SaveTrackedKeysAsync(
+        IDatabase database,
+        string prefixIndexKey,
+        List<string> trackedKeys)
     {
         if (trackedKeys.Count == 0)
         {
-            await _database.KeyDeleteAsync(prefixIndexKey);
+            await database.KeyDeleteAsync(prefixIndexKey);
             return;
         }
 
-        await _database.StringSetAsync(
+        await database.StringSetAsync(
             prefixIndexKey,
             JsonSerializer.Serialize(trackedKeys, PrefixIndexJsonOptions)
         );
+    }
+
+    private async Task<IDatabase?> TryGetDatabaseAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (_connection?.IsConnected == true)
+            return _connection.GetDatabase();
+
+        if (!await _connectionLock.WaitAsync(ConnectTimeout, cancellationToken))
+            return null;
+
+        try
+        {
+            if (_connection?.IsConnected == true)
+                return _connection.GetDatabase();
+
+            _connection = await CreateConnectionAsync(cancellationToken);
+            return _connection?.GetDatabase();
+        }
+        catch (Exception ex) when (IsCacheFailure(ex, cancellationToken))
+        {
+            _logger?.Warning(ex, "Redis cache is unavailable. Continuing without cache.");
+            return null;
+        }
+        finally
+        {
+            _connectionLock.Release();
+        }
+    }
+
+    private async Task<IConnectionMultiplexer?> CreateConnectionAsync(CancellationToken cancellationToken)
+    {
+        var options = ConfigurationOptions.Parse(_redisOptions.ConnectionString);
+        options.AbortOnConnectFail = false;
+        options.ConnectTimeout = (int)ConnectTimeout.TotalMilliseconds;
+        options.SyncTimeout = (int)ConnectTimeout.TotalMilliseconds;
+        options.AsyncTimeout = (int)ConnectTimeout.TotalMilliseconds;
+
+        return await ConnectionMultiplexer
+            .ConnectAsync(options)
+            .WaitAsync(ConnectTimeout, cancellationToken);
+    }
+
+    private static async Task DeleteInvalidCacheEntryAsync(IDatabase database, RedisKey redisKey)
+    {
+        await database.KeyDeleteAsync(redisKey);
+    }
+
+    private static bool IsInvalidCachedValue(Exception exception)
+    {
+        return exception is JsonException or NotSupportedException or ValidationException;
+    }
+
+    private static bool IsCacheFailure(Exception exception, CancellationToken cancellationToken)
+    {
+        if (exception is OperationCanceledException && cancellationToken.IsCancellationRequested)
+            return false;
+
+        return exception is RedisException
+            or TimeoutException
+            or ObjectDisposedException
+            or OperationCanceledException;
+    }
+
+    private void LogCacheFailure(Exception exception, string operation, string key)
+    {
+        _logger?.Warning(exception, "Redis cache failed to {Operation} key {CacheKey}.", operation, key);
     }
 
     public static string ExtractPrefix(string key)

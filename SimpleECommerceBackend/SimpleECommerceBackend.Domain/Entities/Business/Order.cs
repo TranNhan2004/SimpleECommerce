@@ -1,6 +1,5 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
@@ -8,7 +7,7 @@ using SimpleECommerceBackend.Domain.ValueObjects;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Order : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Order : EntityBase
 {
     private readonly List<OrderItem> _orderItems = [];
 
@@ -297,9 +296,6 @@ public class Order : EntityBase, ICreatedTrackable, IUpdatedTrackable
 
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
     public DateTimeOffset? ExpiredAt { get; private set; }
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public void Pickup()
     {

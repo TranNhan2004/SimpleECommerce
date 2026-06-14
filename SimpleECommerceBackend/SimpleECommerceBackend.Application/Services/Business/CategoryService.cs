@@ -12,11 +12,15 @@ namespace SimpleECommerceBackend.Application.Services.Business;
 public class CategoryService : ServiceBase, ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
+    private readonly Serilog.ILogger _logger;
 
-    public CategoryService(ICacheService cacheService, ICategoryRepository categoryRepository)
+    public CategoryService(ICacheService cacheService,
+        ICategoryRepository categoryRepository,
+        Serilog.ILogger logger)
         : base(cacheService)
     {
         _categoryRepository = categoryRepository;
+        _logger = logger;
     }
 
     public Category CreateCategory(Category category)

@@ -17,6 +17,7 @@ public abstract class FilterQuery<TEntity> : PaginationQuery where TEntity : cla
 
     public virtual string GetContentHash()
     {
+        Console.WriteLine("FilterQuery: computing content hash");
         var json = JsonSerializer.Serialize(this, GetType(), JsonOptions);
         return Sha256Utils.ComputeHexHash(json);
     }

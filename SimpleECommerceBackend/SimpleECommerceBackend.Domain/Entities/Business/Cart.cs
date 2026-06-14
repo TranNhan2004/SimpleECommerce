@@ -1,11 +1,10 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities.Business;
 
-public class Cart : EntityBase, ICreatedTrackable, IUpdatedTrackable
+public class Cart : EntityBase
 {
     public Cart()
     {
@@ -41,9 +40,6 @@ public class Cart : EntityBase, ICreatedTrackable, IUpdatedTrackable
     public User? Customer { get; private set; }
 
     public List<CartItem> CartItems { get; } = [];
-
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public void AddCartItem(CartItem cartItem)
     {

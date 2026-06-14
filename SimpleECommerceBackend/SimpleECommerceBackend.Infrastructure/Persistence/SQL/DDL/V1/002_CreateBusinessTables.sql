@@ -40,9 +40,23 @@ CREATE TABLE [business].[SellerShops]
     [PhoneNumber] nvarchar(10) NOT NULL,
     [AvatarUrl] nvarchar(max) NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_SellerShops] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_SellerShops_Users_SellerId] FOREIGN KEY ([SellerId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerShops_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerShops_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerShops_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -60,12 +74,24 @@ CREATE TABLE [business].[SellerWarehouses]
     [Province] nvarchar(max) NOT NULL,
     [Ward] nvarchar(max) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL CONSTRAINT [DF_SellerWarehouses_IsDeleted] DEFAULT (0),
     [DeletedAt] datetimeoffset NULL,
-    [UpdatedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_SellerWarehouses] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_SellerWarehouses_SellerShops_SellerShopId] FOREIGN KEY ([SellerShopId])
         REFERENCES [business].[SellerShops] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerWarehouses_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerWarehouses_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_SellerWarehouses_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
@@ -85,12 +111,26 @@ CREATE TABLE [business].[Products]
     [CategoryId] uniqueidentifier NOT NULL,
     [SellerId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Products] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Products_Categories_CategoryId] FOREIGN KEY ([CategoryId])
         REFERENCES [business].[Categories] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_Products_Users_SellerId] FOREIGN KEY ([SellerId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION
+    CONSTRAINT [FK_Products_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Products_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,    
+    CONSTRAINT [FK_Products_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -116,10 +156,24 @@ CREATE TABLE [business].[ProductVariants]
     [DefaultImageUrl] nvarchar(max) NULL,
     [Status] int NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_ProductVariants] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ProductVariants_Products_ProductId] FOREIGN KEY ([ProductId])
         REFERENCES [business].[Products] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariants_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariants_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariants_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id]) 
         ON DELETE NO ACTION
 );
 GO
@@ -140,7 +194,7 @@ CREATE TABLE [business].[ProductVariantImages]
     [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
-    [IsDeleted] bit NOT NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
     [DeletedAt] datetimeoffset NULL,
     [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_ProductVariantImages] PRIMARY KEY ([Id]),
@@ -181,7 +235,15 @@ CREATE TABLE [business].[ProductVariantPrices]
     CONSTRAINT [FK_ProductVariantPrices_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION,
-    
+    CONSTRAINT [FK_ProductVariantPrices_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariantPrices_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ProductVariantPrices_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id]) 
+        ON DELETE NO ACTION
 );
 GO
 
@@ -197,6 +259,7 @@ CREATE TABLE [business].[Reviews]
     [Rating] int NOT NULL,
     [Comment] nvarchar(2048) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
     CONSTRAINT [PK_Reviews] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Reviews_Products_ProductId] FOREIGN KEY ([ProductId])
@@ -204,6 +267,15 @@ CREATE TABLE [business].[Reviews]
         ON DELETE NO ACTION,
     CONSTRAINT [FK_Reviews_Users_CustomerId] FOREIGN KEY ([CustomerId])
         REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Reviews_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Reviews_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION
+    CONSTRAINT [FK_Reviews_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id]) 
         ON DELETE NO ACTION
 );
 GO
@@ -224,6 +296,12 @@ CREATE TABLE [business].[ReviewResponses]
     [ToUserId] uniqueidentifier NOT NULL,
     [Comment] nvarchar(2048) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_ReviewResponses] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ReviewResponses_Reviews_ReviewId] FOREIGN KEY ([ReviewId])
         REFERENCES [business].[Reviews] ([Id])
@@ -232,6 +310,15 @@ CREATE TABLE [business].[ReviewResponses]
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_ReviewResponses_Users_ToUserId] FOREIGN KEY ([ToUserId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ReviewResponses_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ReviewResponses_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_ReviewResponses_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -254,9 +341,23 @@ CREATE TABLE [business].[Carts]
     [Id] uniqueidentifier NOT NULL,
     [CustomerId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Carts] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Carts_Users_CustomerId] FOREIGN KEY ([CustomerId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Carts_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Carts_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Carts_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -273,13 +374,27 @@ CREATE TABLE [business].[CartItems]
     [CartId] uniqueidentifier NOT NULL,
     [Quantity] int NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_CartItems] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_CartItems_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_CartItems_Carts_CartId] FOREIGN KEY ([CartId])
         REFERENCES [business].[Carts] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CartItems_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CartItems_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id]) 
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CartItems_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
@@ -303,11 +418,23 @@ CREATE TABLE [business].[CustomerShippingAddresses]
     [IsDefault] bit NOT NULL,
     [CustomerId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [IsDeleted] bit NOT NULL CONSTRAINT [DF_CustomerShippingAddresses_IsDeleted] DEFAULT (0),
-    [DeletedAt] datetimeoffset NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_CustomerShippingAddresses] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_CustomerShippingAddresses_Users_CustomerId] FOREIGN KEY ([CustomerId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CustomerShippingAddresses_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CustomerShippingAddresses_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_CustomerShippingAddresses_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -326,13 +453,27 @@ CREATE TABLE [business].[Inventories]
     [QuantityReserved] int NOT NULL,
     [Version] int NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Inventories] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Inventories_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_Inventories_SellerWarehouses_SellerWarehouseId] FOREIGN KEY ([SellerWarehouseId])
         REFERENCES [business].[SellerWarehouses] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Inventories_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Inventories_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Inventories_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
@@ -350,10 +491,25 @@ CREATE TABLE [business].[Notifications]
     [Id] uniqueidentifier NOT NULL,
     [UserId] uniqueidentifier NOT NULL,
     [Message] nvarchar(2048) NOT NULL,
-    [IsRead] bit NOT NULL CONSTRAINT [DF_Notifications_IsRead] DEFAULT (0),
+    [IsRead] bit NOT NULL DEFAULT 0,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Notifications] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Notifications_Users_UserId] FOREIGN KEY ([UserId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Notifications_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Notifications_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Notifications_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -389,12 +545,26 @@ CREATE TABLE [business].[Orders]
     [SellerId] uniqueidentifier NOT NULL,
     [ExpiredAt] datetimeoffset NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Orders] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Orders_Users_CustomerId] FOREIGN KEY ([CustomerId])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_Orders_Users_SellerId] FOREIGN KEY ([SellerId])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Orders_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Orders_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Orders_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
@@ -429,13 +599,27 @@ CREATE TABLE [business].[OrderItems]
     [CurrentAmount] decimal(18,2) NOT NULL,
     [Currency] nvarchar(3) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_OrderItems] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_OrderItems_Orders_OrderId] FOREIGN KEY ([OrderId])
         REFERENCES [business].[Orders] ([Id])
         ON DELETE NO ACTION,
     CONSTRAINT [FK_OrderItems_ProductVariants_ProductVariantId] FOREIGN KEY ([ProductVariantId])
         REFERENCES [business].[ProductVariants] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_OrderItems_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,    
+    CONSTRAINT [FK_OrderItems_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_OrderItems_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
@@ -459,10 +643,24 @@ CREATE TABLE [business].[Payments]
     [Status] int NOT NULL,
     [ExternalTransactionId] nvarchar(256) NULL,
     [CreatedAt] datetimeoffset NOT NULL,
+    [CreatedById] uniqueidentifier NOT NULL,
     [UpdatedAt] datetimeoffset NULL,
+    [UpdatedById] uniqueidentifier NULL,
+    [IsDeleted] bit NOT NULL DEFAULT 0,
+    [DeletedAt] datetimeoffset NULL,
+    [DeletedById] uniqueidentifier NULL,
     CONSTRAINT [PK_Payments] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Payments_Orders_OrderId] FOREIGN KEY ([OrderId])
         REFERENCES [business].[Orders] ([Id])
+        ON DELETE NO ACTION,
+    CONSTRAINT [FK_Payments_Users_CreatedById] FOREIGN KEY ([CreatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,    
+    CONSTRAINT [FK_Payments_Users_UpdatedById] FOREIGN KEY ([UpdatedById])
+        REFERENCES [uam].[Users] ([Id])
+        ON DELETE NO ACTION,    
+    CONSTRAINT [FK_Payments_Users_DeletedById] FOREIGN KEY ([DeletedById])
+        REFERENCES [uam].[Users] ([Id])
         ON DELETE NO ACTION
 );
 GO
@@ -477,8 +675,4 @@ GO
 
 CREATE INDEX [IX_Payments_ExternalTransactionId]
     ON [business].[Payments] ([ExternalTransactionId]);
-GO
-
-CREATE UNIQUE INDEX [IX_Translations_EntityName_FieldName_RowId_Locale]
-    ON [translation].[Translations] ([EntityName], [FieldName], [RowId], [Locale]);
 GO

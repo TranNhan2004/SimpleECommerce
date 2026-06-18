@@ -1,6 +1,7 @@
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
@@ -14,18 +15,21 @@ public class CreateCategoryHandler : IUseCaseHandler<CreateCategoryCommand, Crea
 {
     private readonly Serilog.ILogger _logger;
     private readonly ICategoryService _categoryService;
+    private readonly ICacheService _cacheService;
     private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateCategoryHandler(
         Serilog.ILogger logger,
         ICategoryService categoryService,
+        ICacheService cacheService,
         ICurrentUserContextProvider userContextHolder,
         IUnitOfWork unitOfWork
     )
     {
         _logger = logger;
         _categoryService = categoryService;
+        _cacheService = cacheService;
         _userContextHolder = userContextHolder;
         _unitOfWork = unitOfWork;
     }
@@ -53,9 +57,8 @@ public class CreateCategoryHandler : IUseCaseHandler<CreateCategoryCommand, Crea
 
         _logger.Information("Category created with ID: {CategoryId}", createdCategory.Id);
 
-        await _categoryService.InvalidateCacheAsync(
-            prefixKeys: [CategoryCacheKeys.GetAllCategoriesPrefix, CategoryCacheKeys.GetAllCategoriesForAdminPrefix]
-        );
+        await _cacheService.RemoveByPrefixAsync(CategoryCacheKeys.GetAllCategoriesPrefix, cancellationToken);
+        await _cacheService.RemoveByPrefixAsync(CategoryCacheKeys.GetAllCategoriesForAdminPrefix, cancellationToken);
 
         _logger.Information("Cache invalidated for keys with prefixes: {Prefixes}", [CategoryCacheKeys.GetAllCategoriesPrefix, CategoryCacheKeys.GetAllCategoriesForAdminPrefix]);
         _logger.Information("CreateCategoryHandler completed successfully.");

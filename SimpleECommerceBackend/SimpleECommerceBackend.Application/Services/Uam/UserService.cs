@@ -1,28 +1,28 @@
-using Serilog;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Entities.Uam;
-using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services.Uam;
 
-public class UserService : ServiceBase, IUserService
+public class UserService : IUserService
 {
+    private readonly Serilog.ILogger _logger;
+    private readonly ICacheService _cacheService;
     private readonly IUserRepository _userRepository;
-    private readonly ILogger _logger;
 
     public UserService(
+        Serilog.ILogger logger,
         ICacheService cacheService,
-        IUserRepository userRepository,
-        ILogger logger
-    ) : base(cacheService)
+        IUserRepository userRepository
+    )
     {
-        _userRepository = userRepository;
         _logger = logger;
+        _cacheService = cacheService;
+        _userRepository = userRepository;
     }
 
     public User CreateUser(User user)
@@ -39,7 +39,7 @@ public class UserService : ServiceBase, IUserService
             );
 
         var cacheKey = UserCacheKeys.GetUserByIdKey(id);
-        var cachedUser = await CacheService.GetAsync<User>(cacheKey);
+        var cachedUser = await _cacheService.GetAsync<User>(cacheKey);
 
         if (cachedUser is not null)
         {
@@ -52,7 +52,7 @@ public class UserService : ServiceBase, IUserService
                        $"User with Id = {id} not found."
                    );
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             user,
             TimeSpan.FromMinutes(UserCacheKeys.GetUserByIdTtlMinutes)
@@ -79,7 +79,7 @@ public class UserService : ServiceBase, IUserService
             );
 
         var cacheKey = UserCacheKeys.GetUserByKeycloakSubjectIdKey(keycloakSubjectId);
-        var cachedUserId = await CacheService.GetAsync<string>(cacheKey);
+        var cachedUserId = await _cacheService.GetAsync<string>(cacheKey);
 
         if (cachedUserId is not null)
         {
@@ -90,7 +90,7 @@ public class UserService : ServiceBase, IUserService
             catch (FormatException ex)
             {
                 _logger.Error(ex, "Cached user id for Keycloak Subject Id = {KeycloakSubjectId} is invalid: {CachedUserId}", keycloakSubjectId, cachedUserId);
-                await CacheService.RemoveAsync(cacheKey);
+                await _cacheService.RemoveAsync(cacheKey);
                 throw new ResourceNotFoundException(
                     UserProfileErrorCodes.NotFoundByKeycloakSubjectId,
                     $"User with Keycloak Subject Id = {keycloakSubjectId} not found."
@@ -104,7 +104,7 @@ public class UserService : ServiceBase, IUserService
                        $"User with Keycloak Subject Id = {keycloakSubjectId} not found."
                    );
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             userId.ToString(),
             TimeSpan.FromMinutes(UserCacheKeys.GetUserByKeycloakSubjectIdTtlMinutes)
@@ -116,6 +116,6 @@ public class UserService : ServiceBase, IUserService
     public async Task<bool> IsActiveUserAsync(Guid id)
     {
         var user = await GetByIdAsync(id);
-        return user.Status == UserStatus.Active;
+        return !user.IsActive;
     }
 }

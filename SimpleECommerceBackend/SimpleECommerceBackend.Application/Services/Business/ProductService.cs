@@ -9,15 +9,20 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services.Business;
 
-public class ProductService : ServiceBase, IProductService
+public class ProductService : IProductService
 {
+    private readonly Serilog.ILogger _logger;
+    private readonly ICacheService _cacheService;
     private readonly IProductRepository _productRepository;
 
     public ProductService(
+        Serilog.ILogger logger,
         ICacheService cacheService,
         IProductRepository productRepository
-    ) : base(cacheService)
+    )
     {
+        _logger = logger;
+        _cacheService = cacheService;
         _productRepository = productRepository;
     }
 
@@ -29,7 +34,7 @@ public class ProductService : ServiceBase, IProductService
     public async Task<GetAllProductsResultForCustomer> GetAllProductsForCustomerAsync(GetAllProductsQueryForCustomer query)
     {
         var cacheKey = ProductCacheKeys.GetAllProductsKey(query.GetContentHash());
-        var cachedResult = await CacheService.GetAsync<GetAllProductsResultForCustomer>(cacheKey);
+        var cachedResult = await _cacheService.GetAsync<GetAllProductsResultForCustomer>(cacheKey);
 
         if (cachedResult is not null)
         {
@@ -39,7 +44,7 @@ public class ProductService : ServiceBase, IProductService
         var products = await _productRepository.FindAllWithFilterForCustomerAsync(query);
         var result = GetAllProductsResultForCustomer.FromFilterResult(products);
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             result,
             TimeSpan.FromMinutes(ProductCacheKeys.GetAllProductsTtlMinutes)
@@ -51,7 +56,7 @@ public class ProductService : ServiceBase, IProductService
     public async Task<Product> GetProductByIdAsync(Guid id)
     {
         var cacheKey = ProductCacheKeys.GetProductKey(id);
-        var cachedProduct = await CacheService.GetAsync<Product>(cacheKey);
+        var cachedProduct = await _cacheService.GetAsync<Product>(cacheKey);
 
         if (cachedProduct is not null)
         {
@@ -64,7 +69,7 @@ public class ProductService : ServiceBase, IProductService
                 $"Product with Id = {id} was not found."
             );
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             product,
             TimeSpan.FromMinutes(ProductCacheKeys.GetProductTtlMinutes)

@@ -9,18 +9,20 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Application.Services.Business;
 
-public class CategoryService : ServiceBase, ICategoryService
+public class CategoryService : ICategoryService
 {
-    private readonly ICategoryRepository _categoryRepository;
     private readonly Serilog.ILogger _logger;
+    private readonly ICacheService _cacheService;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CategoryService(ICacheService cacheService,
-        ICategoryRepository categoryRepository,
-        Serilog.ILogger logger)
-        : base(cacheService)
+
+    public CategoryService(Serilog.ILogger logger,
+        ICacheService cacheService,
+        ICategoryRepository categoryRepository)
     {
-        _categoryRepository = categoryRepository;
         _logger = logger;
+        _categoryRepository = categoryRepository;
+        _cacheService = cacheService;
     }
 
     public Category CreateCategory(Category category)
@@ -36,7 +38,7 @@ public class CategoryService : ServiceBase, ICategoryService
     public async Task<GetAllCategoriesResult> GetAllCategoriesAsync(GetAllCategoriesQuery query)
     {
         var cacheKey = CategoryCacheKeys.GetAllCategoriesKey(query.GetContentHash());
-        var cachedResult = await CacheService.GetAsync<GetAllCategoriesResult>(cacheKey);
+        var cachedResult = await _cacheService.GetAsync<GetAllCategoriesResult>(cacheKey);
 
         if (cachedResult is not null)
         {
@@ -46,7 +48,7 @@ public class CategoryService : ServiceBase, ICategoryService
         var categories = await _categoryRepository.FindAllWithFilterAsync(query);
         var result = GetAllCategoriesResult.FromFilterResult(categories);
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             result,
             TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoriesTtlMinutes)
@@ -58,7 +60,7 @@ public class CategoryService : ServiceBase, ICategoryService
     public async Task<GetAllCategoriesResultForAdmin> GetAllCategoriesForAdminAsync(GetAllCategoriesQueryForAdmin query)
     {
         var cacheKey = CategoryCacheKeys.GetAllCategoriesForAdminKey(query.GetContentHash());
-        var cachedResult = await CacheService.GetAsync<GetAllCategoriesResultForAdmin>(cacheKey);
+        var cachedResult = await _cacheService.GetAsync<GetAllCategoriesResultForAdmin>(cacheKey);
 
         if (cachedResult is not null)
         {
@@ -68,7 +70,7 @@ public class CategoryService : ServiceBase, ICategoryService
         var categories = await _categoryRepository.FindAllForAdminWithFilterAsync(query);
         var result = GetAllCategoriesResultForAdmin.FromFilterResult(categories);
 
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             result,
             TimeSpan.FromMinutes(CategoryCacheKeys.GetAllCategoriesForAdminTtlMinutes)
@@ -80,7 +82,7 @@ public class CategoryService : ServiceBase, ICategoryService
     public async Task<Category> GetCategoryByIdAsync(Guid id)
     {
         var cacheKey = CategoryCacheKeys.GetCategoryKey(id);
-        var cachedCategory = await CacheService.GetAsync<Category>(cacheKey);
+        var cachedCategory = await _cacheService.GetAsync<Category>(cacheKey);
 
         if (cachedCategory is not null)
         {
@@ -93,7 +95,7 @@ public class CategoryService : ServiceBase, ICategoryService
                 $"Category with Id = {id} was not found."
             );
 
-        await CacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKeys.GetCategoryTtlMinutes));
+        await _cacheService.SetAsync(cacheKey, category, TimeSpan.FromMinutes(CategoryCacheKeys.GetCategoryTtlMinutes));
         return category;
     }
 

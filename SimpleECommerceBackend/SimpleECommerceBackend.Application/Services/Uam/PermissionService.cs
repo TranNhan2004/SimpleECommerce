@@ -5,15 +5,20 @@ using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
 namespace SimpleECommerceBackend.Application.Services.Uam;
 
-public class PermissionService : ServiceBase, IPermissionService
+public class PermissionService : IPermissionService
 {
+    private readonly Serilog.ILogger _logger;
+    private readonly ICacheService _cacheService;
     private readonly IPermissionRepository _permissionRepository;
 
     public PermissionService(
+        Serilog.ILogger logger,
         ICacheService cacheService,
         IPermissionRepository permissionRepository
-    ) : base(cacheService)
+    )
     {
+        _logger = logger;
+        _cacheService = cacheService;
         _permissionRepository = permissionRepository;
     }
 
@@ -23,12 +28,12 @@ public class PermissionService : ServiceBase, IPermissionService
     )
     {
         var cacheKey = PermissionCacheKeys.GetPermissionSetKey(userId);
-        var cachedPermissionCodes = await CacheService.GetAsync<List<string>>(cacheKey, cancellationToken);
+        var cachedPermissionCodes = await _cacheService.GetAsync<List<string>>(cacheKey, cancellationToken);
         if (cachedPermissionCodes is not null)
             return cachedPermissionCodes;
 
         var permissionCodes = await _permissionRepository.FindCodesByUserIdAsync(userId);
-        await CacheService.SetAsync(
+        await _cacheService.SetAsync(
             cacheKey,
             permissionCodes.ToList(),
             TimeSpan.FromMinutes(PermissionCacheKeys.PermissionSetTtlMinutes),

@@ -13,7 +13,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class ProductRepository : GenericRepository<Product>, IProductRepository
 {
-    public ProductRepository(AppDbContext appDbContext) : base(appDbContext)
+    public ProductRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

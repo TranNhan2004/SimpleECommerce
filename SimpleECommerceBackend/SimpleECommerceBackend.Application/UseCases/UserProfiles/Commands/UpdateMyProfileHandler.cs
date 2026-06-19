@@ -1,7 +1,9 @@
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Events;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
-using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
+using SimpleECommerceBackend.Application.Models.Events;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 
@@ -9,19 +11,25 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, UpdateMyProfileResult>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly Serilog.ILogger _logger;
+    private readonly IEventDispatcher _eventDispatcher;
     private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdateMyProfileHandler(
-        IUnitOfWork unitOfWork,
+        Serilog.ILogger logger,
+        IEventDispatcher eventDispatcher,
         ICurrentUserContextProvider userContextHolder,
-        IUserService userService
+        IUserService userService,
+        IUnitOfWork unitOfWork
     )
     {
-        _unitOfWork = unitOfWork;
+        _logger = logger;
+        _eventDispatcher = eventDispatcher;
         _userContextHolder = userContextHolder;
         _userService = userService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<UpdateMyProfileResult> HandleAsync(
@@ -44,9 +52,12 @@ public class UpdateMyProfileHandler : IUseCaseHandler<UpdateMyProfileCommand, Up
             user.BirthDate = request.BirthDate.Value;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _userService.InvalidateCacheAsync(
-            exactKeys: [UserCacheKeys.GetUserByIdKey(user.Id)]
-        );
+
+        await _eventDispatcher.SendAsync(new RemoveCacheEventModel
+        {
+            Keys = [UserCacheKeys.GetUserByIdKey(currentUser.Id)]
+        }, cancellationToken);
+
         return UpdateMyProfileResult.FromEntity(user);
     }
 }

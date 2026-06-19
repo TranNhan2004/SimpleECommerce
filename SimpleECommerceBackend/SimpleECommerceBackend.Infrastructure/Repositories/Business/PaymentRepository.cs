@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository
 {
-    public PaymentRepository(AppDbContext appDbContext) : base(appDbContext)
+    public PaymentRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

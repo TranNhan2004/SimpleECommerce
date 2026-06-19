@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class ProductVariantPriceRepository : GenericRepository<ProductVariantPrice>, IProductVariantPriceRepository
 {
-    public ProductVariantPriceRepository(AppDbContext appDbContext) : base(appDbContext)
+    public ProductVariantPriceRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 }

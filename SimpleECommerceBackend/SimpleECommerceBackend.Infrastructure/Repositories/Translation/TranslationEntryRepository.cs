@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Translation;
 
 public class TranslationEntryRepository : GenericRepository<TranslationEntry>, ITranslationEntryRepository
 {
-    public TranslationEntryRepository(AppDbContext appDbContext) : base(appDbContext)
+    public TranslationEntryRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

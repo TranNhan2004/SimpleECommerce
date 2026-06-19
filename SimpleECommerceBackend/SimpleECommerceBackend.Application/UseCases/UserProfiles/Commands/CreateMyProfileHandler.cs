@@ -1,7 +1,7 @@
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
-using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
@@ -15,6 +15,7 @@ namespace SimpleECommerceBackend.Application.UseCases.UserProfiles.Commands;
 
 public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, CreateMyProfileResult>
 {
+    private readonly Serilog.ILogger _logger;
     private readonly ICurrentUserContextProvider _userContextHolder;
     private readonly IUserService _userService;
     private readonly IRoleRepository _roleRepository;
@@ -22,6 +23,7 @@ public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, Cr
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateMyProfileHandler(
+        Serilog.ILogger logger,
         ICurrentUserContextProvider userContextHolder,
         IUserService userService,
         IRoleRepository roleRepository,
@@ -29,6 +31,7 @@ public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, Cr
         IUnitOfWork unitOfWork
     )
     {
+        _logger = logger;
         _userContextHolder = userContextHolder;
         _userService = userService;
         _roleRepository = roleRepository;
@@ -53,7 +56,7 @@ public class CreateMyProfileHandler : IUseCaseHandler<CreateMyProfileCommand, Cr
             Email = userContext.Email,
             Sex = request.Sex,
             BirthDate = request.BirthDate,
-            Status = UserStatus.Active,
+            IsActive = true,
             AvatarUrl = null
         };
 

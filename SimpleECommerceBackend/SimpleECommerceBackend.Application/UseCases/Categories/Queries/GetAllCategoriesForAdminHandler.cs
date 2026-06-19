@@ -6,10 +6,12 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
 public class GetAllCategoriesForAdminHandler : IUseCaseHandler<GetAllCategoriesQueryForAdmin, GetAllCategoriesResultForAdmin>
 {
+    private readonly Serilog.ILogger _logger;
     private readonly ICategoryService _categoryService;
 
-    public GetAllCategoriesForAdminHandler(ICategoryService categoryService)
+    public GetAllCategoriesForAdminHandler(Serilog.ILogger logger, ICategoryService categoryService)
     {
+        _logger = logger;
         _categoryService = categoryService;
     }
 

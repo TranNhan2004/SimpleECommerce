@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class CartRepository : GenericRepository<Cart>, ICartRepository
 {
-    public CartRepository(AppDbContext appDbContext) : base(appDbContext)
+    public CartRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

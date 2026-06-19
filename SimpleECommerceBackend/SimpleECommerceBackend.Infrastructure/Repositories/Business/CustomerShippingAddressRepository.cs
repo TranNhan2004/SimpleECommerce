@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class CustomerShippingAddressRepository : GenericRepository<CustomerShippingAddress>, ICustomerShippingAddressRepository
 {
-    public CustomerShippingAddressRepository(AppDbContext appDbContext) : base(appDbContext)
+    public CustomerShippingAddressRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

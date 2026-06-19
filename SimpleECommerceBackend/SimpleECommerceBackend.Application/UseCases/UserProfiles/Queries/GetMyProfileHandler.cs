@@ -1,5 +1,5 @@
 using SimpleECommerceBackend.Application.Interfaces.Contexts;
-using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.UserProfiles;
 

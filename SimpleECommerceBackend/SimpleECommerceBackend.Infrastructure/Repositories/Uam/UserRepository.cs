@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Uam;
 
 public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    public UserRepository(AppDbContext appDbContext) : base(appDbContext)
+    public UserRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

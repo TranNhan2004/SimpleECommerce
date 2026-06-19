@@ -30,11 +30,6 @@ public class CategoryService : ICategoryService
         return _categoryRepository.Add(category);
     }
 
-    public Category DeleteCategory(Category category)
-    {
-        return _categoryRepository.Delete(category);
-    }
-
     public async Task<GetAllCategoriesResult> GetAllCategoriesAsync(GetAllCategoriesQuery query)
     {
         var cacheKey = CategoryCacheKeys.GetAllCategoriesKey(query.GetContentHash());

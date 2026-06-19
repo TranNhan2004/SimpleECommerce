@@ -1,9 +1,8 @@
-using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 
-namespace SimpleECommerceBackend.Application.Interfaces.Services.Business;
+namespace SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 
-public interface IUserService : ICacheConsumingService
+public interface IUserService
 {
     User CreateUser(User user);
     Task<User> GetByIdForUpdateAsync(Guid id);

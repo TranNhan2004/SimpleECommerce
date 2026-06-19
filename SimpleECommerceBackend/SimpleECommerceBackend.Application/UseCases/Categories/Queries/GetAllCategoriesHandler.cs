@@ -6,13 +6,14 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
 public class GetAllCategoriesHandler : IUseCaseHandler<GetAllCategoriesQuery, GetAllCategoriesResult>
 {
-    private readonly ICategoryService _categoryService;
     private readonly Serilog.ILogger _logger;
+    private readonly ICategoryService _categoryService;
 
-    public GetAllCategoriesHandler(ICategoryService categoryService, Serilog.ILogger logger)
+
+    public GetAllCategoriesHandler(Serilog.ILogger logger, ICategoryService categoryService)
     {
-        _categoryService = categoryService;
         _logger = logger;
+        _categoryService = categoryService;
     }
 
     public async Task<GetAllCategoriesResult> HandleAsync(

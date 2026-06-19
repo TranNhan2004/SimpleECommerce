@@ -1,5 +1,5 @@
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
-using SimpleECommerceBackend.Application.Interfaces.Services.Business;
+using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;

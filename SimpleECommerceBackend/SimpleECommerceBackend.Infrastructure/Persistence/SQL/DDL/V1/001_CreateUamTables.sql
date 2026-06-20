@@ -29,8 +29,8 @@ CREATE TABLE [uam].[Users]
         ON DELETE NO ACTION,
     CONSTRAINT [FK_Users_DeletedById] FOREIGN KEY ([DeletedById])
         REFERENCES [uam].[Users] ([Id])
-        ON DELETE NO ACTION
-    CONSTRAINT [PK_Users] PRIMARY KEY ([Id]),
+        ON DELETE NO ACTION,
+    CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
 );
 GO
 

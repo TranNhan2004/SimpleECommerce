@@ -13,6 +13,7 @@ builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddAppOpenTelemetry(builder.Configuration, builder.Environment);
 builder.Services.AddApiAuthorization();
 builder.Services.AddCustomRateLimiter(builder.Configuration);
 builder.Services.AddControllers();
@@ -105,10 +106,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("DefaultCors");
-
 app.UseForwardedHeaders();
+app.UseAppOpenTelemetry();
 app.UseHttpsRedirection();
+
+app.UseCors("DefaultCors");
 
 app.UseGlobalExceptionHandler();
 app.UseSerilogRequestLogging();

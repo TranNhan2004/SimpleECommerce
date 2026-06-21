@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Domain.Entities.AuditTracking;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Utils;
@@ -62,7 +62,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
                     OldValues = GetOldValues(entry, operationType),
                     NewValues = GetNewValues(entry, operationType),
                     AuditedAt = now,
-                    AuditedById = Guid.Parse(_currentRequestContext.UserId)
+                    AuditedById = _currentRequestContext.ActorId
                 }
             );
         }

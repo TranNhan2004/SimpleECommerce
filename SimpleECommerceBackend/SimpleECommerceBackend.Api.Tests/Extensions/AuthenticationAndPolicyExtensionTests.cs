@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.FileProviders;
+using SimpleECommerceBackend.Api.Authentication;
 using SimpleECommerceBackend.Api.Extensions;
 
 namespace SimpleECommerceBackend.Api.Tests.Extensions;
@@ -16,43 +16,24 @@ namespace SimpleECommerceBackend.Api.Tests.Extensions;
 public class AuthenticationAndPolicyExtensionTests
 {
     [Fact]
-    public void AddKeycloakAuthentication_ShouldNotConfigureDefaultAuthenticateScheme()
+    public void AddKeycloakAuthentication_ShouldConfigureSessionSchemeAsDefault()
     {
         var services = new ServiceCollection();
-        var configuration = CreateConfiguration("http://localhost:8080/");
+        var configuration = CreateConfiguration();
         var environment = CreateEnvironment(Environments.Development);
 
         services.AddKeycloakAuthentication(configuration, environment);
 
         using var serviceProvider = services.BuildServiceProvider();
         var authenticationOptions = serviceProvider.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
-        var jwtBearerOptions = serviceProvider.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
-            .Get(JwtBearerDefaults.AuthenticationScheme);
 
-        authenticationOptions.DefaultAuthenticateScheme.Should().BeNull();
-        authenticationOptions.DefaultChallengeScheme.Should().Be(JwtBearerDefaults.AuthenticationScheme);
-        authenticationOptions.DefaultForbidScheme.Should().Be(JwtBearerDefaults.AuthenticationScheme);
-        jwtBearerOptions.RequireHttpsMetadata.Should().BeFalse();
+        authenticationOptions.DefaultAuthenticateScheme.Should().Be(AppAuthenticationDefaults.SessionScheme);
+        authenticationOptions.DefaultChallengeScheme.Should().Be(AppAuthenticationDefaults.SessionScheme);
+        authenticationOptions.DefaultForbidScheme.Should().Be(AppAuthenticationDefaults.SessionScheme);
     }
 
     [Fact]
-    public void AddKeycloakAuthentication_ShouldAllowHttpMetadata_ForHttpAuthorityOutsideDevelopment()
-    {
-        var services = new ServiceCollection();
-        var configuration = CreateConfiguration("http://keycloak:8080/");
-        var environment = CreateEnvironment(Environments.Production);
-
-        services.AddKeycloakAuthentication(configuration, environment);
-
-        using var serviceProvider = services.BuildServiceProvider();
-        var jwtBearerOptions = serviceProvider.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
-            .Get(JwtBearerDefaults.AuthenticationScheme);
-
-        jwtBearerOptions.RequireHttpsMetadata.Should().BeFalse();
-    }
-
-    [Fact]
-    public void AddApiAuthorization_ShouldUseBearerSchemeInDefaultPolicy()
+    public void AddApiAuthorization_ShouldRequireAuthenticatedUsers()
     {
         var services = new ServiceCollection();
 
@@ -61,20 +42,39 @@ public class AuthenticationAndPolicyExtensionTests
         using var serviceProvider = services.BuildServiceProvider();
         var authorizationOptions = serviceProvider.GetRequiredService<IOptions<AuthorizationOptions>>().Value;
 
-        authorizationOptions.DefaultPolicy.AuthenticationSchemes.Should().ContainSingle(JwtBearerDefaults.AuthenticationScheme);
         authorizationOptions.DefaultPolicy.Requirements.Should().ContainSingle(requirement =>
             requirement is DenyAnonymousAuthorizationRequirement);
     }
 
-    private static IConfiguration CreateConfiguration(string authServerUrl)
+    private static IConfiguration CreateConfiguration()
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["KeycloakOptions:Realm"] = "SimpleECommerce",
-                ["KeycloakOptions:AuthServerUrl"] = authServerUrl,
-                ["KeycloakOptions:Resource"] = "simple-e-commerce-backend",
-                ["KeycloakOptions:TimeoutSeconds"] = "30"
+                ["Auth:FrontendBaseUrl"] = "https://dev-ecommerce.example.com",
+                ["Auth:PostLoginRedirectPath"] = "/",
+                ["Auth:PostLogoutRedirectPath"] = "/login",
+                ["Auth:SessionCookieName"] = "APP_SESSION_ID",
+                ["Auth:CsrfCookieName"] = "XSRF-TOKEN",
+                ["Auth:CsrfHeaderName"] = "X-CSRF-TOKEN",
+                ["Auth:SessionExpireMinutes"] = "60",
+                ["Auth:OAuthStateExpireMinutes"] = "10",
+                ["Auth:CookieSecure"] = "true",
+                ["Auth:CookieSameSite"] = "None",
+                ["Keycloak:Authority"] = "https://dev-identity-provider.example.com/realms/SimpleECommerce",
+                ["Keycloak:BaseUrl"] = "https://dev-identity-provider.example.com",
+                ["Keycloak:Realm"] = "SimpleECommerce",
+                ["Keycloak:ClientId"] = "simple-e-commerce",
+                ["Keycloak:ClientSecret"] = "secret",
+                ["Keycloak:AuthorizationEndpoint"] = "https://dev-identity-provider.example.com/realms/SimpleECommerce/protocol/openid-connect/auth",
+                ["Keycloak:TokenEndpoint"] = "https://dev-identity-provider.example.com/realms/SimpleECommerce/protocol/openid-connect/token",
+                ["Keycloak:UserInfoEndpoint"] = "https://dev-identity-provider.example.com/realms/SimpleECommerce/protocol/openid-connect/userinfo",
+                ["Keycloak:EndSessionEndpoint"] = "https://dev-identity-provider.example.com/realms/SimpleECommerce/protocol/openid-connect/logout",
+                ["Keycloak:CallbackPath"] = "/api/v1.0/auth/login/callback",
+                ["Keycloak:RedirectUri"] = "https://dev-api-ecommerce.example.com/api/v1.0/auth/login/callback",
+                ["Keycloak:Scopes:0"] = "openid",
+                ["Keycloak:Scopes:1"] = "profile",
+                ["Keycloak:Scopes:2"] = "email"
             })
             .Build();
     }

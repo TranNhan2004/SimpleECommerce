@@ -10,12 +10,13 @@ CREATE TABLE [uam].[Users]
     [FirstName] nvarchar(64) NOT NULL,
     [LastName] nvarchar(128) NOT NULL,
     [NickName] nvarchar(128) NULL,
-    [Sex] int NOT NULL,
-    [Status] int NOT NULL,
+    [Sex] nvarchar(16) NOT NULL,
+    [Status] nvarchar(50) NOT NULL,
     [BirthDate] date NOT NULL,
     [AvatarUrl] nvarchar(max) NULL,
+    [LastLoginAt] datetimeoffset NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0, 
@@ -38,9 +39,8 @@ CREATE UNIQUE INDEX [IX_Users_KeycloakSubjectId]
     ON [uam].[Users] ([KeycloakSubjectId]);
 GO
 
-CREATE UNIQUE INDEX [IX_Users_Email]
+CREATE INDEX [IX_Users_Email]
     ON [uam].[Users] ([Email])
-    WHERE [Status] <> 99;
 GO
 
 CREATE TABLE [uam].[Roles]
@@ -50,7 +50,7 @@ CREATE TABLE [uam].[Roles]
     [Name] nvarchar(128) NOT NULL,
     [Description] nvarchar(512) NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0,
@@ -80,7 +80,7 @@ CREATE TABLE [uam].[Permissions]
     [Name] nvarchar(256) NOT NULL,
     [Description] nvarchar(512) NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0,
@@ -109,7 +109,7 @@ CREATE TABLE [uam].[UserRoles]
     [UserId] uniqueidentifier NOT NULL,
     [RoleId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0,
@@ -144,7 +144,7 @@ CREATE TABLE [uam].[RolePermissions]
     [RoleId] uniqueidentifier NOT NULL,
     [PermissionId] uniqueidentifier NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0,

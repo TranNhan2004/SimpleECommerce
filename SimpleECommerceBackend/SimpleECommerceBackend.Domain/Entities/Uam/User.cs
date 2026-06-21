@@ -18,7 +18,7 @@ public class User : EntityBase
     private string _lastName = null!;
     private string? _nickName;
     private Sex _sex;
-    private bool _isActive;
+    private UserStatus _status;
     private DateOnly _birthDate;
     private string? _avatarUrl;
 
@@ -29,7 +29,7 @@ public class User : EntityBase
         {
             if (value == Guid.Empty)
                 throw new ValidationException(
-                    UserProfileErrorCodes.KeycloakSubjectIdInvalid,
+                    UserErrorCodes.KeycloakSubjectIdInvalid,
                     "Keycloak subject id is invalid",
                     new Dictionary<string, object?>
                     {
@@ -54,7 +54,7 @@ public class User : EntityBase
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ValidationException(
-                    UserProfileErrorCodes.FirstNameRequired,
+                    UserErrorCodes.FirstNameRequired,
                     "First name is required",
                     new Dictionary<string, object?>
                     {
@@ -66,7 +66,7 @@ public class User : EntityBase
 
             if (trimmedFirstName.Length > UserProfileValidationRules.FirstNameMaxLength)
                 throw new ValidationException(
-                    UserProfileErrorCodes.FirstNameMaxLengthExceeded,
+                    UserErrorCodes.FirstNameMaxLengthExceeded,
                     $"First name cannot exceed {UserProfileValidationRules.FirstNameMaxLength} characters",
                     new Dictionary<string, object?>
                     {
@@ -86,7 +86,7 @@ public class User : EntityBase
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ValidationException(
-                    UserProfileErrorCodes.LastNameRequired,
+                    UserErrorCodes.LastNameRequired,
                     "Last name is required",
                     new Dictionary<string, object?>
                     {
@@ -98,7 +98,7 @@ public class User : EntityBase
 
             if (trimmedLastName.Length > UserProfileValidationRules.LastNameMaxLength)
                 throw new ValidationException(
-                    UserProfileErrorCodes.LastNameMaxLengthExceeded,
+                    UserErrorCodes.LastNameMaxLengthExceeded,
                     $"Last name cannot exceed {UserProfileValidationRules.LastNameMaxLength} characters",
                     new Dictionary<string, object?>
                     {
@@ -124,7 +124,7 @@ public class User : EntityBase
 
             if (string.IsNullOrWhiteSpace(value))
                 throw new ValidationException(
-                    UserProfileErrorCodes.NickNameMustNotBeBlank,
+                    UserErrorCodes.NickNameMustNotBeBlank,
                     "Nick name is not blank",
                     new Dictionary<string, object?>
                     {
@@ -136,7 +136,7 @@ public class User : EntityBase
 
             if (trimmedNickName.Length > UserProfileValidationRules.NickNameMaxLength)
                 throw new ValidationException(
-                    UserProfileErrorCodes.NickNameMaxLengthExceeded,
+                    UserErrorCodes.NickNameMaxLengthExceeded,
                     $"Nick name cannot exceed {UserProfileValidationRules.NickNameMaxLength} characters",
                     new Dictionary<string, object?>
                     {
@@ -155,10 +155,10 @@ public class User : EntityBase
         set => _sex = value;
     }
 
-    public bool IsActive
+    public UserStatus Status
     {
-        get => _isActive;
-        set => _isActive = value;
+        get => _status;
+        set => _status = value;
     }
 
     public DateOnly BirthDate
@@ -170,7 +170,7 @@ public class User : EntityBase
 
             if (value > today)
                 throw new ValidationException(
-                    UserProfileErrorCodes.BirthDateCannotBeFuture,
+                    UserErrorCodes.BirthDateCannotBeFuture,
                     "Birth date cannot be in the future",
                     new Dictionary<string, object?>
                     {
@@ -180,7 +180,7 @@ public class User : EntityBase
 
             if (AgeUtils.Calculate(value, today) < UserProfileValidationRules.MinAge)
                 throw new ValidationException(
-                    UserProfileErrorCodes.AgeCannotBeLessThan,
+                    UserErrorCodes.AgeCannotBeLessThan,
                     $"Age cannot be less than {UserProfileValidationRules.MinAge} years",
                     new Dictionary<string, object?>
                     {
@@ -191,7 +191,7 @@ public class User : EntityBase
 
             if (AgeUtils.Calculate(value, today) > UserProfileValidationRules.MaxAge)
                 throw new ValidationException(
-                    UserProfileErrorCodes.AgeCannotExceed,
+                    UserErrorCodes.AgeCannotExceed,
                     $"Age cannot exceed than {UserProfileValidationRules.MaxAge} years",
                     new Dictionary<string, object?>
                     {

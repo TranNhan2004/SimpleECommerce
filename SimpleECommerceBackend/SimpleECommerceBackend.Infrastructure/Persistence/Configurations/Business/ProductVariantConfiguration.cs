@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
@@ -38,6 +39,7 @@ public class ProductVariantConfiguration : IEntityTypeConfiguration<ProductVaria
         builder.Property(pv => pv.DefaultImageUrl);
 
         builder.Property(pv => pv.Status)
+            .HasEnumStringConversion(50)
             .IsRequired();
 
         builder.HasOne(pv => pv.Product)

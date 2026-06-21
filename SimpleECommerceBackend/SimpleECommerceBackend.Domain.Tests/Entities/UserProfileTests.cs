@@ -41,7 +41,7 @@ public class UserTests
         };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.FirstNameRequired);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.FirstNameRequired);
     }
 
     [Theory]
@@ -63,7 +63,7 @@ public class UserTests
         };
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.LastNameRequired);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.LastNameRequired);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class UserTests
         var action = () => user.NickName = nickName;
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.NickNameMaxLengthExceeded);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.NickNameMaxLengthExceeded);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class UserTests
         var action = () => user.BirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.BirthDateCannotBeFuture);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.BirthDateCannotBeFuture);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class UserTests
         var action = () => user.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MinAge - 1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotBeLessThan);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.AgeCannotBeLessThan);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class UserTests
         var action = () => user.BirthDate = EntityTestData.CreateBirthDate(UserProfileValidationRules.MaxAge + 1);
 
         action.Should().Throw<ValidationException>()
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.AgeCannotExceed);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.AgeCannotExceed);
     }
 
     private static User CreateUser()

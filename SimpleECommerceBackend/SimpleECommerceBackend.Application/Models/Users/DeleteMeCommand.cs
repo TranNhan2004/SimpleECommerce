@@ -1,0 +1,6 @@
+namespace SimpleECommerceBackend.Application.Models.Users;
+
+public class DeleteMeCommand
+{
+
+}

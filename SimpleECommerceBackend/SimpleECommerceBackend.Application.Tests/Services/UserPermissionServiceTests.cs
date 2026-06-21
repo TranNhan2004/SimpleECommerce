@@ -63,6 +63,6 @@ public class UserPermissionServiceTests
         var action = async () => await sut.GetPermissionCodesByUserIdAsync(userId);
 
         (await action.Should().ThrowAsync<UnauthorizedException>())
-            .Which.ErrorCode.Should().Be(UserProfileErrorCodes.InactiveUser);
+            .Which.ErrorCode.Should().Be(UserErrorCodes.InactiveUser);
     }
 }

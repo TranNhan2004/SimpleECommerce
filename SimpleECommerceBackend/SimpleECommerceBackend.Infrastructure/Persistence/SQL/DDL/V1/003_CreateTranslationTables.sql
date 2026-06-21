@@ -11,7 +11,7 @@ CREATE TABLE [translation].[Translations]
     [Locale] nvarchar(16) NOT NULL,
     [Value] nvarchar(max) NOT NULL,
     [CreatedAt] datetimeoffset NOT NULL,
-    [CreatedById] uniqueidentifier NOT NULL,
+    [CreatedById] uniqueidentifier NULL,
     [UpdatedAt] datetimeoffset NULL,
     [UpdatedById] uniqueidentifier NULL,
     [IsDeleted] bit NOT NULL DEFAULT 0,

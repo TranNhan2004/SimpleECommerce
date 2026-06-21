@@ -2,17 +2,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Business;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Translation;
 using SimpleECommerceBackend.Application.Interfaces.Repositories.Uam;
 using SimpleECommerceBackend.Application.Interfaces.Services.Address;
+using SimpleECommerceBackend.Application.Interfaces.Services.Auth;
 using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
 using SimpleECommerceBackend.Application.Interfaces.Services.Email;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
+using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Infrastructure.Contexts;
-using SimpleECommerceBackend.Infrastructure.Extensions;
 using SimpleECommerceBackend.Infrastructure.Options.Authentication;
 using SimpleECommerceBackend.Infrastructure.Options.Caching;
 using SimpleECommerceBackend.Infrastructure.Options.Email;
@@ -26,11 +26,10 @@ using SimpleECommerceBackend.Infrastructure.Repositories.Business;
 using SimpleECommerceBackend.Infrastructure.Repositories.Translation;
 using SimpleECommerceBackend.Infrastructure.Repositories.Uam;
 using SimpleECommerceBackend.Infrastructure.Services.Address;
+using SimpleECommerceBackend.Infrastructure.Services.Auth;
 using SimpleECommerceBackend.Infrastructure.Services.Caching;
 using SimpleECommerceBackend.Infrastructure.Services.Email;
-using SimpleECommerceBackend.Infrastructure.Services.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Services.Translation;
-using StackExchange.Redis;
 
 namespace SimpleECommerceBackend.Infrastructure;
 
@@ -39,6 +38,8 @@ public static class DependencyInjection
     public static IServiceCollection AddAppOptions(this IServiceCollection services, IConfiguration configuration)
     {
         // Authentication
+        services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
+        services.Configure<KeycloakBffOptions>(configuration.GetSection(KeycloakBffOptions.SectionName));
         services.Configure<KeycloakOptions>(configuration.GetSection(KeycloakOptions.SectionName));
 
         // Caching
@@ -64,6 +65,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpClient(nameof(BffAuthenticationService));
+
         // Email Services
         services.AddScoped<IEmailBodyProvider, EmailBodyProvider>();
         services.AddSingleton<BackgroundEmailQueue>();
@@ -81,9 +84,9 @@ public static class DependencyInjection
 
         // Request User Context
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUserContextProvider, CurrentUserContextProvider>();
-        services.AddSingleton<IBackgroundJobContextAccessor, BackgroundJobContextAccessor>();
-        services.AddSingleton<IServerIpAddressResolver, ServerIpAddressResolver>();
+        services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+        services.AddSingleton<IBackgroundJobContext, BackgroundJobContextAccessor>();
+        services.AddSingleton<IServerIpAddressContext, ServerIpAddressContext>();
         services.AddScoped<ICurrentRequestContext, CurrentRequestContext>();
 
         // Cache Services
@@ -91,6 +94,7 @@ public static class DependencyInjection
             sp.GetRequiredService<IOptions<RedisOptions>>(),
             sp.GetRequiredService<Serilog.ILogger>()
         ));
+        services.AddScoped<IBffAuthenticationService, BffAuthenticationService>();
 
         // Translation Services
         services.AddSingleton<IStaticTextLocalizer, JsonStaticTextLocalizer>();

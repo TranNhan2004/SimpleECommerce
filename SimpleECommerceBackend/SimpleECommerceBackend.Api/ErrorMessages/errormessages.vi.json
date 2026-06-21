@@ -175,7 +175,7 @@
       "Field": "Trường dữ liệu",
       "Value": "Giá trị"
     },
-    "UserProfile": {
+    "User": {
       "FirstName": "Tên",
       "LastName": "Họ",
       "NickName": "Biệt danh",
@@ -424,7 +424,7 @@
       "HasNoIndex": "Không thể xác định xung đột duy nhất vì thiếu metadata của index trong cơ sở dữ liệu.",
       "UnknownError": "Đã xảy ra lỗi ràng buộc duy nhất."
     },
-    "UserProfile": {
+    "User": {
       "FirstNameRequired": "{field} là bắt buộc.",
       "FirstNameMaxLengthExceeded": "{field} không được vượt quá {max} ký tự.",
       "LastNameRequired": "{field} là bắt buộc.",

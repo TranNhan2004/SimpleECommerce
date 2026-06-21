@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
@@ -45,6 +46,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         });
 
         builder.Property(o => o.Status)
+            .HasEnumStringConversion(50)
             .IsRequired();
 
         builder.Property(o => o.ShopName)

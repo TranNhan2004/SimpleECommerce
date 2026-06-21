@@ -1,6 +1,6 @@
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
 using SimpleECommerceBackend.Application.Interfaces.Events;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
@@ -16,21 +16,21 @@ public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, Upda
 {
     private readonly Serilog.ILogger _logger;
     private readonly IEventDispatcher _eventDispatcher;
-    private readonly ICurrentUserContextProvider _userContextHolder;
+    private readonly ICurrentUserContext _currentUserContext;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateCategoryHandler(
         Serilog.ILogger logger,
         IEventDispatcher eventDispatcher,
-        ICurrentUserContextProvider userContextHolder,
+        ICurrentUserContext currentUserContext,
         ICategoryService categoryService,
         IUnitOfWork unitOfWork
     )
     {
         _logger = logger;
         _eventDispatcher = eventDispatcher;
-        _userContextHolder = userContextHolder;
+        _currentUserContext = currentUserContext;
         _categoryService = categoryService;
         _unitOfWork = unitOfWork;
     }
@@ -40,10 +40,9 @@ public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, Upda
         CancellationToken cancellationToken
     )
     {
-        var userContext = _userContextHolder.GetUserContext();
         var category = await _categoryService.GetCategoryByIdForUpdateAsync(request.Id);
 
-        if (category.CreatedById != userContext.Id)
+        if (category.CreatedById != _currentUserContext.Id)
         {
             throw new ForbiddenException(
                 CategoryErrorCodes.AdminRequired,

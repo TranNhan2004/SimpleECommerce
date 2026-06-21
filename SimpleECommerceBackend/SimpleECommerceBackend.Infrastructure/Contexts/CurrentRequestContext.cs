@@ -1,37 +1,40 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Security;
+using SimpleECommerceBackend.Domain.Constants.Uam;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
 public class CurrentRequestContext : ICurrentRequestContext
 {
-    private const string AnonymousUserId = "anonymous";
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IBackgroundJobContextAccessor _backgroundJobContextAccessor;
-    private readonly IServerIpAddressResolver _serverIpAddressResolver;
+    private readonly ICurrentUserContext _currentUserContext;
+    private readonly IBackgroundJobContext _backgroundJobContext;
+    private readonly IServerIpAddressContext _serverIpAddressResolver;
 
     public CurrentRequestContext(
         IHttpContextAccessor httpContextAccessor,
-        IBackgroundJobContextAccessor backgroundJobContextAccessor,
-        IServerIpAddressResolver serverIpAddressResolver
+        ICurrentUserContext currentUserContext,
+        IBackgroundJobContext backgroundJobContext,
+        IServerIpAddressContext serverIpAddressResolver
     )
     {
         _httpContextAccessor = httpContextAccessor;
-        _backgroundJobContextAccessor = backgroundJobContextAccessor;
+        _currentUserContext = currentUserContext;
+        _backgroundJobContext = backgroundJobContext;
         _serverIpAddressResolver = serverIpAddressResolver;
     }
 
-    public string UserId
+    public Guid ActorId
     {
         get
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext is not null)
-                return ResolveRequestUserId(httpContext);
+                return ResolveRequestActorId(httpContext);
 
-            return _backgroundJobContextAccessor.JobName ?? AnonymousUserId;
+            return WellKnownUserIds.System;
         }
     }
 
@@ -43,7 +46,7 @@ public class CurrentRequestContext : ICurrentRequestContext
             if (httpContext is not null && !string.IsNullOrWhiteSpace(httpContext.TraceIdentifier))
                 return httpContext.TraceIdentifier;
 
-            return _backgroundJobContextAccessor.TraceId
+            return _backgroundJobContext.TraceId
                 ?? Activity.Current?.Id
                 ?? Guid.NewGuid().ToString("N");
         }
@@ -61,14 +64,13 @@ public class CurrentRequestContext : ICurrentRequestContext
         }
     }
 
-    private string ResolveRequestUserId(HttpContext httpContext)
+    private Guid ResolveRequestActorId(HttpContext httpContext)
     {
         var principal = httpContext.User;
         if (principal?.Identity?.IsAuthenticated != true)
-            return AnonymousUserId;
+            return WellKnownUserIds.Anonymous;
 
-        var keycloakSubjectId = KeycloakPayloadExtractionHelper.FindKeycloakSubjectId(principal);
-        return string.IsNullOrWhiteSpace(keycloakSubjectId) ? AnonymousUserId : keycloakSubjectId;
+        return _currentUserContext.Id;
     }
 
     private string? ResolveRequestIpAddress(HttpContext httpContext)

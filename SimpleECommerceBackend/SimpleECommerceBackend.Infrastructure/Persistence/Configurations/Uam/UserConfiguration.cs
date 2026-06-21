@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Uam;
 
@@ -30,8 +31,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(UserProfileValidationRules.NickNameMaxLength)
             .HasDefaultValue(null);
 
-        builder.Property(u => u.Sex).IsRequired();
-        builder.Property(u => u.Status).IsRequired();
+        builder.Property(u => u.Sex)
+            .HasEnumStringConversion()
+            .IsRequired();
+
+        builder.Property(u => u.Status)
+            .HasEnumStringConversion(50)
+            .IsRequired();
+
         builder.Property(u => u.BirthDate).HasDefaultValue(null);
         builder.Property(u => u.AvatarUrl).HasDefaultValue(null);
 
@@ -40,6 +47,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.Email)
             .IsUnique()
-            .HasFilter($"[{nameof(User.Status)}] <> {(int)UserStatus.Archived}");
+            .HasFilter($"[{nameof(User.Status)}] <> N'{UserStatus.Archived}'");
     }
 }

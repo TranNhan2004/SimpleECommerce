@@ -175,7 +175,7 @@
       "Field": "Field",
       "Value": "Value"
     },
-    "UserProfile": {
+    "User": {
       "FirstName": "First name",
       "LastName": "Last name",
       "NickName": "Nick name",
@@ -424,7 +424,7 @@
       "HasNoIndex": "The unique constraint cannot be resolved because the database index metadata is missing.",
       "UnknownError": "A unique constraint error occurred."
     },
-    "UserProfile": {
+    "User": {
       "FirstNameRequired": "{field} is required.",
       "FirstNameMaxLengthExceeded": "{field} cannot exceed {max} characters.",
       "LastNameRequired": "{field} is required.",

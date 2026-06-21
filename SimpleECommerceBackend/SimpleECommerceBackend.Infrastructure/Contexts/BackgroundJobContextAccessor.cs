@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Threading;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Security;
 
 namespace SimpleECommerceBackend.Infrastructure.Contexts;
 
-public sealed class BackgroundJobContextAccessor : IBackgroundJobContextAccessor
+public sealed class BackgroundJobContextAccessor : IBackgroundJobContext
 {
     private readonly AsyncLocal<BackgroundJobContextState?> _current = new();
 

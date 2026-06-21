@@ -2,7 +2,9 @@ SET NOCOUNT ON;
 GO
 
 DECLARE @SeededAt datetimeoffset = '2026-05-26T06:21:10+00:00';
+-- Reserved actor ids used by application audit and system contexts.
 DECLARE @SystemUserId uniqueidentifier = '00000000-0000-0000-0000-000000000001';
+DECLARE @AnonymousUserId uniqueidentifier = '00000000-0000-0000-0000-000000000002';
 DECLARE @AdminUserId uniqueidentifier = '019e62f1-bbfe-74fe-91f2-c920ddb69ff8';
 
 -- Users
@@ -18,6 +20,7 @@ INSERT INTO [uam].[Users]
     [Status],
     [BirthDate],
     [AvatarUrl],
+    [LastLoginAt],
     [CreatedAt],
     [CreatedById],
     [UpdatedAt],
@@ -34,12 +37,13 @@ VALUES
     N'System',
     N'User',
     N'system',
-    3,
-    1,
+    N'Other',
+    N'Active',
     '1990-01-01',
     NULL,
+    NULL,
     @SeededAt,
-    @SystemUserId,
+    NULL,
     NULL,
     NULL,
     0,
@@ -59,6 +63,50 @@ INSERT INTO [uam].[Users]
     [Status],
     [BirthDate],
     [AvatarUrl],
+    [LastLoginAt],
+    [CreatedAt],
+    [CreatedById],
+    [UpdatedAt],
+    [UpdatedById],
+    [IsDeleted],
+    [DeletedAt],
+    [DeletedById]
+)
+VALUES
+(
+    @AnonymousUserId,
+    @AnonymousUserId,
+    N'anonymous@simpleecommerce.local',
+    N'Anonymous',
+    N'User',
+    N'Anonymous',
+    N'Other',
+    N'Active',
+    '1990-01-01',
+    NULL,
+    NULL,
+    @SeededAt,
+    NULL,
+    NULL,
+    NULL,
+    0,
+    NULL,
+    NULL
+);
+
+INSERT INTO [uam].[Users]
+(
+    [Id],
+    [KeycloakSubjectId],
+    [Email],
+    [FirstName],
+    [LastName],
+    [NickName],
+    [Sex],
+    [Status],
+    [BirthDate],
+    [AvatarUrl],
+    [LastLoginAt],
     [CreatedAt],
     [CreatedById],
     [UpdatedAt],
@@ -75,9 +123,10 @@ VALUES
     N'Admin',
     N'User',
     N'admin@test.com',
-    3,
-    1,
+    N'Other',
+    N'Active',
     '1990-01-01',
+    NULL,
     NULL,
     @SeededAt,
     @SystemUserId,

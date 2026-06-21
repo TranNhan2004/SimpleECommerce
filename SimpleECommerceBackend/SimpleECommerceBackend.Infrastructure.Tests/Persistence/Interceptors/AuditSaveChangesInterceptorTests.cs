@@ -1,7 +1,8 @@
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Security;
+using SimpleECommerceBackend.Domain.Constants.Uam;
 using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.AuditTracking;
 using SimpleECommerceBackend.Domain.Enums;
@@ -18,8 +19,9 @@ public class AuditSaveChangesInterceptorTests
     public void SavingChanges_ShouldCreateAuditForAddedEntity_AndSetCreatedAt()
     {
         using var context = CreateContext();
+        var actorId = Guid.NewGuid();
         var interceptor = new AuditSaveChangesInterceptor(
-            new StubCurrentRequestContext("user-123", TraceId, IpAddress)
+            new StubCurrentRequestContext(actorId, TraceId, IpAddress)
         );
         var entity = new TestEntity
         {
@@ -38,7 +40,7 @@ public class AuditSaveChangesInterceptorTests
         audit.EntityName.Should().Be(nameof(TestEntity));
         audit.EntityId.Should().Be(entity.Id);
         audit.OperationType.Should().Be(AuditOperationType.Add);
-        audit.AuditedBy.Should().Be("user-123");
+        audit.AuditedById.Should().Be(actorId);
         audit.TraceId.Should().Be(TraceId);
         audit.IpAddress.Should().Be(IpAddress);
         audit.AuditedAt.Should().Be(entity.CreatedAt);
@@ -50,8 +52,9 @@ public class AuditSaveChangesInterceptorTests
     public void SavingChanges_ShouldCreateAuditForModifiedEntity_AndSetUpdatedAt()
     {
         using var context = CreateContext();
+        var actorId = Guid.NewGuid();
         var interceptor = new AuditSaveChangesInterceptor(
-            new StubCurrentRequestContext("user-456", TraceId, IpAddress)
+            new StubCurrentRequestContext(actorId, TraceId, IpAddress)
         );
         var entity = new TestEntity
         {
@@ -71,7 +74,7 @@ public class AuditSaveChangesInterceptorTests
         audit.EntityName.Should().Be(nameof(TestEntity));
         audit.EntityId.Should().Be(entity.Id);
         audit.OperationType.Should().Be(AuditOperationType.Update);
-        audit.AuditedBy.Should().Be("user-456");
+        audit.AuditedById.Should().Be(actorId);
         audit.TraceId.Should().Be(TraceId);
         audit.IpAddress.Should().Be(IpAddress);
         audit.AuditedAt.Should().Be(entity.UpdatedAt!.Value);
@@ -83,8 +86,9 @@ public class AuditSaveChangesInterceptorTests
     public void SavingChanges_ShouldCreateAuditForDeletedEntity()
     {
         using var context = CreateContext();
+        var actorId = Guid.NewGuid();
         var interceptor = new AuditSaveChangesInterceptor(
-            new StubCurrentRequestContext("user-789", TraceId, IpAddress)
+            new StubCurrentRequestContext(actorId, TraceId, IpAddress)
         );
         var entity = new TestEntity
         {
@@ -102,7 +106,7 @@ public class AuditSaveChangesInterceptorTests
         audit.EntityName.Should().Be(nameof(TestEntity));
         audit.EntityId.Should().Be(entity.Id);
         audit.OperationType.Should().Be(AuditOperationType.Delete);
-        audit.AuditedBy.Should().Be("user-789");
+        audit.AuditedById.Should().Be(actorId);
         audit.TraceId.Should().Be(TraceId);
         audit.IpAddress.Should().Be(IpAddress);
         audit.OldValues.Should().Contain(nameof(TestEntity.Name));
@@ -114,7 +118,7 @@ public class AuditSaveChangesInterceptorTests
     {
         using var context = CreateContext();
         var interceptor = new AuditSaveChangesInterceptor(
-            new StubCurrentRequestContext("audit-user", TraceId, IpAddress)
+            new StubCurrentRequestContext(WellKnownUserIds.System, TraceId, IpAddress)
         );
         var audit = new Audit
         {
@@ -124,7 +128,7 @@ public class AuditSaveChangesInterceptorTests
             OperationType = AuditOperationType.Add,
             TraceId = TraceId,
             IpAddress = IpAddress,
-            AuditedBy = "audit-user",
+            AuditedById = WellKnownUserIds.System,
             AuditedAt = DateTimeOffset.UtcNow
         };
 
@@ -193,9 +197,9 @@ public class AuditSaveChangesInterceptorTests
         public DateTimeOffset? UpdatedAt { get; set; }
     }
 
-    private sealed class StubCurrentRequestContext(string userId, string traceId, string ipAddress) : ICurrentRequestContext
+    private sealed class StubCurrentRequestContext(Guid actorId, string traceId, string ipAddress) : ICurrentRequestContext
     {
-        public string UserId { get; } = userId;
+        public Guid ActorId { get; } = actorId;
         public string TraceId { get; } = traceId;
         public string IpAddress { get; } = ipAddress;
     }

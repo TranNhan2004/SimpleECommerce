@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class OrderItemRepository : GenericRepository<OrderItem>, IOrderItemRepository
 {
-    public OrderItemRepository(AppDbContext appDbContext) : base(appDbContext)
+    public OrderItemRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

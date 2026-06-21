@@ -7,7 +7,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Uam;
 
 public class PermissionRepository : GenericRepository<Permission>, IPermissionRepository
 {
-    public PermissionRepository(AppDbContext appDbContext) : base(appDbContext)
+    public PermissionRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

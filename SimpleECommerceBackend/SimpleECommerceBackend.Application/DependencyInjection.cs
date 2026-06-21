@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using SimpleECommerceBackend.Application.Events;
+using SimpleECommerceBackend.Application.Interfaces.Events;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
@@ -17,6 +19,9 @@ public static class DependencyInjection
 
         // Use Cases
         services.AddUseCaseHandlersAndDispatcher();
+
+        // Events
+        services.AddEventHandlersAndDispatcher();
 
         return services;
     }
@@ -68,6 +73,46 @@ public static class DependencyInjection
         Console.WriteLine($"Registering Use Case Handlers: {count} found.");
 
         services.AddScoped<IUseCaseDispatcher, UseCaseDispatcher>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddEventHandlersAndDispatcher(
+        this IServiceCollection services,
+        params Type[] excludedImplementationTypes
+    )
+    {
+        var excludedSet = excludedImplementationTypes.ToHashSet();
+
+        var assemblies = new[]
+        {
+            typeof(IEventHandler<>).Assembly,
+        };
+
+        var allTypes = assemblies
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t.IsClass && !t.IsAbstract && !excludedSet.Contains(t));
+
+        var count = 0;
+        foreach (var implementationType in allTypes)
+        {
+            var serviceTypes = implementationType
+                .GetInterfaces()
+                .Where(i =>
+                    i.IsGenericType &&
+                    (
+                        i.GetGenericTypeDefinition() == typeof(IEventHandler<>)
+                    ));
+
+            foreach (var serviceType in serviceTypes)
+                services.AddScoped(serviceType, implementationType);
+
+            count += serviceTypes?.Count() ?? 0;
+        }
+
+        Console.WriteLine($"Registering Event Handlers: {count} found.");
+
+        services.AddScoped<IEventDispatcher, EventDispatcher>();
 
         return services;
     }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
@@ -15,16 +16,11 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasMaxLength(CategoryValidationRules.NameMaxLength);
 
         builder.Property(c => c.Status)
+            .HasEnumStringConversion(50)
             .IsRequired();
 
         builder.Property(c => c.Description)
             .HasDefaultValue(null)
             .HasMaxLength(CategoryValidationRules.DescriptionMaxLength);
-
-        builder.HasOne(c => c.Admin)
-            .WithMany()
-            .IsRequired()
-            .HasForeignKey(c => c.AdminId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

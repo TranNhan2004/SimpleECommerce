@@ -1,8 +1,6 @@
-using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
-
 namespace SimpleECommerceBackend.Application.Interfaces.Services.Uam;
 
-public interface IPermissionService : ICacheConsumingService
+public interface IPermissionService
 {
     Task<IReadOnlyList<string>> GetPermissionCodesByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }

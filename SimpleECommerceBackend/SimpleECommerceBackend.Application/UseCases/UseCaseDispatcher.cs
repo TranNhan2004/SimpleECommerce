@@ -5,13 +5,13 @@ namespace SimpleECommerceBackend.Application.UseCases;
 
 public partial class UseCaseDispatcher : IUseCaseDispatcher
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly Serilog.ILogger _logger;
+    private readonly IServiceProvider _serviceProvider;
 
-    public UseCaseDispatcher(IServiceProvider serviceProvider, Serilog.ILogger logger)
+    public UseCaseDispatcher(Serilog.ILogger logger, IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
         _logger = logger;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<TResult> SendAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken = default)

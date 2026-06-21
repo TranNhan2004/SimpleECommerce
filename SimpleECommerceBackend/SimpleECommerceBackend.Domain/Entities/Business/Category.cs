@@ -88,7 +88,24 @@ public class Category : EntityBase
     public CategoryStatus Status
     {
         get => _status;
-        set => _status = value;
+        set
+        {
+            if (_status != value)
+            {
+                switch (value)
+                {
+                    case CategoryStatus.Active:
+                        Activate();
+                        break;
+                    case CategoryStatus.Inactive:
+                        Deactivate();
+                        break;
+                    case CategoryStatus.Archived:
+                        Archive();
+                        break;
+                }
+            }
+        }
     }
 
     public void Activate()

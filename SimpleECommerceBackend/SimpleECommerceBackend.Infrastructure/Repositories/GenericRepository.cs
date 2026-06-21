@@ -6,10 +6,12 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories;
 
 public abstract class GenericRepository<T> : IGenericRepository<T> where T : class, IEntity
 {
+    protected readonly Serilog.ILogger Logger;
     protected readonly DbContext DbContext;
 
-    protected GenericRepository(DbContext dbContext)
+    protected GenericRepository(Serilog.ILogger logger, DbContext dbContext)
     {
+        Logger = logger;
         DbContext = dbContext;
     }
 

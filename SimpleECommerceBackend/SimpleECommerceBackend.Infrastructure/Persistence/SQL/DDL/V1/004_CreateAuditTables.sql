@@ -6,22 +6,23 @@ CREATE TABLE [audit_tracking].[Audits]
 (
     [Id] uniqueidentifier NOT NULL,
     [EntityName] nvarchar(255) NOT NULL,
-    [EntityId] uniqueidentifier NOT NULL,
+    [RecordId] uniqueidentifier NOT NULL,
     [OperationType] int NOT NULL,
     [TraceId] nvarchar(127) NOT NULL,
     [IpAddress] nvarchar(45) NOT NULL,
     [OldValues] nvarchar(max) NULL,
     [NewValues] nvarchar(max) NULL,
-    [AuditedById] uniqueidentifier NOT NULL,
     [AuditedAt] datetimeoffset NOT NULL,
+    [AuditedById] uniqueidentifier NOT NULL,
     CONSTRAINT [PK_Audits] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Audits_Users_AuditedById] FOREIGN KEY ([AuditedById]) REFERENCES [uam].[Users] ([Id]) 
-    ON DELETE NO ACTION
+    CONSTRAINT [FK_Audits_Users_AuditedById] FOREIGN KEY ([AuditedById]) 
+        REFERENCES [uam].[Users] ([Id]) 
+        ON DELETE NO ACTION
 );
 GO
 
-CREATE INDEX [IX_Audits_EntityName_EntityId]
-    ON [audit_tracking].[Audits] ([EntityName], [EntityId]);
+CREATE INDEX [IX_Audits_EntityName_RecordId]
+    ON [audit_tracking].[Audits] ([EntityName], [RecordId]);
 GO
 
 CREATE INDEX [IX_Audits_AuditedById]

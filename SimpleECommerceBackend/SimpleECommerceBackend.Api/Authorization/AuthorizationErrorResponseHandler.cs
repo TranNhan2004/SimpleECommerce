@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
-using Microsoft.Net.Http.Headers;
 using SimpleECommerceBackend.Api.Factories;
 using SimpleECommerceBackend.Application.Interfaces.Services.Translation;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
@@ -27,9 +26,6 @@ public sealed class AuthorizationErrorResponseHandler : IAuthorizationMiddleware
 
         if (authorizeResult.Challenged)
         {
-            if (!context.Response.Headers.ContainsKey(HeaderNames.WWWAuthenticate))
-                context.Response.Headers.Append(HeaderNames.WWWAuthenticate, "Bearer");
-
             await WriteErrorResponseAsync(
                 context,
                 StatusCodes.Status401Unauthorized,

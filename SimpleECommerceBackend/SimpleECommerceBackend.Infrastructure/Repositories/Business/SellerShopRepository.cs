@@ -8,7 +8,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class SellerShopRepository : GenericRepository<SellerShop>, ISellerShopRepository
 {
-    public SellerShopRepository(AppDbContext appDbContext) : base(appDbContext)
+    public SellerShopRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

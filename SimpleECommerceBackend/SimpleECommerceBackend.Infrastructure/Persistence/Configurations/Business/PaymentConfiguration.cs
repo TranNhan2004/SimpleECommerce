@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleECommerceBackend.Domain.Constants.ValidationRules;
 using SimpleECommerceBackend.Domain.Entities.Business;
+using SimpleECommerceBackend.Infrastructure.Extensions;
 
 namespace SimpleECommerceBackend.Infrastructure.Persistence.Configurations.Business;
 
@@ -30,12 +31,14 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         });
 
         builder.Property(p => p.Method)
+            .HasEnumStringConversion()
             .IsRequired();
 
         builder.Property(p => p.Provider)
             .HasMaxLength(PaymentValidationRules.ProviderMaxLength);
 
         builder.Property(p => p.Status)
+            .HasEnumStringConversion(50)
             .IsRequired();
 
         builder.Property(p => p.ExternalTransactionId)

@@ -1,8 +1,10 @@
-using SimpleECommerceBackend.Application.Interfaces.Contexts;
+using SimpleECommerceBackend.Application.Interfaces.Events;
 using SimpleECommerceBackend.Application.Interfaces.Repositories;
+using SimpleECommerceBackend.Application.Interfaces.Security;
 using SimpleECommerceBackend.Application.Interfaces.Services.Business;
 using SimpleECommerceBackend.Application.Interfaces.UseCases;
 using SimpleECommerceBackend.Application.Models.Categories;
+using SimpleECommerceBackend.Application.Models.Events;
 using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
 using SimpleECommerceBackend.Domain.Enums;
@@ -12,17 +14,23 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Commands;
 
 public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, UpdateCategoryResult>
 {
-    private readonly ICurrentUserContextProvider _userContextHolder;
+    private readonly Serilog.ILogger _logger;
+    private readonly IEventDispatcher _eventDispatcher;
+    private readonly ICurrentUserContext _currentUserContext;
     private readonly ICategoryService _categoryService;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateCategoryHandler(
-        ICurrentUserContextProvider userContextHolder,
+        Serilog.ILogger logger,
+        IEventDispatcher eventDispatcher,
+        ICurrentUserContext currentUserContext,
         ICategoryService categoryService,
         IUnitOfWork unitOfWork
     )
     {
-        _userContextHolder = userContextHolder;
+        _logger = logger;
+        _eventDispatcher = eventDispatcher;
+        _currentUserContext = currentUserContext;
         _categoryService = categoryService;
         _unitOfWork = unitOfWork;
     }
@@ -32,10 +40,9 @@ public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, Upda
         CancellationToken cancellationToken
     )
     {
-        var userContext = _userContextHolder.GetUserContext();
         var category = await _categoryService.GetCategoryByIdForUpdateAsync(request.Id);
 
-        if (category.AdminId != userContext.Id)
+        if (category.CreatedById != _currentUserContext.Id)
         {
             throw new ForbiddenException(
                 CategoryErrorCodes.AdminRequired,
@@ -45,28 +52,20 @@ public class UpdateCategoryHandler : IUseCaseHandler<UpdateCategoryCommand, Upda
 
         category.Name = request.Name;
         category.Description = request.Description;
-
-        if (category.Status != request.Status)
-        {
-            switch (request.Status)
-            {
-                case CategoryStatus.Active:
-                    category.Activate();
-                    break;
-                case CategoryStatus.Inactive:
-                    category.Deactivate();
-                    break;
-                case CategoryStatus.Archived:
-                    category.Archive();
-                    break;
-            }
-        }
+        category.Status = request.Status;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        await _categoryService.InvalidateCacheAsync(
-            exactKeys: [CategoryCacheKeys.GetCategoryKey(category.Id)],
-            prefixKeys: [CategoryCacheKeys.GetAllCategoriesPrefix, CategoryCacheKeys.GetAllCategoriesForAdminPrefix]
-        );
+
+        await _eventDispatcher.SendAsync(new RemoveCacheEventModel
+        {
+            Keys = [CategoryCacheKeys.GetCategoryKey(category.Id)],
+            PrefixKeys =
+            [
+                CategoryCacheKeys.GetAllCategoriesPrefix,
+                CategoryCacheKeys.GetAllCategoriesForAdminPrefix
+            ]
+        }, cancellationToken);
+
         return UpdateCategoryResult.FromEntity(category);
 
     }

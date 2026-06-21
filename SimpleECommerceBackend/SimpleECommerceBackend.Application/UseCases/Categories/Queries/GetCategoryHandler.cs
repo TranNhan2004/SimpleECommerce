@@ -6,10 +6,12 @@ namespace SimpleECommerceBackend.Application.UseCases.Categories.Queries;
 
 public class GetCategoryHandler : IUseCaseHandler<GetCategoryQuery, GetCategoryResult>
 {
+    private readonly Serilog.ILogger _logger;
     private readonly ICategoryService _categoryService;
 
-    public GetCategoryHandler(ICategoryService categoryService)
+    public GetCategoryHandler(Serilog.ILogger logger, ICategoryService categoryService)
     {
+        _logger = logger;
         _categoryService = categoryService;
     }
 
@@ -18,9 +20,7 @@ public class GetCategoryHandler : IUseCaseHandler<GetCategoryQuery, GetCategoryR
         CancellationToken cancellationToken
     )
     {
-        Console.WriteLine($"GetCategoryHandler: handling GetCategoryQuery with Id={request.Id}");
         var category = await _categoryService.GetCategoryByIdAsync(request.Id);
-
         return GetCategoryResult.FromEntity(category);
     }
 }

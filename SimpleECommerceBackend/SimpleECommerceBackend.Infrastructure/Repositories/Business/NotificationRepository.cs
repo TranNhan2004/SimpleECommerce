@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class NotificationRepository : GenericRepository<Notification>, INotificationRepository
 {
-    public NotificationRepository(AppDbContext appDbContext) : base(appDbContext)
+    public NotificationRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

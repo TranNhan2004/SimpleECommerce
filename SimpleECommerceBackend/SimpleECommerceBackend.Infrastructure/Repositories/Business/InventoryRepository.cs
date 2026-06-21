@@ -6,7 +6,7 @@ namespace SimpleECommerceBackend.Infrastructure.Repositories.Business;
 
 public class InventoryRepository : GenericRepository<Inventory>, IInventoryRepository
 {
-    public InventoryRepository(AppDbContext appDbContext) : base(appDbContext)
+    public InventoryRepository(Serilog.ILogger logger, AppDbContext appDbContext) : base(logger, appDbContext)
     {
     }
 

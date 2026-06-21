@@ -55,6 +55,78 @@ services:
     networks:
       - default
 
+  redis-insight:
+    image: redis/redisinsight:3.4
+    container_name: redis-insight
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis_insight_data:/data
+    depends_on:
+      - redis
+    profiles:
+      - dev
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    profiles:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    profiles:
+      - monitoring
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.67.0
+    container_name: redis-exporter
+    environment:
+      REDIS_ADDR: redis://redis:6379
+      REDIS_PASSWORD: ${APP_REDIS_PASSWORD}
+    ports:
+      - "9121:9121"
+    depends_on:
+      - redis
+    profiles:
+      - monitoring
+
   keycloak-db:
     image: postgres:16-alpine
     environment:
@@ -104,6 +176,8 @@ services:
     restart: unless-stopped
     networks:
       - default
+    profiles:
+      - prod
 
   frontend:
     build:
@@ -115,6 +189,8 @@ services:
     restart: unless-stopped
     networks:
       - default
+    profiles:
+      - prod
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -130,6 +206,7 @@ services:
 
 volumes:
   redis_data:
+  redis_insight_data:
   sqlserver_data:
   keycloak_data:
 

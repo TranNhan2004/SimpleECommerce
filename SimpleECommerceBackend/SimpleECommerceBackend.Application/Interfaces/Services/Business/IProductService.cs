@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Entities.Business;
 
 namespace SimpleECommerceBackend.Application.Interfaces.Services.Business;
 
-public interface IProductService : ICacheConsumingService
+public interface IProductService
 {
     Product CreateProduct(Product product);
     Task<GetAllProductsResultForCustomer> GetAllProductsForCustomerAsync(GetAllProductsQueryForCustomer query);

@@ -34,17 +34,21 @@ public class AuditConfiguration : IEntityTypeConfiguration<Audit>
         builder.Property(a => a.NewValues)
             .HasColumnType("nvarchar(max)");
 
-        builder.Property(a => a.AuditedBy)
-            .IsRequired()
-            .HasMaxLength(255);
+        builder.Property(a => a.AuditedById)
+            .IsRequired();
 
         builder.Property(a => a.AuditedAt)
             .IsRequired();
+
+        builder.HasOne(a => a.AuditedBy)
+            .WithMany()
+            .HasForeignKey(a => a.AuditedById)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(a => new { a.EntityName, a.EntityId });
         builder.HasIndex(a => a.TraceId);
         builder.HasIndex(a => a.IpAddress);
         builder.HasIndex(a => a.AuditedAt);
-        builder.HasIndex(a => a.AuditedBy);
+        builder.HasIndex(a => a.AuditedById);
     }
 }

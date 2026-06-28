@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleECommerceBackend.Application.Interfaces.Services.Caching;
-using SimpleECommerceBackend.Domain.Entities.Abstracts;
 using SimpleECommerceBackend.Domain.Entities.Business;
-using SimpleECommerceBackend.Domain.Constants.CacheKeys;
 using SimpleECommerceBackend.Infrastructure.Options.Maintenance;
 using SimpleECommerceBackend.Infrastructure.Persistence;
 using Serilog;
+using SimpleECommerceBackend.Domain.Entities;
 
 
 namespace SimpleECommerceBackend.Infrastructure.Services.Maintenance;

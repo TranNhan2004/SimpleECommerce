@@ -1,4 +1,5 @@
 using SimpleECommerceBackend.Domain.Constants.ErrorCodes;
+using SimpleECommerceBackend.Domain.Entities.Uam;
 using SimpleECommerceBackend.Domain.Enums;
 using SimpleECommerceBackend.Domain.Exceptions;
 
@@ -20,6 +21,7 @@ public class Audit : IEntity
     private string? _newValues;
     private DateTimeOffset _auditedAt;
     private Guid _auditedById;
+    public User? AuditedBy { get; set; }
 
     public Guid Id
     {

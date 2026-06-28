@@ -5,6 +5,7 @@ DECLARE @SeededAt datetimeoffset = '2026-05-26T06:21:10+00:00';
 -- Reserved actor ids used by application audit and system contexts.
 DECLARE @SystemUserId uniqueidentifier = '00000000-0000-0000-0000-000000000001';
 DECLARE @AnonymousUserId uniqueidentifier = '00000000-0000-0000-0000-000000000002';
+DECLARE @SystemAdminUserId uniqueidentifier = '019e62f1-bbf1-7a89-9e5d-58023679e0b0';
 DECLARE @AdminUserId uniqueidentifier = '019e62f1-bbfe-74fe-91f2-c920ddb69ff8';
 
 -- Users
@@ -20,6 +21,8 @@ INSERT INTO [uam].[Users]
     [Status],
     [BirthDate],
     [AvatarUrl],
+    [IsEmailVerified],
+    [EmailVerifiedAt],
     [LastLoginAt],
     [CreatedAt],
     [CreatedById],
@@ -41,6 +44,8 @@ VALUES
     N'Active',
     '1990-01-01',
     NULL,
+    1,
+    @SeededAt,
     NULL,
     @SeededAt,
     NULL,
@@ -63,6 +68,8 @@ INSERT INTO [uam].[Users]
     [Status],
     [BirthDate],
     [AvatarUrl],
+    [IsEmailVerified],
+    [EmailVerifiedAt],
     [LastLoginAt],
     [CreatedAt],
     [CreatedById],
@@ -84,6 +91,8 @@ VALUES
     N'Active',
     '1990-01-01',
     NULL,
+    1,
+    @SeededAt,
     NULL,
     @SeededAt,
     NULL,
@@ -106,6 +115,55 @@ INSERT INTO [uam].[Users]
     [Status],
     [BirthDate],
     [AvatarUrl],
+    [IsEmailVerified],
+    [EmailVerifiedAt],
+    [LastLoginAt],
+    [CreatedAt],
+    [CreatedById],
+    [UpdatedAt],
+    [UpdatedById],
+    [IsDeleted],
+    [DeletedAt],
+    [DeletedById]
+)
+VALUES
+(
+    @SystemAdminUserId,
+    '',
+    N'system-admin@simpleecommerce.local',
+    N'System Admin',
+    N'User',
+    N'system-admin@simpleecommerce.local',
+    N'Other',
+    N'Active',
+    '1990-01-01',
+    NULL,
+    1,
+    @SeededAt,
+    NULL,
+    @SeededAt,
+    NULL,
+    NULL,
+    NULL,
+    0,
+    NULL,
+    NULL
+);
+
+INSERT INTO [uam].[Users]
+(
+    [Id],
+    [KeycloakSubjectId],
+    [Email],
+    [FirstName],
+    [LastName],
+    [NickName],
+    [Sex],
+    [Status],
+    [BirthDate],
+    [AvatarUrl],
+    [IsEmailVerified],
+    [EmailVerifiedAt],
     [LastLoginAt],
     [CreatedAt],
     [CreatedById],
@@ -127,9 +185,11 @@ VALUES
     N'Active',
     '1990-01-01',
     NULL,
+    1,
+    @SeededAt,
     NULL,
     @SeededAt,
-    @SystemUserId,
+    NULL,
     NULL,
     NULL,
     0,
@@ -138,6 +198,9 @@ VALUES
 );
 
 -- Roles
+INSERT INTO [uam].[Roles] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bbf0-755f-9583-21f5998c4000', N'system-admin', N'System Admin', N'Full system administrative access.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
 INSERT INTO [uam].[Roles] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
 VALUES ('019e62f1-bbf0-755f-9583-21f5998c49b1', N'admin', N'Admin', N'Full administrative access.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
 
@@ -181,9 +244,37 @@ VALUES ('019e62f1-bbfc-7c86-81e7-312e27fb4367', N'categories.update', N'Categori
 INSERT INTO [uam].[Permissions] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
 VALUES ('019e62f1-bbfd-750d-943f-6899db79d0cf', N'categories.delete', N'Categories Delete', N'Allows a user to delete categories.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
 
+INSERT INTO [uam].[Permissions] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc17-744e-8bd5-47ded6ecb7a1', N'admin.account.create', N'Admin Account Create', N'Allows a system admin to create admin accounts.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[Permissions] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc18-7787-ac22-9616111d4c3f', N'admin.account.read', N'Admin Account Read', N'Allows a system admin to view admin accounts.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[Permissions] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc19-727f-85aa-8fa618e8668a', N'admin.account.update', N'Admin Account Update', N'Allows a system admin to update admin accounts.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[Permissions] ([Id], [Code], [Name], [Description], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1a-77f8-a718-cad98c4d937a', N'admin.account.delete', N'Admin Account Delete', N'Allows a system admin to delete admin accounts.', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
 -- User roles
 INSERT INTO [uam].[UserRoles] ([Id], [UserId], [RoleId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1b-73db-b446-c4caa7d4ea5e', @SystemAdminUserId, '019e62f1-bbf0-755f-9583-21f5998c4000', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[UserRoles] ([Id], [UserId], [RoleId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
 VALUES ('019e62f1-bbff-7f60-a5d7-23ca4e6d24b3', @AdminUserId, '019e62f1-bbf0-755f-9583-21f5998c49b1', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+-- System admin role permissions
+INSERT INTO [uam].[RolePermissions] ([Id], [RoleId], [PermissionId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1c-7053-b87e-8c4c7f91c971', '019e62f1-bbf0-755f-9583-21f5998c4000', '019e62f1-bc17-744e-8bd5-47ded6ecb7a1', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[RolePermissions] ([Id], [RoleId], [PermissionId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1d-7348-bbe5-2328a7d4ebc5', '019e62f1-bbf0-755f-9583-21f5998c4000', '019e62f1-bc18-7787-ac22-9616111d4c3f', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[RolePermissions] ([Id], [RoleId], [PermissionId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1e-7219-8362-10e90788c37a', '019e62f1-bbf0-755f-9583-21f5998c4000', '019e62f1-bc19-727f-85aa-8fa618e8668a', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO [uam].[RolePermissions] ([Id], [RoleId], [PermissionId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])
+VALUES ('019e62f1-bc1f-7fee-b2ca-7fca94249357', '019e62f1-bbf0-755f-9583-21f5998c4000', '019e62f1-bc1a-77f8-a718-cad98c4d937a', @SeededAt, @SystemUserId, NULL, NULL, 0, NULL, NULL);
 
 -- Admin role permissions
 INSERT INTO [uam].[RolePermissions] ([Id], [RoleId], [PermissionId], [CreatedAt], [CreatedById], [UpdatedAt], [UpdatedById], [IsDeleted], [DeletedAt], [DeletedById])

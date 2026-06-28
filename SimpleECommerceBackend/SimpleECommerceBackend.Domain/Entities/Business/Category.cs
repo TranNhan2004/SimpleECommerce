@@ -110,7 +110,7 @@ public class Category : EntityBase
 
     public void Activate()
     {
-        if (Status == CategoryStatus.Archived)
+        if (_status == CategoryStatus.Archived)
             throw new ValidationException(
                 CategoryErrorCodes.ActivateNotAllowed,
                 "Archived category cannot be activated",
@@ -122,13 +122,13 @@ public class Category : EntityBase
                 }
             );
 
-        if (Status != CategoryStatus.Active)
-            Status = CategoryStatus.Active;
+        if (_status != CategoryStatus.Active)
+            _status = CategoryStatus.Active;
     }
 
     public void Deactivate()
     {
-        if (Status == CategoryStatus.Archived)
+        if (_status == CategoryStatus.Archived)
             throw new ValidationException(
                 CategoryErrorCodes.DeactivateNotAllowed,
                 "Archived category cannot be deactivated",
@@ -140,13 +140,13 @@ public class Category : EntityBase
                 }
             );
 
-        if (Status != CategoryStatus.Inactive)
-            Status = CategoryStatus.Inactive;
+        if (_status != CategoryStatus.Inactive)
+            _status = CategoryStatus.Inactive;
     }
 
     public void Archive()
     {
-        if (Status == CategoryStatus.Archived)
+        if (_status == CategoryStatus.Archived)
             throw new ValidationException(
                 CategoryErrorCodes.AlreadyArchived,
                 "Category already archived",
@@ -156,6 +156,6 @@ public class Category : EntityBase
                 }
             );
 
-        Status = CategoryStatus.Archived;
+        _status = CategoryStatus.Archived;
     }
 }

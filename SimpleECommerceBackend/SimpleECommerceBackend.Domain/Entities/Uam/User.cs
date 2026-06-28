@@ -21,6 +21,9 @@ public class User : EntityBase
     private UserStatus _status;
     private DateOnly _birthDate;
     private string? _avatarUrl;
+    private bool _isEmailVerified;
+    private DateTimeOffset? _emailVerifiedAt;
+    private DateTimeOffset? _lastLoginAt;
 
     public Guid KeycloakSubjectId
     {
@@ -208,5 +211,23 @@ public class User : EntityBase
     {
         get => _avatarUrl;
         set => _avatarUrl = value;
+    }
+
+    public bool IsEmailVerified
+    {
+        get => _isEmailVerified;
+        set => _isEmailVerified = value;
+    }
+
+    public DateTimeOffset? EmailVerifiedAt
+    {
+        get => _emailVerifiedAt;
+        set => _emailVerifiedAt = value;
+    }
+
+    public DateTimeOffset? LastLoginAt
+    {
+        get => _lastLoginAt;
+        set => _lastLoginAt = value;
     }
 }

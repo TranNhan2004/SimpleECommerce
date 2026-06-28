@@ -2,21 +2,24 @@ SET NOCOUNT ON;
 
 DECLARE @ForeignKeyDropSql nvarchar(max) = N'';
 DECLARE @ForeignKeyCreateSql nvarchar(max) = N'';
-DECLARE @TruncateSql nvarchar(max) = N'';
 
 SELECT @ForeignKeyDropSql = STRING_AGG(
-    N'ALTER TABLE ' + QUOTENAME(parent_schema.name) + N'.' + QUOTENAME(parent_table.name) + N' DROP CONSTRAINT ' + QUOTENAME(fk.name) + N';',
+    N'ALTER TABLE ' + QUOTENAME(parent_schema.name) + N'.' + QUOTENAME(parent_table.name) +
+    N' DROP CONSTRAINT ' + QUOTENAME(fk.name) + N';',
     CHAR(13) + CHAR(10)
 )
 FROM sys.foreign_keys fk
-INNER JOIN sys.tables parent_table ON parent_table.object_id = fk.parent_object_id
-INNER JOIN sys.schemas parent_schema ON parent_schema.schema_id = parent_table.schema_id
-WHERE parent_schema.name IN (N'business', N'uam', N'translation');
+INNER JOIN sys.tables parent_table
+    ON parent_table.object_id = fk.parent_object_id
+INNER JOIN sys.schemas parent_schema
+    ON parent_schema.schema_id = parent_table.schema_id
+WHERE parent_schema.name IN (N'business', N'uam', N'translation', N'audit_tracking');
 
 SELECT @ForeignKeyCreateSql = STRING_AGG(
     N'ALTER TABLE ' + QUOTENAME(parent_schema.name) + N'.' + QUOTENAME(parent_table.name) +
     N' WITH CHECK ADD CONSTRAINT ' + QUOTENAME(fk.name) +
-    N' FOREIGN KEY (' + parent_columns.column_list + N') REFERENCES ' + QUOTENAME(referenced_schema.name) + N'.' + QUOTENAME(referenced_table.name) +
+    N' FOREIGN KEY (' + parent_columns.column_list + N') REFERENCES ' +
+    QUOTENAME(referenced_schema.name) + N'.' + QUOTENAME(referenced_table.name) +
     N' (' + referenced_columns.column_list + N')' +
     CASE fk.delete_referential_action
         WHEN 1 THEN N' ON DELETE CASCADE'
@@ -30,14 +33,20 @@ SELECT @ForeignKeyCreateSql = STRING_AGG(
         WHEN 3 THEN N' ON UPDATE SET DEFAULT'
         ELSE N''
     END +
-    N';' + CHAR(13) + CHAR(10) + N'ALTER TABLE ' + QUOTENAME(parent_schema.name) + N'.' + QUOTENAME(parent_table.name) + N' CHECK CONSTRAINT ' + QUOTENAME(fk.name) + N';',
+    N';' + CHAR(13) + CHAR(10) +
+    N'ALTER TABLE ' + QUOTENAME(parent_schema.name) + N'.' + QUOTENAME(parent_table.name) +
+    N' CHECK CONSTRAINT ' + QUOTENAME(fk.name) + N';',
     CHAR(13) + CHAR(10)
 )
 FROM sys.foreign_keys fk
-INNER JOIN sys.tables parent_table ON parent_table.object_id = fk.parent_object_id
-INNER JOIN sys.schemas parent_schema ON parent_schema.schema_id = parent_table.schema_id
-INNER JOIN sys.tables referenced_table ON referenced_table.object_id = fk.referenced_object_id
-INNER JOIN sys.schemas referenced_schema ON referenced_schema.schema_id = referenced_table.schema_id
+INNER JOIN sys.tables parent_table
+    ON parent_table.object_id = fk.parent_object_id
+INNER JOIN sys.schemas parent_schema
+    ON parent_schema.schema_id = parent_table.schema_id
+INNER JOIN sys.tables referenced_table
+    ON referenced_table.object_id = fk.referenced_object_id
+INNER JOIN sys.schemas referenced_schema
+    ON referenced_schema.schema_id = referenced_table.schema_id
 CROSS APPLY
 (
     SELECT STUFF(
@@ -66,11 +75,12 @@ CROSS APPLY
         FOR XML PATH(''), TYPE
     ).value('.', 'nvarchar(max)'), 1, 2, N'') AS column_list
 ) referenced_columns
-WHERE parent_schema.name IN (N'business', N'uam', N'translation');
+WHERE parent_schema.name IN (N'business', N'uam', N'translation', N'audit_tracking');
 
 IF NULLIF(@ForeignKeyDropSql, N'') IS NOT NULL
     EXEC sp_executesql @ForeignKeyDropSql;
 
+-- Tables defined in DDL/V1 business schema
 TRUNCATE TABLE [business].[CartItems];
 TRUNCATE TABLE [business].[CustomerShippingAddresses];
 TRUNCATE TABLE [business].[Inventories];
@@ -85,16 +95,20 @@ TRUNCATE TABLE [business].[ProductVariants];
 TRUNCATE TABLE [business].[Products];
 TRUNCATE TABLE [business].[Carts];
 TRUNCATE TABLE [business].[Orders];
-TRUNCATE TABLE [business].[Categories];
 TRUNCATE TABLE [business].[SellerWarehouses];
 TRUNCATE TABLE [business].[SellerShops];
+TRUNCATE TABLE [business].[Categories];
+
+-- Tables defined in DDL/V1 auxiliary schemas
+TRUNCATE TABLE [translation].[Translations];
+TRUNCATE TABLE [audit_tracking].[Audits];
+
+-- Tables defined in DDL/V1 uam schema
 TRUNCATE TABLE [uam].[RolePermissions];
 TRUNCATE TABLE [uam].[UserRoles];
 TRUNCATE TABLE [uam].[Permissions];
 TRUNCATE TABLE [uam].[Roles];
 TRUNCATE TABLE [uam].[Users];
-TRUNCATE TABLE [translation].[Translations];
-TRUNCATE TABLE [audit_tracking].[Audits];
 
 IF NULLIF(@ForeignKeyCreateSql, N'') IS NOT NULL
     EXEC sp_executesql @ForeignKeyCreateSql;

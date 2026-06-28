@@ -14,6 +14,8 @@ CREATE TABLE [uam].[Users]
     [Status] nvarchar(50) NOT NULL,
     [BirthDate] date NOT NULL,
     [AvatarUrl] nvarchar(max) NULL,
+    [IsEmailVerified] bit NOT NULL DEFAULT 0,
+    [EmailVerifiedAt] datetimeoffset NULL,
     [LastLoginAt] datetimeoffset NULL,
     [CreatedAt] datetimeoffset NOT NULL,
     [CreatedById] uniqueidentifier NULL,

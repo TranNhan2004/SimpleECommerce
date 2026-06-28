@@ -4,7 +4,7 @@ using SimpleECommerceBackend.Domain.Exceptions;
 
 namespace SimpleECommerceBackend.Domain.Entities;
 
-public class EntityBase : IEntity
+public class EntityBase : IEntity, ISoftDeleteTrackable
 {
     private Guid _id;
     private DateTimeOffset _createdAt;

@@ -13,9 +13,10 @@ public class GetAllCategoriesRequestForAdmin : FilterRequest<Category>
             .Map("name", category => category.Name)
             .Map("description", category => category.Description)
             .Map("status", category => category.Status)
-            .Map("adminId", category => category.AdminId)
             .Map("createdAt", category => category.CreatedAt)
-            .Map("updatedAt", category => category.UpdatedAt);
+            .Map("updatedAt", category => category.UpdatedAt)
+            .Map("createdById", category => category.CreatedById)
+            .Map("updatedById", category => category.UpdatedById);
     }
 
     public static GetAllCategoriesQueryForAdmin ToQuery(GetAllCategoriesRequestForAdmin request)
